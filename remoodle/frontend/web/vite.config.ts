@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from "node:url";
-import { extname } from "node:path";
 import { defineConfig, loadEnv, type IndexHtmlTransformResult } from "vite";
 import vue from "@vitejs/plugin-vue";
 import packageJson from "./package.json";
@@ -18,23 +17,35 @@ export default defineConfig((config) => {
       : null;
 
   return {
+    build: {
+      rollupOptions: {
+        ...(cdnPrefixUrl !== null && {
+          output: {
+            entryFileNames: "[name].js",
+            chunkFileNames: "[name].js",
+            assetFileNames: "assets/[name][extname]",
+          },
+        }),
+      },
+    },
     experimental: {
       ...(cdnPrefixUrl !== null && {
         renderBuiltUrl(
           filename: string,
           {
-            hostId,
+            hostType,
           }: {
-            hostId: string;
+            hostType: "js" | "css" | "html";
           },
         ) {
-          if (extname(hostId) === ".js") {
+          if (hostType === "js") {
             return {
               runtime: `window.__toCdnUrl(${JSON.stringify(filename)})`,
             };
+          } else if (hostType === "css") {
+            return `${cdnPrefixUrl}/` + filename;
           }
-
-          return `${cdnPrefixUrl}/` + filename;
+          return { relative: true };
         },
       }),
     },
