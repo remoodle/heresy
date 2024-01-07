@@ -48,7 +48,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd tradelink/frontend
+          cd remoodle/frontend/web
           yarn install --frozen-lockfile
 
       - name: Build and deploy bundle on CDN with prefix
