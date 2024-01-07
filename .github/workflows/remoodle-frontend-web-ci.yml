@@ -1,0 +1,37 @@
+name: "[remoodle/frontend/web] CI"
+
+on:
+  pull_request:
+    branches: [trunk]
+    paths:
+      - "remoodle/frontend/web/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+defaults:
+  run:
+    working-directory: ./remoodle/frontend/web
+
+jobs:
+  ci:
+    name: Type-check & Lint & Format-check & Unit test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Check types
+        run: yarn type-check
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Check formatting
+        run: yarn format-check

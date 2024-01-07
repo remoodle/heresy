@@ -1,0 +1,117 @@
+name: "[remoodle/frontend/web] Deploy PR Preview"
+
+on:
+  pull_request:
+    branches: [trunk]
+    paths:
+      - "remoodle/frontend/web/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build and Deploy PR Preview
+    steps:
+      - name: In Progress Comment
+        id: in-progress-comment
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const issueNumber = context.issue.number;
+            const comments = await github.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+            });
+
+            const commentBody = "## Deploying on Cloudflare Pages\n\n" + ":hourglass: Deployment in progress...";
+
+            const inProgressComment = comments.data.find((comment) => comment.body.includes("Deploying on Cloudflare Pages"));
+            if (inProgressComment) {
+              await github.issues.updateComment({
+                issue_number: issueNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: inProgressComment.id,
+                body: commentBody,
+              });
+              return inProgressComment.id;
+            }
+
+            const comment = await github.issues.createComment({
+              issue_number: issueNumber,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody,
+            });
+            return comment.data.id;
+
+      - name: Retrieve deploy-as info
+        id: deploy-as
+        uses: actions/github-script@v3
+        with:
+          result-encoding: string
+          script: |
+            const prTitle = context.payload.pull_request.title;
+            const branchName = context.payload.pull_request.head.ref;
+
+            const optionMatches = /\(deploy-as: (.*?)\)/.exec(prTitle);
+
+            return optionMatches ? optionMatches[1] : branchName;
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Deploy
+        uses: ./.github/actions/wrangler-action
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        with:
+          workingDirectory: ./remoodle/frontend/web
+          preCommands: yarn install && yarn build
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --project-name=remoodle --branch=${{ steps.deploy-as.outputs.result }}
+
+      - name: Comment Deploy Failure
+        if: failure()
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const commitCommentId = ${{ steps.in-progress-comment.outputs.result }};
+
+            await github.issues.updateComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commitCommentId,
+              body: "## Deploying on Cloudflare Pages\n\n" + `:x: The deployment failed.`,
+            });
+
+      - name: Comment Deploy Preview Link
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const commitCommentId = "${{ steps.in-progress-comment.outputs.result }}";
+            const branch = "${{ steps.deploy-as.outputs.result }}";
+
+            const subdomain = branch.replace(/\//g, '-').replace(/\./g, '-').toLowerCase().slice(0, 28);
+
+            const previewURL = `https://${subdomain}.remoodle.pages.dev`;
+
+            await github.issues.updateComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: commitCommentId,
+              body: "## Deploying on Cloudflare Pages\n\n" + `:rocket: The PR preview for *${subdomain}* is ready and deployed at ${previewURL}`,
+            });

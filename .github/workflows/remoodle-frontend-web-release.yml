@@ -1,0 +1,59 @@
+name: "[remoodle/frontend/web] Deploy on Stage/Production and Release"
+
+on:
+  push:
+    branches: [trunk]
+    paths:
+      - "remoodle/frontend/web/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  deploy:
+    name: Update Release PR, Build and Deploy to Stage / Production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          token: ${{ secrets.ROBOT_TOKEN }}
+          release-type: node
+          path: remoodle/frontend/web
+          monorepo-tags: true
+          package-name: remoodle/web
+          tag-separator: "-"
+          pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
+
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Install Dependencies
+        run: |
+          cd remoodle/frontend/web
+          yarn install
+
+      - name: Deploy on trunk
+        uses: ./.github/actions/wrangler-action
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        with:
+          workingDirectory: ./remoodle/frontend/web
+          preCommands: yarn build
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --branch="trunk" --project-name=remoodle
+
+      - name: Deploy on production
+        if: steps.release.outputs.releases_created == 'true'
+        uses: ./.github/actions/wrangler-action
+        with:
+          workingDirectory: ./remoodle/frontend/web
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --branch="production" --project-name=remoodle
