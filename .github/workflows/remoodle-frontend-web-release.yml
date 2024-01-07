@@ -36,10 +36,16 @@ jobs:
           cd remoodle/frontend/web
           yarn install
 
+      - uses: benjlevesque/short-sha@v2.2
+        id: short-sha
+        with:
+          length: 8
+
       - name: Deploy on trunk
         uses: ./.github/actions/wrangler-action
         env:
           COMMIT_SHA: ${{ github.sha }}
+          CDN_PREFIX: ${{ steps.short-sha.outputs.sha }}
         with:
           workingDirectory: ./remoodle/frontend/web
           preCommands: yarn build
@@ -47,6 +53,15 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
             pages deploy dist --branch="trunk" --project-name=remoodle
+
+      - name: Deploy on prefix
+        uses: ./.github/actions/wrangler-action
+        with:
+          workingDirectory: ./remoodle/frontend/web
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.sha }}
 
       - name: Deploy on production
         if: steps.release.outputs.releases_created == 'true'

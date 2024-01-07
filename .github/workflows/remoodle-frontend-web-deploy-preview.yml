@@ -72,10 +72,16 @@ jobs:
         with:
           node-version: "18.x"
 
-      - name: Deploy
+      - uses: benjlevesque/short-sha@v2.2
+        id: short-sha
+        with:
+          length: 8
+
+      - name: Deploy on branch
         uses: ./.github/actions/wrangler-action
         env:
           COMMIT_SHA: ${{ github.sha }}
+          CDN_PREFIX: ${{ steps.short-sha.outputs.sha }}
         with:
           workingDirectory: ./remoodle/frontend/web
           preCommands: yarn install && yarn build
@@ -83,6 +89,15 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
             pages deploy dist --project-name=remoodle --branch=${{ steps.deploy-as.outputs.result }}
+
+      - name: Deploy on prefix
+        uses: ./.github/actions/wrangler-action
+        with:
+          workingDirectory: ./remoodle/frontend/web
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.sha }}
 
       - name: Comment Deploy Failure
         if: failure()
