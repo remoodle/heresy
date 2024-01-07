@@ -5,6 +5,7 @@ on:
     branches: [trunk]
     paths:
       - "remoodle/frontend/web/**"
+      - ".github/workflows/remoodle-frontend-web-deploy-preview.yml"
     types:
       - opened
       - synchronize
@@ -19,7 +20,20 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy PR Preview
     steps:
-      - name: In Progress Comment
+      - name: Retrieve deploy-as info
+        id: deploy-as
+        uses: actions/github-script@v3
+        with:
+          result-encoding: string
+          script: |
+            const pr = context.payload.pull_request.title;
+            const branch = context.payload.pull_request.head.ref;
+
+            const optionMatches = /\(deploy-as: (.*?)\)/.exec(pr);
+
+            return optionMatches ? optionMatches[1] : branch;
+
+      - name: Comment Deploy In Progress
         id: in-progress-comment
         uses: actions/github-script@v3
         with:
@@ -54,50 +68,51 @@ jobs:
             });
             return comment.data.id;
 
-      - name: Retrieve deploy-as info
-        id: deploy-as
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
+
+      - name: Get shorten commit SHA
+        id: short-sha
         uses: actions/github-script@v3
         with:
           result-encoding: string
           script: |
-            const prTitle = context.payload.pull_request.title;
-            const branchName = context.payload.pull_request.head.ref;
+            return context.sha.slice(0, 8);
 
-            const optionMatches = /\(deploy-as: (.*?)\)/.exec(prTitle);
+      - name: Install dependencies
+        run: |
+          cd remoodle/frontend/web
+          yarn install --frozen-lockfile
 
-            return optionMatches ? optionMatches[1] : branchName;
-
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-
-      - uses: benjlevesque/short-sha@v2.2
-        id: short-sha
-        with:
-          length: 8
-
-      - name: Deploy on branch
+      - name: Build and deploy bundle on CDN with prefix
         uses: ./.github/actions/wrangler-action
         env:
           COMMIT_SHA: ${{ github.sha }}
-          CDN_PREFIX: ${{ steps.short-sha.outputs.sha }}
+          CDN_HOST: ${{ vars.CDN_HOST }}
+          CDN_PREFIX: ${{ steps.short-sha.outputs.result }}
         with:
           workingDirectory: ./remoodle/frontend/web
-          preCommands: yarn install && yarn build
+          preCommands: yarn build
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          command: >
+            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
+
+      - name: Deploy on named branch
+        uses: ./.github/actions/wrangler-action
+        with:
+          workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
             pages deploy dist --project-name=remoodle --branch=${{ steps.deploy-as.outputs.result }}
-
-      - name: Deploy on prefix
-        uses: ./.github/actions/wrangler-action
-        with:
-          workingDirectory: ./remoodle/frontend/web
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: >
-            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.sha }}
 
       - name: Comment Deploy Failure
         if: failure()

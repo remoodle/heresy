@@ -5,6 +5,7 @@ on:
     branches: [trunk]
     paths:
       - "remoodle/frontend/web/**"
+      - ".github/workflows/remoodle-frontend-web-release.yml"
 
 permissions:
   contents: write
@@ -15,7 +16,8 @@ jobs:
     name: Update Release PR, Build and Deploy to Stage / Production
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/release-please-action@v3
+      - name: Run release-please
+        uses: google-github-actions/release-please-action@v3
         id: release
         with:
           token: ${{ secrets.ROBOT_TOKEN }}
@@ -26,42 +28,51 @@ jobs:
           tag-separator: "-"
           pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
 
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
         with:
           node-version: "18.x"
+          cache: "yarn"
+          cache-dependency-path: "**/yarn.lock"
 
-      - name: Install Dependencies
-        run: |
-          cd remoodle/frontend/web
-          yarn install
-
-      - uses: benjlevesque/short-sha@v2.2
+      - name: Get shorten commit SHA
         id: short-sha
+        uses: actions/github-script@v3
         with:
-          length: 8
+          result-encoding: string
+          script: |
+            return context.sha.slice(0, 8);
 
-      - name: Deploy on trunk
+      - name: Install dependencies
+        run: |
+          cd tradelink/frontend
+          yarn install --frozen-lockfile
+
+      - name: Build and deploy bundle on CDN with prefix
         uses: ./.github/actions/wrangler-action
         env:
           COMMIT_SHA: ${{ github.sha }}
-          CDN_PREFIX: ${{ steps.short-sha.outputs.sha }}
+          CDN_HOST: ${{ vars.CDN_HOST }}
+          CDN_PREFIX: ${{ steps.short-sha.outputs.result }}
         with:
           workingDirectory: ./remoodle/frontend/web
           preCommands: yarn build
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
-            pages deploy dist --branch="trunk" --project-name=remoodle
+            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
-      - name: Deploy on prefix
+      - name: Deploy on trunk
         uses: ./.github/actions/wrangler-action
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
-            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.sha }}
+            pages deploy dist --project-name=remoodle --branch="trunk"
 
       - name: Deploy on production
         if: steps.release.outputs.releases_created == 'true'
@@ -71,4 +82,4 @@ jobs:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: >
-            pages deploy dist --branch="production" --project-name=remoodle
+            pages deploy dist --project-name=remoodle --branch="production"

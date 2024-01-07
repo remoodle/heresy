@@ -11,37 +11,39 @@ export default defineConfig((config) => {
 
   const isCI = !!env.CI;
   const sha = env.COMMIT_SHA;
-  const cdnPrefixUrl = `https://${env.CDN_PREFIX}.remoodle.pages.dev`;
+
+  const cdnPrefixUrl =
+    !!env.CDN_PREFIX && !!env.CDN_HOST
+      ? `https://${env.CDN_PREFIX}.${env.CDN_HOST}`
+      : null;
 
   return {
     experimental: {
-      renderBuiltUrl(
-        filename: string,
-        {
-          hostId,
-          hostType,
-          type,
-        }: {
-          hostId: string;
-          hostType: "js" | "css" | "html";
-          type: "public" | "asset";
+      ...(cdnPrefixUrl !== null && {
+        renderBuiltUrl(
+          filename: string,
+          {
+            hostId,
+          }: {
+            hostId: string;
+          },
+        ) {
+          if (extname(hostId) === ".js") {
+            return {
+              runtime: `window.__toCdnUrl(${JSON.stringify(filename)})`,
+            };
+          }
+
+          return `${cdnPrefixUrl}/` + filename;
         },
-      ) {
-        if (type === "public") {
-          return `${cdnPrefixUrl}/` + filename;
-        } else if (extname(hostId) === ".js") {
-          return { runtime: `window.__toCdnUrl(${JSON.stringify(filename)})` };
-        } else {
-          return `${cdnPrefixUrl}/` + filename;
-        }
-      },
+      }),
     },
     plugins: [
       vue(),
       {
         name: "cdn-prefix",
         transformIndexHtml() {
-          if (!cdnPrefixUrl) {
+          if (!isCI || !cdnPrefixUrl) {
             return;
           }
 
@@ -50,9 +52,7 @@ export default defineConfig((config) => {
           els.push({
             tag: "script",
             injectTo: "head",
-            children: `window.__toCdnUrl = (filename) => {
-              return '${cdnPrefixUrl}/' + filename;
-            };`,
+            children: `window.__toCdnUrl = (filename) => "${cdnPrefixUrl}/" + filename;`,
           });
 
           return els;
@@ -71,7 +71,7 @@ export default defineConfig((config) => {
 
           els.push({
             tag: "script",
-            injectTo: "body",
+            injectTo: "head",
             children: `window.__BUILD_INFO__ = ${JSON.stringify({
               version: `${version}.${sha.slice(0, 8)}`,
             })}`,
