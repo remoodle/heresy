@@ -16,13 +16,14 @@ defaults:
 
 jobs:
   ci:
-    name: Type-check & Lint & Format-check & Unit test
+    name: Check types, linting and formatting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
