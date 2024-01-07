@@ -18,23 +18,40 @@ export default defineConfig((config) => {
       : null;
 
   return {
+    build: {
+      rollupOptions: {
+        ...(cdnPrefixUrl !== null && {
+          output: {
+            entryFileNames: "[name].js",
+            chunkFileNames: "[name].js",
+            assetFileNames: "assets/[name][extname]",
+          },
+        }),
+      },
+    },
     experimental: {
       ...(cdnPrefixUrl !== null && {
         renderBuiltUrl(
           filename: string,
           {
             hostId,
+            hostType,
+            type,
           }: {
             hostId: string;
+            hostType: "js" | "css" | "html";
+            type: "public" | "asset";
           },
         ) {
-          if (extname(hostId) === ".js") {
+          if (type === "public") {
+            return { relative: true };
+          } else if (extname(hostId) === ".js") {
             return {
               runtime: `window.__toCdnUrl(${JSON.stringify(filename)})`,
             };
+          } else {
+            return `${cdnPrefixUrl}/` + filename;
           }
-
-          return `${cdnPrefixUrl}/` + filename;
         },
       }),
     },
