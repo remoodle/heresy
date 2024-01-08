@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterView } from "vue-router";
 import { getBuildInfo, isDefined } from "@/shared/lib/utils";
+import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const buildInfo = getBuildInfo();
 </script>
@@ -25,4 +26,5 @@ const buildInfo = getBuildInfo();
       </span>
     </footer>
   </div>
+  <Toaster />
 </template>
