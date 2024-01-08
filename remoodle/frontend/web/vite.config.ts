@@ -35,23 +35,17 @@ export default defineConfig((config) => {
           filename: string,
           {
             hostId,
-            hostType,
-            type,
           }: {
             hostId: string;
-            hostType: "js" | "css" | "html";
-            type: "public" | "asset";
           },
         ) {
-          if (type === "public") {
-            return { relative: true };
-          } else if (extname(hostId) === ".js") {
+          if (extname(hostId) === ".js") {
             return {
               runtime: `window.__toCdnUrl(${JSON.stringify(filename)})`,
             };
-          } else {
-            return `${cdnPrefixUrl}/` + filename;
           }
+
+          return `${cdnPrefixUrl}/` + filename;
         },
       }),
     },
@@ -59,6 +53,7 @@ export default defineConfig((config) => {
       vue(),
       {
         name: "cdn-prefix",
+        enforce: "pre",
         transformIndexHtml() {
           if (!isCI || !cdnPrefixUrl) {
             return;
@@ -67,8 +62,34 @@ export default defineConfig((config) => {
           const els: IndexHtmlTransformResult = [];
 
           els.push({
+            tag: "link",
+            injectTo: "head-prepend",
+            attrs: {
+              rel: "preconnect",
+              href: cdnPrefixUrl,
+            },
+          });
+          els.push({
+            tag: "link",
+            injectTo: "head-prepend",
+            attrs: {
+              rel: "preconnect",
+              href: cdnPrefixUrl,
+              crossorigin: true,
+            },
+          });
+          els.push({
+            tag: "link",
+            injectTo: "head-prepend",
+            attrs: {
+              rel: "dns-prefetch",
+              href: cdnPrefixUrl,
+            },
+          });
+
+          els.push({
             tag: "script",
-            injectTo: "head",
+            injectTo: "head-prepend",
             children: `window.__toCdnUrl = (filename) => "${cdnPrefixUrl}/" + filename;`,
           });
 
