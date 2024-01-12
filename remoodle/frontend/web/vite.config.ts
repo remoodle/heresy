@@ -1,11 +1,11 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, loadEnv } from "vite";
-import Vue from "@vitejs/plugin-vue";
-import CDNPrefixer, {
+import { defineConfig, loadEnv, splitVendorChunkPlugin } from "vite";
+import vue from "@vitejs/plugin-vue";
+import injectCDNPrefix, {
   extractPrefixConfig,
   createRenderBuiltUrl,
 } from "./plugins/cdn-prefix";
-import BuildInfo from "./plugins/build-info";
+import injectBuildInfo from "./plugins/build-info";
 import packageJson from "./package.json";
 
 export default defineConfig((config) => {
@@ -13,7 +13,10 @@ export default defineConfig((config) => {
 
   const env = loadEnv(mode, process.cwd(), "");
 
-  const { cdnPrefixUrl } = extractPrefixConfig(env);
+  const { cdnPrefixUrl } = extractPrefixConfig({
+    host: env.CDN_HOST,
+    prefix: env.CDN_PREFIX,
+  });
 
   return {
     resolve: {
@@ -25,9 +28,10 @@ export default defineConfig((config) => {
       renderBuiltUrl: (...args) => createRenderBuiltUrl(cdnPrefixUrl, ...args),
     },
     plugins: [
-      Vue(),
-      CDNPrefixer({ cdnPrefixUrl }),
-      BuildInfo({ sha: env.COMMIT_SHA, packageJson }),
+      vue(),
+      splitVendorChunkPlugin(),
+      injectCDNPrefix({ cdnPrefixUrl }),
+      injectBuildInfo({ sha: env.COMMIT_SHA, packageJson }),
     ],
     build: {
       rollupOptions: {

@@ -5,15 +5,21 @@ interface CDNPrefixPluginOptions {
   cdnPrefixUrl: string | null;
 }
 
-export const extractPrefixConfig = (env: Record<string, string>) => {
-  if (!env.CDN_PREFIX || !env.CDN_HOST) {
+export const extractPrefixConfig = ({
+  prefix,
+  host,
+}: {
+  prefix: string;
+  host: string;
+}) => {
+  if (!prefix || !host) {
     return {
       cdnPrefixUrl: null,
     };
   }
 
   return {
-    cdnPrefixUrl: `https://${env.CDN_PREFIX}.${env.CDN_HOST}`,
+    cdnPrefixUrl: `https://${prefix}.${host}`,
   };
 };
 
