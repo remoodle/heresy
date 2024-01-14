@@ -106,7 +106,7 @@ jobs:
         run: pnpm build-only
 
       - name: Deploy bundle on CDN with prefix
-        uses: ./.github/actions/wrangler-action
+        uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
@@ -114,7 +114,7 @@ jobs:
           command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
       - name: Deploy on named branch
-        uses: ./.github/actions/wrangler-action
+        uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
