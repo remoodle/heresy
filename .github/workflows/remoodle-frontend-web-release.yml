@@ -66,7 +66,7 @@ jobs:
         run: pnpm build-only
 
       - name: Deploy bundle on CDN with prefix
-        uses: ./.github/actions/wrangler-action
+        uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
@@ -74,7 +74,7 @@ jobs:
           command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
       - name: Deploy on trunk
-        uses: ./.github/actions/wrangler-action
+        uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
@@ -83,7 +83,7 @@ jobs:
 
       - name: Deploy on production
         if: steps.release.outputs.releases_created == 'true'
-        uses: ./.github/actions/wrangler-action
+        uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
