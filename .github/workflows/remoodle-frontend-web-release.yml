@@ -1,4 +1,4 @@
-name: "[remoodle/frontend/web] Deploy on Stage/Production and Release"
+name: "[remoodle/frontend/web] Release, please"
 
 on:
   push:
@@ -11,11 +11,31 @@ permissions:
   contents: write
   pull-requests: write
 
+defaults:
+  run:
+    working-directory: ./remoodle/frontend/web
+
 jobs:
   deploy:
     name: Update Release PR, Build and Deploy to Stage / Production
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18]
+
     steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+          cache-dependency-path: "tradelink/frontend/pnpm-lock.yaml"
+
       - name: Run release-please
         uses: google-github-actions/release-please-action@v3
         id: release
@@ -28,42 +48,30 @@ jobs:
           tag-separator: "-"
           pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
 
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-          cache: "yarn"
-          cache-dependency-path: "**/yarn.lock"
-
       - name: Get shorten commit SHA
         id: short-sha
         uses: actions/github-script@v3
         with:
           result-encoding: string
-          script: |
-            return context.sha.slice(0, 8);
+          script: return context.sha.slice(0, 8);
 
       - name: Install dependencies
-        run: |
-          cd remoodle/frontend/web
-          yarn install --frozen-lockfile
+        run: pnpm install
 
-      - name: Build and deploy bundle on CDN with prefix
-        uses: ./.github/actions/wrangler-action
+      - name: Build app
         env:
           COMMIT_SHA: ${{ github.sha }}
           CDN_HOST: ${{ vars.CDN_HOST }}
           CDN_PREFIX: ${{ steps.short-sha.outputs.result }}
+        run: pnpm build-only
+
+      - name: Deploy bundle on CDN with prefix
+        uses: ./.github/actions/wrangler-action
         with:
           workingDirectory: ./remoodle/frontend/web
-          preCommands: yarn build
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: >
-            pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
+          command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
       - name: Deploy on trunk
         uses: ./.github/actions/wrangler-action
@@ -71,8 +79,7 @@ jobs:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: >
-            pages deploy dist --project-name=remoodle --branch="trunk"
+          command: pages deploy dist --project-name=remoodle --branch="trunk"
 
       - name: Deploy on production
         if: steps.release.outputs.releases_created == 'true'
@@ -81,5 +88,4 @@ jobs:
           workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: >
-            pages deploy dist --project-name=remoodle --branch="production"
+          command: pages deploy dist --project-name=remoodle --branch="production"

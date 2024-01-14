@@ -16,23 +16,33 @@ defaults:
 
 jobs:
   ci:
-    name: Check types, linting and formatting
+    name: Check types, formatting and lint
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    strategy:
+      matrix:
+        node-version: [18]
 
-      - name: Setup Node
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+          cache-dependency-path: "remoodle/frontend/web/pnpm-lock.yaml"
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: Check types
-        run: yarn type-check
+        run: pnpm type-check
 
       - name: Lint
-        run: yarn lint
+        run: pnpm lint
 
       - name: Check formatting
-        run: yarn format-check
+        run: pnpm format-check
