@@ -17,8 +17,6 @@ import { Badge } from "@/shared/ui/badge";
 
 <template>
   <main>
-    Hello
-
     <Button> Click </Button>
     Hello Hello Hello
 
