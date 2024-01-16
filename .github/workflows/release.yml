@@ -21,11 +21,8 @@ jobs:
         id: release
         with:
           release-type: node
-          monorepo-tags: true
-          package-name: remoodle/web
-          tag-separator: "-"
-          pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
-  
+          package-name: "rmd/web"
+
   deploy:
     needs: release
     if: needs.release.outputs.deploy == 'true'
