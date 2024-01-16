@@ -1,23 +1,16 @@
-name: "[remoodle/frontend/web] Release, please"
+name: "Release, please"
 
 on:
   push:
     branches: [trunk]
-    paths:
-      - "remoodle/frontend/web/**"
-      - ".github/workflows/remoodle-frontend-web-release.yml"
 
 permissions:
   contents: write
   pull-requests: write
 
-defaults:
-  run:
-    working-directory: ./remoodle/frontend/web
-
 jobs:
   deploy:
-    name: Update Release PR, Build and Deploy to Stage / Production
+    name: Update Release PR, Build and Deploy
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -34,15 +27,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
-          cache-dependency-path: "remoodle/frontend/web/pnpm-lock.yaml"
+          cache-dependency-path: "pnpm-lock.yaml"
 
       - name: Run release-please
         uses: google-github-actions/release-please-action@v3
         id: release
         with:
-          token: ${{ secrets.ROBOT_TOKEN }}
           release-type: node
-          path: remoodle/frontend/web
           monorepo-tags: true
           package-name: remoodle/web
           tag-separator: "-"
@@ -68,7 +59,6 @@ jobs:
       - name: Deploy bundle on CDN with prefix
         uses: cloudflare/wrangler-action@v3
         with:
-          workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
@@ -76,7 +66,6 @@ jobs:
       - name: Deploy on trunk
         uses: cloudflare/wrangler-action@v3
         with:
-          workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=remoodle --branch="trunk"
@@ -85,7 +74,6 @@ jobs:
         if: steps.release.outputs.releases_created == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
-          workingDirectory: ./remoodle/frontend/web
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=remoodle --branch="production"

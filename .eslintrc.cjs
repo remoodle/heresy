@@ -1,4 +1,18 @@
+require("@rushstack/eslint-patch/modern-module-resolution");
+
 module.exports = {
+  root: true,
+  env: {
+    node: true,
+    browser: true,
+    es2022: true,
+  },
+  extends: [
+    "plugin:vue/vue3-strongly-recommended",
+    "eslint:recommended",
+    "@vue/eslint-config-typescript",
+    "@vue/eslint-config-prettier/skip-formatting",
+  ],
   rules: {
     "max-depth": ["error", 4],
     "max-lines": [
@@ -19,5 +33,9 @@ module.exports = {
       },
     ],
     "@typescript-eslint/no-explicit-any": "off",
+    "vue/multi-word-component-names": "off",
+  },
+  parserOptions: {
+    ecmaVersion: "latest",
   },
 };
