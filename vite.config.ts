@@ -13,7 +13,7 @@ export default defineConfig((config) => {
 
   const env = loadEnv(mode, process.cwd(), "");
 
-  const { cdnPrefixUrl } = extractPrefixConfig({
+  const { cdnPrefixUrl = env.CF_PAGES_URL } = extractPrefixConfig({
     host: env.CDN_HOST,
     prefix: env.CDN_PREFIX,
   });
@@ -31,7 +31,10 @@ export default defineConfig((config) => {
       vue(),
       splitVendorChunkPlugin(),
       injectCDNPrefix({ cdnPrefixUrl }),
-      injectBuildInfo({ sha: env.COMMIT_SHA, packageJson }),
+      injectBuildInfo({
+        sha: env.COMMIT_SHA || env.CF_PAGES_COMMIT_SHA,
+        packageJson,
+      }),
     ],
     build: {
       rollupOptions: {

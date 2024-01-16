@@ -9,13 +9,31 @@ permissions:
   pull-requests: write
 
 jobs:
+  release:
+    name: Sync package.json version with tags
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.release.outputs.releases_created }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run release-please
+        uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: node
+          monorepo-tags: true
+          package-name: remoodle/web
+          tag-separator: "-"
+          pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
+  
   deploy:
-    name: Update Release PR, Build and Deploy
+    needs: release
+    if: needs.release.outputs.deploy == 'true'
+    name: Build and Deploy
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [18]
-
     steps:
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2
@@ -28,16 +46,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
-
-      - name: Run release-please
-        uses: google-github-actions/release-please-action@v3
-        id: release
-        with:
-          release-type: node
-          monorepo-tags: true
-          package-name: remoodle/web
-          tag-separator: "-"
-          pull-request-title-pattern: "chore${scope}: ${component} release (deploy-as: release-${version})"
 
       - name: Get shorten commit SHA
         id: short-sha
@@ -63,15 +71,7 @@ jobs:
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
-      - name: Deploy on trunk
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=remoodle --branch="trunk"
-
       - name: Deploy on production
-        if: steps.release.outputs.releases_created == 'true'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
