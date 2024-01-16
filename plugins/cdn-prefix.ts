@@ -14,7 +14,7 @@ export const extractPrefixConfig = ({
 }) => {
   if (!prefix || !host) {
     return {
-      cdnPrefixUrl: null,
+      cdnPrefixUrl: undefined,
     };
   }
 
