@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Button from "@/shared/ui/button/Button.vue";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import {
   AlertDialog,
@@ -13,11 +12,34 @@ import {
   AlertDialogTrigger,
 } from "@/shared/ui/alert-dialog";
 import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { api } from "@/shared/api";
+import { useUserStore } from "@/shared/stores/user";
+
+const userStore = useUserStore();
+
+const login = async () => {
+  // await api.getTest();
+  userStore.login();
+};
 </script>
 
 <template>
-  <main>
-    <Button> Click </Button>
+  <main class="container mx-auto max-w-md">
+    {{ userStore.user }}
+    {{ !!userStore.user }}
+    {{ userStore.authorized }}
+    <form class="flex flex-col gap-2" @submit.prevent="login">
+      <Input type="text" placeholder="Email" />
+      <Button class="w-full" type="submit"> Login </Button>
+    </form>
+
+    <Button class="w-full" variant="destructive" @click="userStore.logout()">
+      Logout
+    </Button>
+
+    <!-- <Button> Click </Button>
     Hello Hello Hello
 
     <Alert variant="destructive">
@@ -48,6 +70,6 @@ import { Badge } from "@/shared/ui/badge";
 
     <Badge variant="outline"> Outline </Badge>
 
-    <Badge variant="destructive"> Destructive </Badge>
+    <Badge variant="destructive"> Destructive </Badge> -->
   </main>
 </template>

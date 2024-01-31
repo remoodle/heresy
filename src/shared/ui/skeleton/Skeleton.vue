@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils";
 
 interface SkeletonProps {
   class?: string;

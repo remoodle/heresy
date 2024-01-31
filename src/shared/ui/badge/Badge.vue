@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VariantProps } from "class-variance-authority";
 import { badgeVariants } from ".";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils";
 
 interface BadgeVariantProps extends VariantProps<typeof badgeVariants> {}
 

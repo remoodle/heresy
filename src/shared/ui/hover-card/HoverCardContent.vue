@@ -5,7 +5,7 @@ import {
   HoverCardPortal,
   useForwardProps,
 } from "radix-vue";
-import { cn } from "@/shared/lib/utils";
+import { cn } from "@/shared/utils";
 
 const props = withDefaults(
   defineProps<HoverCardContentProps & { class?: string }>(),
