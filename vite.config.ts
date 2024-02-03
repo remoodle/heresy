@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from "vite";
 import vue from "@vitejs/plugin-vue";
@@ -6,14 +7,17 @@ import injectCDNPrefix, {
   createRenderBuiltUrl,
 } from "./plugins/cdn-prefix";
 import injectBuildInfo from "./plugins/build-info";
+import { partytownVite } from "@builder.io/partytown/utils";
 import packageJson from "./package.json";
+
+const resolve = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig((config) => {
   const { mode } = config;
 
   const env = loadEnv(mode, process.cwd(), "");
 
-  const { cdnPrefixUrl = env.CF_PAGES_URL } = extractPrefixConfig({
+  const { cdnPrefixUrl = env.CF_PAGES_URL ?? null } = extractPrefixConfig({
     host: env.CDN_HOST,
     prefix: env.CDN_PREFIX,
   });
@@ -21,7 +25,7 @@ export default defineConfig((config) => {
   return {
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL("./src", import.meta.url)),
+        "@": resolve("./src"),
       },
     },
     experimental: {
@@ -34,6 +38,9 @@ export default defineConfig((config) => {
       injectBuildInfo({
         sha: env.COMMIT_SHA || env.CF_PAGES_COMMIT_SHA,
         packageJson,
+      }),
+      partytownVite({
+        dest: join(__dirname, "dist", "~partytown"),
       }),
     ],
     build: {

@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@builder.io/partytown':
+    specifier: ^0.9.1
+    version: 0.9.1
   '@vueuse/core':
     specifier: ^10.7.1
     version: 10.7.1(vue@3.4.5)
@@ -152,6 +155,12 @@ packages:
       '@babel/helper-string-parser': 7.23.4
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
+
+  /@builder.io/partytown@0.9.1:
+    resolution: {integrity: sha512-9Bo4eZBoc7FlY38atqaXvuEMjuwU6ege/ZN+lh5G7/dC0LtdZCQJQ6CndrUtYGeia+7JoQyWXBpjcx1jFty0VA==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    dev: false
 
   /@esbuild/aix-ppc64@0.19.11:
     resolution: {integrity: sha512-FnzU0LyE3ySQk7UntJO4+qIiQgI7KoODnZg5xzXIrFJlKd2P2gwHsHY4927xj9y5PJmJSzULiUCWmv7iWnNa7g==}
