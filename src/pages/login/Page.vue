@@ -1,70 +1,105 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { useRoute, useRouter, onBeforeRouteLeave } from "vue-router";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/shared/ui/alert-dialog";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { api } from "@/shared/api";
+import { createAsyncProcess } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
 
 const userStore = useUserStore();
 
-const login = async () => {
-  userStore.login();
+const mimicAuthToken = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve("1239405234ra--f-sfsdfsd1");
+    }, 1000);
+  });
 };
+
+const step = ref(1);
+
+const nextStep = () => {
+  step.value += 1;
+};
+
+const prevStep = () => {
+  step.value -= 1;
+};
+
+const barcode = ref("");
+const token = ref("");
+
+const code = ref("");
+
+const { run: getAuthToken, loading: gettingAuthToken } = createAsyncProcess(
+  async () => {
+    const data = (await mimicAuthToken()) as string;
+
+    token.value = data;
+
+    nextStep();
+  },
+);
+
+const login = async () => {
+  if (step.value === 1) {
+    await getAuthToken();
+    return;
+  }
+
+  if (step.value === 2) {
+    // with code and token
+    userStore.login();
+  }
+};
+
+onBeforeRouteLeave((to, from, next) => {
+  if (step.value !== 1 && !userStore.authorized) {
+    const answer = window.confirm(
+      "Are you sure you want to leave? You will lose your progress",
+    );
+
+    if (!answer) {
+      next(false);
+      return;
+    }
+  }
+
+  next();
+});
 </script>
 
 <template>
   <main class="container mx-auto max-w-md">
-    {{ userStore.user }}
-    {{ !!userStore.user }}
-    {{ userStore.authorized }}
+    {{ step }}
+    {{ token }}
+    {{ code }}
     <form class="flex flex-col gap-2" @submit.prevent="login">
-      <Input type="text" placeholder="Email" />
-      <Button class="w-full" type="submit"> Login </Button>
+      <template v-if="step === 1">
+        <Input
+          v-model="barcode"
+          type="text"
+          placeholder="barcode"
+          required
+          :disabled="gettingAuthToken"
+        />
+      </template>
+      <template v-if="step === 2">
+        <Alert>
+          <AlertTitle>Heads up!</AlertTitle>
+          <AlertDescription>
+            we have sent you a code in telegram
+          </AlertDescription>
+        </Alert>
+
+        <Input v-model="code" type="text" placeholder="code" required />
+      </template>
+      <Button class="w-full" type="submit" :disabled="gettingAuthToken">
+        Login
+      </Button>
     </form>
-
-    <!-- <Button> Click </Button>
-    Hello Hello Hello
-
-    <Alert variant="destructive">
-      <AlertTitle>Heads up!</AlertTitle>
-      <AlertDescription>
-        You can add components to your app using the cli.
-      </AlertDescription>
-    </Alert>
-
-    <AlertDialog>
-      <AlertDialogTrigger>Open</AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-
-    <Badge>Badge</Badge>
-
-    <Badge variant="outline"> Outline </Badge>
-
-    <Badge variant="destructive"> Destructive </Badge> -->
   </main>
 </template>
