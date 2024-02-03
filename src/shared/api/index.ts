@@ -3,7 +3,6 @@ import axios, {
   type AxiosRequestConfig,
   AxiosError,
 } from "axios";
-import type { APIWrapper, APIError } from "@/shared/types";
 import { SERVER_URL } from "@/shared/config";
 import { isDefined } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";

@@ -1,0 +1,49 @@
+<script lang="ts" setup>
+import { computed } from "vue";
+import { RouterLink, type RouteLocationRaw } from "vue-router";
+
+const props = withDefaults(
+  defineProps<{
+    to: RouteLocationRaw;
+    hover?: boolean;
+    target?: string;
+    underline?: boolean;
+    decreaseOpacity?: boolean;
+    multiline?: boolean;
+  }>(),
+  {
+    hover: false,
+    target: undefined,
+    underline: false,
+    decreaseOpacity: true,
+    multiline: false,
+  },
+);
+
+const isExternal = computed(
+  () => typeof props.to == "string" && props.to.startsWith("http"),
+);
+
+const classes = computed(() => [
+  "link",
+  [props.underline ? "underline" : "no-underline"],
+  { "link-hover": props.hover },
+  { "hover:opacity-80": props.decreaseOpacity },
+  { "min-w-max": isExternal.value && !props.multiline },
+]);
+</script>
+
+<template>
+  <a
+    v-if="typeof to == 'string' && isExternal"
+    :href="to"
+    :target="target ?? '_blank'"
+    :class="classes"
+    v-bind="$attrs"
+  >
+    <slot />
+  </a>
+  <RouterLink v-else :to="to" :class="classes" :target="target" v-bind="$attrs">
+    <slot />
+  </RouterLink>
+</template>

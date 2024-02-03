@@ -1,7 +1,33 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { watch } from "vue";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { Footer } from "@/widgets/footer";
+import { useUserStore } from "@/shared/stores/user";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
+
+const route = useRoute();
+const router = useRouter();
+
+const userStore = useUserStore();
+
+watch(
+  () => userStore.authorized,
+  (now, was) => {
+    if (was && !now && route.meta.auth === "required") {
+      router.push({ name: "login", query: { next: route.fullPath } });
+    }
+
+    if (!was && now && route.meta.auth === "forbidden") {
+      const redirectTo = route.query.next as string;
+
+      if (redirectTo) {
+        return router.push(redirectTo);
+      }
+
+      router.push({ name: "dashboard" });
+    }
+  },
+);
 </script>
 
 <template>

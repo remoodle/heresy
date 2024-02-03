@@ -6,7 +6,6 @@ import {
   type RemovableRef,
 } from "@vueuse/core";
 import { getStorageKey } from "@/shared/utils";
-import type { APIUser } from "@/shared/types";
 import { api } from "@/shared/api";
 
 export const useUserStore = defineStore("user", () => {

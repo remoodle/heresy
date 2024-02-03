@@ -1,5 +1,5 @@
 import { ref, type Ref } from "vue";
-import type { APIError } from "@/shared/types";
+import { type RouteParams, type RouteLocationRaw } from "vue-router";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { camelize, getCurrentInstance, toHandlerKey } from "vue";
@@ -48,4 +48,14 @@ export function createAsyncProcess<T extends (...args: any) => unknown>(
   };
 
   return { loading, run, error };
+}
+
+export function routeTo(
+  name: AppRouteNames,
+  params?: RouteParams,
+): RouteLocationRaw {
+  return {
+    name,
+    params,
+  };
 }
