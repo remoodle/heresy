@@ -12,7 +12,7 @@ const props = defineProps<DialogFooterProps>();
   <div
     :class="
       cn(
-        'flex flex-col space-y-2 sm:space-y-0 mt-1.5 sm:flex-row sm:justify-end sm:space-x-2',
+        'mt-1.5 flex flex-col space-y-2 sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0',
         props.class,
       )
     "

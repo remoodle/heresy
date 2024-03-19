@@ -4,46 +4,44 @@ import {
   type RouteRecordRaw,
 } from "vue-router";
 import { useUserStore } from "@/shared/stores/user";
-import LoginPage from "@/pages/login/Page.vue";
+import { RouteName } from "@/shared/types";
+import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
-import DashboardPage from "@/pages/dashboard/Page.vue";
 
 declare module "vue-router" {
   interface RouteMeta {
     auth: "required" | "forbidden" | "none";
-    hideAuthNavigation?: boolean;
   }
 }
 
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    name: "home",
-    component: HomePage,
-    meta: {
-      auth: "none",
-    },
-  },
-  {
-    path: "/login",
-    name: "login",
-    component: LoginPage,
-    meta: {
-      auth: "forbidden",
-      hideAuthNavigation: true,
-    },
-  },
-  {
-    name: "dashboard",
-    path: "/dashboard",
-    component: DashboardPage,
+    name: RouteName.Home,
     meta: {
       auth: "required",
     },
+    component: HomePage,
+  },
+  {
+    path: "/login",
+    name: RouteName.Login,
+    meta: {
+      auth: "forbidden",
+    },
+    component: AuthPage,
+  },
+  {
+    path: "/sign-up",
+    name: RouteName.SignUp,
+    meta: {
+      auth: "forbidden",
+    },
+    component: AuthPage,
   },
   {
     path: "/:pathMatch(.*)*",
-    name: "404",
+    name: RouteName.NotFound,
     component: () => import("@/pages/404/Page.vue"),
   },
 ];
@@ -81,11 +79,11 @@ router.beforeEach((to, from) => {
   const authorized = userStore.authorized;
 
   if (to.meta.auth === "required" && !authorized) {
-    return { name: "login", query: { next: to.fullPath } };
+    return { name: RouteName.Login, query: { next: to.fullPath } };
   }
 
   if (to.meta.auth === "forbidden" && authorized) {
-    return { name: "dashboard" };
+    return { name: RouteName.Home };
   }
 });
 

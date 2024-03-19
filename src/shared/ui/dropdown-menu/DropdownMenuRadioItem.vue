@@ -19,7 +19,7 @@ const emits = defineEmits<DropdownMenuRadioItemEmits>();
     v-bind="{ ...props, ...useEmitAsProps(emits) }"
     :class="
       cn(
-        'flex relative items-center rounded-md transition-colors data-[disabled]:opacity-50 data-[disabled]:pointer-events-none data-[highlighted]:bg-outline-hover pl-7 py-1.5 text-sm outline-none select-none cursor-default',
+        'data-[highlighted]:bg-outline-hover relative flex cursor-default select-none items-center rounded-md py-1.5 pl-7 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         props.class,
       )
     "

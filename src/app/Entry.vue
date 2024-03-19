@@ -3,6 +3,7 @@ import { watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { Footer } from "@/widgets/footer";
 import { useUserStore } from "@/shared/stores/user";
+import { RouteName } from "@/shared/types";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const route = useRoute();
@@ -14,7 +15,7 @@ watch(
   () => userStore.authorized,
   (now, was) => {
     if (was && !now && route.meta.auth === "required") {
-      router.push({ name: "login", query: { next: route.fullPath } });
+      router.push({ name: RouteName.Login, query: { next: route.fullPath } });
     }
 
     if (!was && now && route.meta.auth === "forbidden") {
@@ -24,14 +25,14 @@ watch(
         return router.push(redirectTo);
       }
 
-      router.push({ name: "dashboard" });
+      router.push({ name: RouteName.Home });
     }
   },
 );
 </script>
 
 <template>
-  <div class="flex min-h-[100svh] flex-col">
+  <div class="flex h-[100svh] flex-col">
     <!-- <div class="top-0 sticky">
       <div
         class="flex h-16 w-full justify-center bg-base-200 text-base-content shadow-sm transition-all duration-100"
@@ -39,11 +40,15 @@ watch(
         ReMoodle
       </div>
     </div> -->
-    <div class="my-10">
-      <div class="-my-10 overflow-x-hidden">
-        <RouterView />
-      </div>
-    </div>
+    <!-- <div class="my-10"> -->
+    <!-- <div class="-my-10 overflow-x-hidden"> -->
+    <!-- <main class="container"> -->
+    <!-- <div class="flex flex-1 overflow-y-hidden"> -->
+    <RouterView />
+    <!-- </div> -->
+    <!-- </main> -->
+    <!-- </div> -->
+    <!-- </div> -->
     <Footer />
   </div>
   <Toaster />

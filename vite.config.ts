@@ -2,12 +2,13 @@ import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import { defineConfig, loadEnv, splitVendorChunkPlugin } from "vite";
 import vue from "@vitejs/plugin-vue";
+import { partytownVite } from "@builder.io/partytown/utils";
+import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
 import injectCDNPrefix, {
   extractPrefixConfig,
   createRenderBuiltUrl,
 } from "./plugins/cdn-prefix";
 import injectBuildInfo from "./plugins/build-info";
-import { partytownVite } from "@builder.io/partytown/utils";
 import packageJson from "./package.json";
 
 const resolve = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -33,6 +34,7 @@ export default defineConfig((config) => {
     },
     plugins: [
       vue(),
+      validateEnv(),
       splitVendorChunkPlugin(),
       injectCDNPrefix({ cdnPrefixUrl }),
       injectBuildInfo({

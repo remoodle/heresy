@@ -6,12 +6,13 @@ import {
   type RemovableRef,
 } from "@vueuse/core";
 import { getStorageKey } from "@/shared/utils";
+import type { User } from "@/shared/types";
 import { api } from "@/shared/api";
 
 export const useUserStore = defineStore("user", () => {
   const token: RemovableRef<string> = useStorage(getStorageKey("token"), "");
 
-  const user: RemovableRef<APIUser | undefined> = useStorage(
+  const user: RemovableRef<User | undefined> = useStorage(
     getStorageKey("user"),
     null,
     undefined,
@@ -43,22 +44,34 @@ export const useUserStore = defineStore("user", () => {
   //     return Promise.resolve(response);
   //   });
 
+  const setToken = (newToken: string) => {
+    token.value = newToken;
+  };
+
+  const login = (authToken: string, moodleUser: User) => {
+    setToken(authToken);
+    user.value = moodleUser;
+  };
+
   const logout = () => {
     token.value = "";
     user.value = null;
   };
 
-  const login = () => {
-    token.value = "test";
-    user.value = {
-      name: "test",
-      email: "",
-    };
-  };
+  // const login = () => {
+  //   token.value = "test";
+  //   user.value = {
+  //     moodle_id: 1,
+  //     barcode: "220473",
+  //     name: "test",
+  //     email: "",
+  //   };
+  // };
 
   return {
     user,
     token,
+    setToken,
     authorized,
     login,
     logout,

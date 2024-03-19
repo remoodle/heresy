@@ -1,8 +1,12 @@
+import { camelize, getCurrentInstance, toHandlerKey } from "vue";
 import { ref, type Ref } from "vue";
 import { type RouteParams, type RouteLocationRaw } from "vue-router";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { camelize, getCurrentInstance, toHandlerKey } from "vue";
+import type { APIError } from "../types";
+import { RouteName } from "../types";
+
+export { camelize, getCurrentInstance, toHandlerKey };
 
 export function getBuildInfo() {
   return window.__BUILD_INFO__;
@@ -18,6 +22,10 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getStorageKey(key: string, storageVersion = 1) {
   return `h3r3sy-${key}-v${storageVersion}`;
+}
+
+export function isEmptyString(value: string) {
+  return value.trim() === "";
 }
 
 interface UseAsync<T extends (...args: unknown[]) => unknown, E = APIError> {
@@ -51,7 +59,7 @@ export function createAsyncProcess<T extends (...args: any) => unknown>(
 }
 
 export function routeTo(
-  name: AppRouteNames,
+  name: RouteName,
   params?: RouteParams,
 ): RouteLocationRaw {
   return {
@@ -59,3 +67,7 @@ export function routeTo(
     params,
   };
 }
+
+export const vFocus = {
+  mounted: (el: HTMLInputElement) => el.focus(),
+};

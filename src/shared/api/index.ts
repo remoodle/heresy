@@ -1,10 +1,14 @@
-import axios, {
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  AxiosError,
-} from "axios";
-import { SERVER_URL } from "@/shared/config";
-import { isDefined } from "@/shared/utils";
+import axios, { AxiosError } from "axios";
+import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import { VITE_API_URL } from "@/shared/config";
+import type {
+  APIError,
+  APIWrapper,
+  CoursesOverall,
+  User,
+  UserSettings,
+} from "@/shared/types";
+import { isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
 
 class AxiosService {
@@ -12,28 +16,31 @@ class AxiosService {
 
   constructor(baseURL: string) {
     this.axiosInstance = axios.create({
-      baseURL: baseURL,
+      baseURL: `https://proxy.anyrange.workers.dev`,
+      // baseURL: `${baseURL}/api`,
     });
   }
 }
 
 class API extends AxiosService {
   constructor() {
-    super(SERVER_URL);
+    super(VITE_API_URL);
 
     this.axiosInstance.interceptors.request.use((request) => {
       const userStore = useUserStore();
       const token = userStore.token;
 
-      if (isDefined(token)) {
-        request.headers["access-token"] = token;
+      request.headers["Forward-to"] = "api-dev.remoodle.app";
+
+      if (isDefined(token) && !isEmptyString(token)) {
+        request.headers["Auth-Token"] = token;
       }
 
       return request;
     });
   }
 
-  async request<T>(
+  private async request<T>(
     config: AxiosRequestConfig,
   ): Promise<[T, null] | [null, APIError]> {
     try {
@@ -41,35 +48,64 @@ class API extends AxiosService {
 
       return [response.data as T, null];
     } catch (error) {
-      if (error instanceof AxiosError) {
-        if (
-          typeof error.response === "object" &&
-          error.response.data &&
-          "error" in error.response.data
-        ) {
-          return [
-            null,
-            {
-              status: Number(error.response.data.error.status ?? 500),
-              message: error.response.data.error.message,
-            },
-          ];
-        }
-
+      if (
+        error instanceof AxiosError &&
+        typeof error.response === "object" &&
+        error.response.data &&
+        "error" in error.response.data
+      ) {
         return [
           null,
-          { status: error.response?.status ?? 500, message: error.message },
+          {
+            status: Number(error.response.status),
+            message: error.response.data.error.message,
+          },
         ];
       }
 
-      return [null, { status: 666, message: "Unknown error" }];
+      return [null, { status: 500, message: "Unknown error" }];
     }
   }
 
-  async getTest() {
-    return this.request<{ kal: any[] }>({
+  async register(payload: {
+    // email: string;
+    name_alias: string;
+    password: string;
+    token: string;
+  }) {
+    return this.request<User>({
+      method: "POST",
+      url: "/api/auth/register",
+      data: payload,
+    });
+  }
+
+  async login(payload: { identifier: string; password: string }) {
+    return this.request<{ token: string }>({
+      method: "POST",
+      url: "/api/auth/password",
+      data: payload,
+    });
+  }
+
+  async getUserSettings() {
+    return this.request<UserSettings>({
       method: "GET",
-      url: `/test`,
+      url: "/api/user/settings",
+    });
+  }
+
+  async getCourses() {
+    return this.request<{ courses: string[] }>({
+      method: "GET",
+      url: "/api/courses",
+    });
+  }
+
+  async getCoursesOverall() {
+    return this.request<CoursesOverall>({
+      method: "GET",
+      url: "/api/courses/overall",
     });
   }
 }

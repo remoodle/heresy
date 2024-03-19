@@ -7,11 +7,7 @@ const appStore = useAppStore();
 </script>
 
 <template>
-  <Button variant="secondary" @click="appStore.toggleTheme()">
-    <Icon
-      class="h-6 w-6 mr-2"
-      :name="appStore.theme === 'light' ? 'sun' : 'moon'"
-    />
-    Change theme
+  <Button variant="secondary" size="icon" @click="appStore.toggleTheme()">
+    <Icon class="h-6 w-6" :name="appStore.theme === 'light' ? 'sun' : 'moon'" />
   </Button>
 </template>

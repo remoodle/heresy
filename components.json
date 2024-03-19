@@ -10,6 +10,6 @@
   "framework": "vite",
   "aliases": {
     "components": "@/shared",
-    "utils": "@/shared/utils/index.ts"
+    "utils": "@/shared/utils"
   }
 }

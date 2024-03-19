@@ -1,25 +1,14 @@
 /// <reference types="vite/client" />
 
+type ImportMetaEnvAugmented =
+  import("@julr/vite-plugin-validate-env").ImportMetaEnvAugmented<
+    typeof import("../env").default
+  >;
+
+interface ImportMetaEnv extends ImportMetaEnvAugmented {}
+
 interface Window {
   __BUILD_INFO__?: {
     version: string;
   };
 }
-
-type APIError = {
-  status: number;
-  message: string;
-};
-
-type APIErrorResponse = {
-  error: APIError;
-};
-
-type APIWrapper<T> = T | APIErrorResponse;
-
-type APIUser = {
-  name: string;
-  email: string;
-};
-
-type AppRouteNames = "home" | "login" | "dashboard";
