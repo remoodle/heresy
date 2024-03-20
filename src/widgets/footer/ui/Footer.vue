@@ -11,12 +11,8 @@ const currentYear = new Date().getFullYear();
   <footer class="container flex h-20 items-center justify-between border-t">
     <div>
       <span> © 2023-{{ currentYear }} ReMoodle </span>
-      <span v-if="isDefined(buildInfo)">
-        Version: {{ buildInfo.version }}
-      </span>
+      <span v-if="isDefined(buildInfo)"> v{{ buildInfo.version }} </span>
     </div>
     <ThemeSwitcher />
   </footer>
 </template>
-
-<style scoped></style>

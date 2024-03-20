@@ -27,21 +27,12 @@ const { run: submit, loading } = createAsyncProcess(async () => {
     throw error;
   }
 
-  userStore.setToken(data.token);
-
-  // TODO: remove shit when API is fixed
-  const [userData, userError] = await api.getUserSettings();
-
-  if (userError) {
-    throw userError;
-  }
-
-  userStore.login(userStore.token, {
-    moodle_id: userData.moodle_id,
-    barcode: userData.barcode,
-    name: userData.name,
-    ...(isDefined(userData.name_alias) && { name_alias: userData.name_alias }),
-    ...(isDefined(userData.email) && { name_alias: userData.email }),
+  userStore.login(data.moodle_token, {
+    moodle_id: data.moodle_id,
+    barcode: data.barcode,
+    name: data.name,
+    ...(isDefined(data.name_alias) && { name_alias: data.name_alias }),
+    ...(isDefined(data.email) && { name_alias: data.email }),
   });
 });
 </script>

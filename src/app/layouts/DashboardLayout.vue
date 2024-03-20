@@ -22,13 +22,17 @@ const userStore = useUserStore();
 </script>
 
 <template>
-  123
-  <!-- <Header /> -->
+  <Header />
+  <div class="container mx-auto flex-wrap justify-between p-5 sm:flex">
+    <main class="m-auto flex w-full flex-col items-center justify-center">
+      <RouterView></RouterView>
+    </main>
+  </div>
   <!-- <main class="container mx-auto max-w-md">
     {{ userStore.user }}
     {{ !!userStore.user }}
     {{ userStore.authorized }} -->
-  home
+  <!-- home -->
 
   <!-- <Button class="w-full" variant="destructive" @click="userStore.logout()">
     Logout

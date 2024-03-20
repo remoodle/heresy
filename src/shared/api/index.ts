@@ -4,7 +4,12 @@ import { VITE_API_URL } from "@/shared/config";
 import type {
   APIError,
   APIWrapper,
+  ActiveCourses,
+  CourseContent,
+  CourseContents,
   CoursesOverall,
+  Deadline,
+  Grade,
   User,
   UserSettings,
 } from "@/shared/types";
@@ -17,7 +22,7 @@ class AxiosService {
   constructor(baseURL: string) {
     this.axiosInstance = axios.create({
       baseURL: `https://proxy.anyrange.workers.dev`,
-      // baseURL: `${baseURL}/api`,
+      // baseURL: `${baseURL}`,
     });
   }
 }
@@ -81,7 +86,11 @@ class API extends AxiosService {
   }
 
   async login(payload: { identifier: string; password: string }) {
-    return this.request<{ token: string }>({
+    return this.request<
+      UserSettings & {
+        moodle_token: string;
+      }
+    >({
       method: "POST",
       url: "/api/auth/password",
       data: payload,
@@ -95,17 +104,38 @@ class API extends AxiosService {
     });
   }
 
-  async getCourses() {
-    return this.request<{ courses: string[] }>({
+  async getDeadlines() {
+    return this.request<Deadline[]>({
       method: "GET",
-      url: "/api/courses",
+      url: "/api/user/deadlines",
+    });
+  }
+
+  async getActiveCourses() {
+    return this.request<ActiveCourses>({
+      method: "GET",
+      url: "/api/user/course",
+    });
+  }
+
+  async getCourseGrades(course: string) {
+    return this.request<Grade[]>({
+      method: "GET",
+      url: `/api/user/course/${course}/grades`,
+    });
+  }
+
+  async getCourseContent(course: string) {
+    return this.request<CourseContent[]>({
+      method: "GET",
+      url: `/api/user/course/${course}/contents`,
     });
   }
 
   async getCoursesOverall() {
     return this.request<CoursesOverall>({
       method: "GET",
-      url: "/api/courses/overall",
+      url: "/api/user/course/overall",
     });
   }
 }

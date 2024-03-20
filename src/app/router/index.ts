@@ -7,6 +7,7 @@ import { useUserStore } from "@/shared/stores/user";
 import { RouteName } from "@/shared/types";
 import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
+import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
   interface RouteMeta {
@@ -16,12 +17,14 @@ declare module "vue-router" {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: "/",
+    path: "/dash",
     name: RouteName.Home,
     meta: {
       auth: "required",
     },
-    component: HomePage,
+    component: DashboardLayout,
+    // component: () => import("@/pages/preset/Page.vue"),
+    children: [{ path: "", name: "dashboard", component: HomePage }],
   },
   {
     path: "/login",
