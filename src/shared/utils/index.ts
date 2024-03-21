@@ -29,6 +29,13 @@ export function getRepoURL(repo: string) {
   return `${GITHUB_ORG_URL}/${repo}`;
 }
 
+export function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+}
+
 export function isEmptyString(value: string) {
   return value.trim() === "";
 }

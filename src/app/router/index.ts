@@ -8,6 +8,8 @@ import { RouteName } from "@/shared/types";
 import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
 import NotFoundPage from "@/pages/404/Page.vue";
+import AccountPage from "@/pages/account/Page.vue";
+import CoursePage from "@/pages/course/Page.vue";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
@@ -24,8 +26,14 @@ const routes: RouteRecordRaw[] = [
       auth: "required",
     },
     component: DashboardLayout,
-    children: [{ path: "", name: "dashboard", component: HomePage }],
+    redirect: { name: RouteName.Dashboard },
+    children: [
+      { path: "", name: RouteName.Dashboard, component: HomePage },
+      { path: "account", name: RouteName.Account, component: AccountPage },
+      { path: "course/:id", name: RouteName.Course, component: CoursePage },
+    ],
   },
+
   {
     path: "/login",
     name: RouteName.Login,

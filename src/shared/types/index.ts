@@ -1,8 +1,11 @@
 export enum RouteName {
   Home = "home",
+  Dashboard = "dashboard",
   Login = "login",
   SignUp = "sign-up",
   NotFound = "404",
+  Account = "account",
+  Course = "course",
 }
 
 export type APIError = {
@@ -19,7 +22,7 @@ export type APIWrapper<T> = T | APIErrorResponse;
 export type User = {
   moodle_id: number;
   barcode: string;
-  name?: string;
+  name: string;
   name_alias?: string;
   email?: string;
 };

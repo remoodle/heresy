@@ -24,7 +24,7 @@ const userStore = useUserStore();
 <template>
   <Header />
   <div class="bg-secondary">
-    <div class="container mx-auto my-10 flex-wrap justify-between sm:flex">
+    <div class="my-10 flex-wrap justify-between sm:flex">
       <main class="flex w-full flex-col">
         <RouterView></RouterView>
       </main>
