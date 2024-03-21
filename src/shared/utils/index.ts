@@ -1,10 +1,8 @@
 import { camelize, getCurrentInstance, toHandlerKey } from "vue";
 import { ref, type Ref } from "vue";
-import { type RouteParams, type RouteLocationRaw } from "vue-router";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { APIError } from "../types";
-import { RouteName } from "../types";
 import { GITHUB_ORG_URL } from "../config";
 
 export { camelize, getCurrentInstance, toHandlerKey };
@@ -40,6 +38,19 @@ export function isEmptyString(value: string) {
   return value.trim() === "";
 }
 
+export function partition<T, U extends string>(
+  arr: ReadonlyArray<T>,
+  sorter: (el: T) => U,
+): { [K in U]: T[] | undefined } {
+  const res = {} as { [K in U]: T[] | undefined };
+  for (const el of arr) {
+    const key = sorter(el);
+    const target: T[] = res[key] ?? (res[key] = []);
+    target.push(el);
+  }
+  return res;
+}
+
 interface UseAsync<T extends (...args: unknown[]) => unknown, E = APIError> {
   loading: Ref<boolean>;
   error: Ref<E | null>;
@@ -68,16 +79,6 @@ export function createAsyncProcess<T extends (...args: any) => unknown>(
   };
 
   return { loading, run, error };
-}
-
-export function routeTo(
-  name: RouteName,
-  params?: RouteParams,
-): RouteLocationRaw {
-  return {
-    name,
-    params,
-  };
 }
 
 export const vFocus = {

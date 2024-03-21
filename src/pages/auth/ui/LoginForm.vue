@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { cn, isDefined, routeTo } from "@/shared/utils";
+import { cn } from "@/shared/utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
 import { useToast } from "@/shared/ui/toast/use-toast";
 import { api } from "@/shared/api";
 import { createAsyncProcess, vFocus } from "@/shared/utils";
@@ -34,13 +33,7 @@ const { run: submit, loading } = createAsyncProcess(async () => {
     throw error;
   }
 
-  userStore.login(data.moodle_token, {
-    moodle_id: data.moodle_id,
-    barcode: data.barcode,
-    name: data.name,
-    ...(isDefined(data.name_alias) && { name_alias: data.name_alias }),
-    ...(isDefined(data.email) && { name_alias: data.email }),
-  });
+  userStore.login(data.moodle_token, data);
 });
 </script>
 

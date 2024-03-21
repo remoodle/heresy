@@ -8,7 +8,7 @@ import type {
   CoursesOverall,
   Deadline,
   Grade,
-  User,
+  MoodleUser,
   UserSettings,
 } from "@/shared/types";
 import { getBuildInfo, isDefined, isEmptyString } from "@/shared/utils";
@@ -92,12 +92,12 @@ class API {
   }
 
   async register(payload: {
-    // email: string;
     token: string;
     name_alias?: string;
     password?: string;
+    email?: string;
   }) {
-    return this.request<User>("auth/register", {
+    return this.request<MoodleUser>("auth/register", {
       method: "POST",
       json: payload,
     });

@@ -27,7 +27,7 @@ const elBanner = ref();
 
 <template>
   <div class="-my-10 rounded-b-[45px]">
-    <main class="container pt-10" :class="[dense ? 'mb-4' : 'mb-8']">
+    <main class="container" :class="[dense ? 'mb-4 pt-4' : 'mb-6 pt-6']">
       <div ref="elBanner">
         <slot name="banner"></slot>
       </div>
@@ -50,7 +50,7 @@ const elBanner = ref();
               </Link>
               <h1
                 data-testid="page-title"
-                class="break-all text-3xl font-semibold md:text-4xl"
+                class="break-all text-2xl font-semibold md:text-3xl"
               >
                 <slot name="title"></slot>
               </h1>

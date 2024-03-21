@@ -15,7 +15,7 @@ const props = withDefaults(
     hover: false,
     target: undefined,
     underline: false,
-    decreaseOpacity: true,
+    decreaseOpacity: false,
     multiline: false,
   },
 );

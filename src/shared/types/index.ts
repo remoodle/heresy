@@ -22,12 +22,12 @@ export type APIErrorResponse = {
 
 export type APIWrapper<T> = T | APIErrorResponse;
 
-export type User = {
+export type MoodleUser = {
   moodle_id: number;
   barcode: string;
   name: string;
-  name_alias?: string;
-  email?: string;
+  name_alias: string | null;
+  email: string | null;
 };
 
 // TODO: Replace with real types
@@ -80,7 +80,7 @@ export type ExtendedCourse = ActiveCourse & {
   grades: Grade[];
 };
 
-export type CoursesOverall = User & {
+export type CoursesOverall = MoodleUser & {
   courses: ExtendedCourse[];
 };
 

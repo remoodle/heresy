@@ -1,16 +1,23 @@
-import { ref, computed, watch } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import {
   useStorage,
   StorageSerializers,
   type RemovableRef,
 } from "@vueuse/core";
-import { getStorageKey } from "@/shared/utils";
-import type { User } from "@/shared/types";
-import { api } from "@/shared/api";
+import { getStorageKey, isDefined } from "@/shared/utils";
+import type { MoodleUser } from "@/shared/types";
 
 export const useUserStore = defineStore("user", () => {
   const token: RemovableRef<string> = useStorage(getStorageKey("token"), "");
+
+  type User = {
+    moodle_id: number;
+    barcode: string;
+    name: string;
+    name_alias?: string;
+    email?: string;
+  };
 
   const user: RemovableRef<User | undefined> = useStorage(
     getStorageKey("user"),
@@ -23,50 +30,27 @@ export const useUserStore = defineStore("user", () => {
     return !!user.value && !!token.value;
   });
 
-  //   const {
-  //     run: fetchProfile,
-  //     loading,
-  //     error: profileLoadingError,
-  //   } = createAsyncProcess(async () => {
-  //     const response = await api.getProfile();
-
-  //     const [data, error] = response;
-
-  //     if (
-  //       authorized.value &&
-  //       (error?.message === "Access denied - authentication is required" || !data)
-  //     ) {
-  //       logout();
-  //     } else {
-  //       user.value = data;
-  //     }
-
-  //     return Promise.resolve(response);
-  //   });
-
   const setToken = (newToken: string) => {
     token.value = newToken;
   };
 
-  const login = (authToken: string, moodleUser: User) => {
-    setToken(authToken);
-    user.value = moodleUser;
+  const login = (tokenData: string, userData: MoodleUser) => {
+    setToken(tokenData);
+    user.value = {
+      moodle_id: userData.moodle_id,
+      name: userData.name,
+      barcode: userData.barcode,
+      ...(isDefined(userData.name_alias) && {
+        name_alias: userData.name_alias,
+      }),
+      ...(isDefined(userData.email) && { name_alias: userData.email }),
+    };
   };
 
   const logout = () => {
     token.value = "";
     user.value = null;
   };
-
-  // const login = () => {
-  //   token.value = "test";
-  //   user.value = {
-  //     moodle_id: 1,
-  //     barcode: "220473",
-  //     name: "test",
-  //     email: "",
-  //   };
-  // };
 
   return {
     user,
