@@ -153,4 +153,4 @@ class API {
   }
 }
 
-export const api = new API(`${API_URL}/rest`);
+export const api = new API(`${API_URL}/v1`);
