@@ -1,18 +1,24 @@
 <script setup lang="ts">
+import { Logo } from "@/widgets/logo";
 import { ThemeSwitcher } from "@/features/theme-switcher";
-import { getBuildInfo, isDefined } from "@/shared/utils";
-
-const buildInfo = getBuildInfo();
-
-const currentYear = new Date().getFullYear();
+import APIVersion from "./APIVersion.vue";
+import ClientVersion from "./ClientVersion.vue";
 </script>
 
 <template>
-  <footer class="container flex h-20 items-center justify-between border-t">
-    <div>
-      <span> © 2023-{{ currentYear }} ReMoodle </span>
-      <span v-if="isDefined(buildInfo)"> v{{ buildInfo.version }} </span>
+  <footer
+    class="container flex flex-wrap items-center justify-between gap-x-4 gap-y-3 py-6"
+  >
+    <Logo />
+
+    <div
+      class="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t py-4"
+    >
+      <p class="text-muted-foreground">
+        <ClientVersion />
+        <APIVersion />
+      </p>
+      <ThemeSwitcher class="flex-none" />
     </div>
-    <ThemeSwitcher />
   </footer>
 </template>

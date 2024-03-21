@@ -23,10 +23,12 @@ const userStore = useUserStore();
 
 <template>
   <Header />
-  <div class="container mx-auto flex-wrap justify-between p-5 sm:flex">
-    <main class="m-auto flex w-full flex-col items-center justify-center">
-      <RouterView></RouterView>
-    </main>
+  <div class="bg-secondary">
+    <div class="container mx-auto my-10 flex-wrap justify-between sm:flex">
+      <main class="flex w-full flex-col">
+        <RouterView></RouterView>
+      </main>
+    </div>
   </div>
   <!-- <main class="container mx-auto max-w-md">
     {{ userStore.user }}

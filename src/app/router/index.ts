@@ -7,6 +7,7 @@ import { useUserStore } from "@/shared/stores/user";
 import { RouteName } from "@/shared/types";
 import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
+import NotFoundPage from "@/pages/404/Page.vue";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
@@ -17,13 +18,12 @@ declare module "vue-router" {
 
 const routes: RouteRecordRaw[] = [
   {
-    path: "/dash",
+    path: "/",
     name: RouteName.Home,
     meta: {
       auth: "required",
     },
     component: DashboardLayout,
-    // component: () => import("@/pages/preset/Page.vue"),
     children: [{ path: "", name: "dashboard", component: HomePage }],
   },
   {
@@ -45,7 +45,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/:pathMatch(.*)*",
     name: RouteName.NotFound,
-    component: () => import("@/pages/404/Page.vue"),
+    component: NotFoundPage,
   },
 ];
 

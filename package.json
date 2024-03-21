@@ -16,9 +16,9 @@
   "dependencies": {
     "@builder.io/partytown": "^0.9.1",
     "@vueuse/core": "^10.7.1",
-    "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
+    "ky": "^1.2.2",
     "lucide-vue-next": "^0.307.0",
     "pinia": "^2.1.7",
     "radix-vue": "^1.2.6",

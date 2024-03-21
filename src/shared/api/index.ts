@@ -1,74 +1,92 @@
-import axios, { AxiosError } from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
-import { VITE_API_URL } from "@/shared/config";
+import ky, { HTTPError, type Options } from "ky";
+import { API_URL } from "@/shared/config";
 import type {
   APIError,
   APIWrapper,
   ActiveCourses,
   CourseContent,
-  CourseContents,
   CoursesOverall,
   Deadline,
   Grade,
   User,
   UserSettings,
 } from "@/shared/types";
-import { isDefined, isEmptyString } from "@/shared/utils";
+import { getBuildInfo, isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
 
-class AxiosService {
-  axiosInstance: AxiosInstance;
+class API {
+  kyInstance;
 
   constructor(baseURL: string) {
-    this.axiosInstance = axios.create({
-      baseURL: `https://proxy.anyrange.workers.dev`,
-      // baseURL: `${baseURL}`,
-    });
-  }
-}
+    this.kyInstance = ky.create({
+      prefixUrl: baseURL,
+      retry: { limit: 1 },
+      hooks: {
+        beforeRequest: [
+          (request) => {
+            const userStore = useUserStore();
+            const token = userStore.token;
 
-class API extends AxiosService {
-  constructor() {
-    super(VITE_API_URL);
+            if (isDefined(token) && !isEmptyString(token)) {
+              request.headers.set("Auth-Token", token);
+            }
 
-    this.axiosInstance.interceptors.request.use((request) => {
-      const userStore = useUserStore();
-      const token = userStore.token;
+            const buildInfo = getBuildInfo();
 
-      request.headers["Forward-to"] = "api-dev.remoodle.app";
+            if (buildInfo) {
+              request.headers.set("X-Requested-With", buildInfo.version);
+            }
+          },
+        ],
+        afterResponse: [
+          (_input, _options, response) => {
+            console.log({ response });
+          },
 
-      if (isDefined(token) && !isEmptyString(token)) {
-        request.headers["Auth-Token"] = token;
-      }
-
-      return request;
+          async (input, options, response) => {
+            if (response.status === 403) {
+              // Get a fresh token
+              // const token = await ky('https://example.com/token').text();
+              // Retry with the token
+              // options.headers.set('Authorization', `token ${token}`);
+              // return ky(input, options);
+            }
+          },
+        ],
+      },
     });
   }
 
   private async request<T>(
-    config: AxiosRequestConfig,
+    input: RequestInfo,
+    options?: Options,
   ): Promise<[T, null] | [null, APIError]> {
     try {
-      const response = await this.axiosInstance.request<APIWrapper<T>>(config);
+      const response = await this.kyInstance(input, options).json<
+        APIWrapper<T>
+      >();
 
-      return [response.data as T, null];
+      return [response as T, null];
     } catch (error) {
-      if (
-        error instanceof AxiosError &&
-        typeof error.response === "object" &&
-        error.response.data &&
-        "error" in error.response.data
-      ) {
-        return [
-          null,
-          {
-            status: Number(error.response.status),
-            message: error.response.data.error.message,
-          },
-        ];
+      try {
+        if (error instanceof HTTPError) {
+          const errorJSON = await error.response.json();
+
+          if ("error" in errorJSON) {
+            return [
+              null,
+              {
+                status: error.response.status,
+                message: errorJSON.error.message,
+              },
+            ];
+          }
+        }
+      } catch (_) {
+        return [null, { status: 500, message: "Couldn't parse error" }];
       }
 
-      return [null, { status: 500, message: "Unknown error" }];
+      return [null, { status: 500, message: "Something went wrong" }];
     }
   }
 
@@ -78,10 +96,9 @@ class API extends AxiosService {
     password: string;
     token: string;
   }) {
-    return this.request<User>({
+    return this.request<User>("auth/register", {
       method: "POST",
-      url: "/api/auth/register",
-      data: payload,
+      json: payload,
     });
   }
 
@@ -90,54 +107,50 @@ class API extends AxiosService {
       UserSettings & {
         moodle_token: string;
       }
-    >({
+    >("auth/password", {
       method: "POST",
-      url: "/api/auth/password",
-      data: payload,
+      json: payload,
     });
   }
 
   async getUserSettings() {
-    return this.request<UserSettings>({
+    return this.request<UserSettings>("user/settings", {
       method: "GET",
-      url: "/api/user/settings",
     });
   }
 
   async getDeadlines() {
-    return this.request<Deadline[]>({
+    return this.request<Deadline[]>("user/deadlines", {
       method: "GET",
-      url: "/api/user/deadlines",
     });
   }
 
   async getActiveCourses() {
-    return this.request<ActiveCourses>({
+    return this.request<ActiveCourses>("user/course", {
       method: "GET",
-      url: "/api/user/course",
     });
   }
 
-  async getCourseGrades(course: string) {
-    return this.request<Grade[]>({
+  async getCourseGrades(courseId: string) {
+    return this.request<Grade[]>(`api/user/course/${courseId}/grades`, {
       method: "GET",
-      url: `/api/user/course/${course}/grades`,
     });
   }
 
-  async getCourseContent(course: string) {
-    return this.request<CourseContent[]>({
-      method: "GET",
-      url: `/api/user/course/${course}/contents`,
-    });
+  async getCourseContent(courseId: string) {
+    return this.request<CourseContent[]>(
+      `api/user/course/${courseId}/contents`,
+      {
+        method: "GET",
+      },
+    );
   }
 
   async getCoursesOverall() {
-    return this.request<CoursesOverall>({
+    return this.request<CoursesOverall>("user/course/overall", {
       method: "GET",
-      url: "/api/user/course/overall",
     });
   }
 }
 
-export const api = new API();
+export const api = new API(`${API_URL}/api`);

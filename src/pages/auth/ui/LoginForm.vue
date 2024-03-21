@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
+import { useToast } from "@/shared/ui/toast/use-toast";
 import { api } from "@/shared/api";
 import { createAsyncProcess, vFocus } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
@@ -17,6 +18,8 @@ const form = ref({
   password: "",
 });
 
+const { toast } = useToast();
+
 const { run: submit, loading } = createAsyncProcess(async () => {
   const [data, error] = await api.login({
     identifier: form.value.name,
@@ -24,6 +27,9 @@ const { run: submit, loading } = createAsyncProcess(async () => {
   });
 
   if (error) {
+    toast({
+      title: error.message,
+    });
     throw error;
   }
 

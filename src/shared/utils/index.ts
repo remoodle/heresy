@@ -5,6 +5,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { APIError } from "../types";
 import { RouteName } from "../types";
+import { GITHUB_ORG_URL } from "../config";
 
 export { camelize, getCurrentInstance, toHandlerKey };
 
@@ -20,8 +21,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function getStorageKey(key: string, storageVersion = 1) {
-  return `h3r3sy-${key}-v${storageVersion}`;
+export function getStorageKey(key: string, storageVersion?: number) {
+  return `remoodle-${key}` + (storageVersion ? `-${storageVersion}` : "");
+}
+
+export function getRepoURL(repo: string) {
+  return `${GITHUB_ORG_URL}/${repo}`;
 }
 
 export function isEmptyString(value: string) {
