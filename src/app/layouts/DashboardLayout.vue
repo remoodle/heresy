@@ -17,6 +17,7 @@ import { Input } from "@/shared/ui/input";
 import { api } from "@/shared/api";
 import { useUserStore } from "@/shared/stores/user";
 import { Header } from "@/widgets/header";
+import { Footer } from "@/widgets/footer";
 
 const userStore = useUserStore();
 </script>
@@ -30,6 +31,8 @@ const userStore = useUserStore();
       </main>
     </div>
   </div>
+  <Footer />
+
   <!-- <main class="container mx-auto max-w-md">
     {{ userStore.user }}
     {{ !!userStore.user }}

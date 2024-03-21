@@ -10,7 +10,7 @@ const buildInfo = getBuildInfo() ?? {
 
 <template>
   <span>
-    <Link :to="getRepoURL(WEB_CLIENT_REPO)" underline>{{
+    <Link :to="getRepoURL(WEB_CLIENT_REPO)" underline hover>{{
       WEB_CLIENT_REPO
     }}</Link>
     <span v-if="isDefined(buildInfo)"> v{{ buildInfo.version }} </span>

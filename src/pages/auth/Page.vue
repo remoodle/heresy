@@ -2,8 +2,10 @@
 import { useRoute } from "vue-router";
 import { RouteName } from "@/shared/types";
 import { Footer } from "@/widgets/footer";
+import TokenForm from "./ui/TokenForm.vue";
 import LoginForm from "./ui/LoginForm.vue";
 import SignupForm from "./ui/SignupForm.vue";
+import { Link } from "@/shared/ui/link";
 
 const route = useRoute();
 </script>
@@ -19,23 +21,22 @@ const route = useRoute();
         <div class="flex flex-col space-y-2 text-center">
           <h1 class="text-2xl font-semibold tracking-tight">
             <template v-if="route.name === RouteName.Login">
-              Login to your account
+              Welcome back
             </template>
-            <template v-else-if="route.name === RouteName.SignUp">
-              Create account
-            </template>
+            <template v-else> Let's go! </template>
           </h1>
           <p class="text-sm text-muted-foreground">
             <template v-if="route.name === RouteName.Login">
-              Enter your email below to create your account
+              Enter your credentials below to login
             </template>
-            <template v-else-if="route.name === RouteName.SignUp">
-              Fill in your details to get started
-            </template>
+            <template v-else> Fill in your details to get started </template>
           </p>
         </div>
         <template v-if="route.name === RouteName.Login">
           <LoginForm />
+        </template>
+        <template v-if="route.name === RouteName.Token">
+          <TokenForm />
         </template>
         <template v-else-if="route.name === RouteName.SignUp">
           <SignupForm />
@@ -46,35 +47,29 @@ const route = useRoute();
               ? "Don't have an account?"
               : "Already have an account?"
           }}
-          <RouterLink
+          <Link
+            underline
+            hover
             :to="{
               name:
                 route.name === RouteName.Login
                   ? RouteName.SignUp
                   : RouteName.Login,
             }"
-            class="underline underline-offset-4 hover:text-primary"
           >
             {{ route.name === RouteName.Login ? "Sign up" : "Sign in" }}
-          </RouterLink>
+          </Link>
         </p>
-        <template v-if="route.name === RouteName.SignUp">
-          <p class="px-8 text-center text-sm text-muted-foreground">
-            By clicking continue, you agree to our
-            <a
-              href="/terms"
-              class="underline underline-offset-4 hover:text-primary"
+        <template v-if="route.name !== RouteName.Login">
+          <p class="text-center text-sm text-muted-foreground">
+            By continuing, you agree to our
+            <Link :to="{ name: RouteName.Terms }" underline hover
+              >Terms of Service</Link
             >
-              Terms of Service
-            </a>
             and
-            <a
-              href="/privacy"
-              class="underline underline-offset-4 hover:text-primary"
-            >
-              Privacy Policy
-            </a>
-            .
+            <Link :to="{ name: RouteName.Privacy }" underline hover
+              >Privacy Policy</Link
+            >.
           </p>
         </template>
       </div>

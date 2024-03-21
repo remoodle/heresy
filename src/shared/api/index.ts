@@ -44,6 +44,7 @@ class API {
           },
 
           async (input, options, response) => {
+            console.log(response);
             if (response.status === 403) {
               // Get a fresh token
               // const token = await ky('https://example.com/token').text();
@@ -67,17 +68,17 @@ class API {
       >();
 
       return [response as T, null];
-    } catch (error) {
+    } catch (err) {
       try {
-        if (error instanceof HTTPError) {
-          const errorJSON = await error.response.json();
+        if (err instanceof HTTPError) {
+          const response = await err.response.json();
 
-          if ("error" in errorJSON) {
+          if ("error" in response) {
             return [
               null,
               {
-                status: error.response.status,
-                message: errorJSON.error.message,
+                status: err.response.status,
+                message: response.error,
               },
             ];
           }
@@ -92,9 +93,9 @@ class API {
 
   async register(payload: {
     // email: string;
-    name_alias: string;
-    password: string;
     token: string;
+    name_alias?: string;
+    password?: string;
   }) {
     return this.request<User>("auth/register", {
       method: "POST",
@@ -110,6 +111,16 @@ class API {
     >("auth/password", {
       method: "POST",
       json: payload,
+    });
+  }
+
+  async authorize(token: string) {
+    return this.request<
+      UserSettings & {
+        moodle_token: string;
+      }
+    >(`auth/token/${token}`, {
+      method: "GET",
     });
   }
 

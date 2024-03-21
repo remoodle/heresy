@@ -3,6 +3,7 @@ import { watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { Footer } from "@/widgets/footer";
 import { useUserStore } from "@/shared/stores/user";
+import { useAppStore } from "@/shared/stores/app";
 import { RouteName } from "@/shared/types";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
 
@@ -10,6 +11,7 @@ const route = useRoute();
 const router = useRouter();
 
 const userStore = useUserStore();
+const appStore = useAppStore();
 
 watch(
   () => userStore.authorized,
@@ -49,7 +51,7 @@ watch(
     <!-- </main> -->
     <!-- </div> -->
     <!-- </div> -->
-    <Footer />
+    <!-- <Footer /> -->
   </div>
   <Toaster />
 </template>

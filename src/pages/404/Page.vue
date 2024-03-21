@@ -9,7 +9,7 @@ import { RouteName } from "@/shared/types";
       <h1 class="text-5xl font-bold">404</h1>
       <h2 class="text-2xl capitalize">Page not found</h2>
 
-      <Link :to="{ name: RouteName.Home }" underline class="mt-5">
+      <Link :to="{ name: RouteName.Home }" underline hover class="mt-5">
         Go back home
       </Link>
     </div>

@@ -3,9 +3,12 @@ export enum RouteName {
   Dashboard = "dashboard",
   Login = "login",
   SignUp = "sign-up",
+  Token = "token",
   NotFound = "404",
   Account = "account",
   Course = "course",
+  Terms = "terms",
+  Privacy = "privacy",
 }
 
 export type APIError = {

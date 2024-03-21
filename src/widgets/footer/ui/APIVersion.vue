@@ -31,7 +31,7 @@ onMounted(async () => {
   <span v-if="status">
     |
     <template v-if="status.available">
-      <Link :to="getRepoURL(WEB_SERVICES_REPO)" underline>{{
+      <Link :to="getRepoURL(WEB_SERVICES_REPO)" underline hover>{{
         WEB_SERVICES_REPO
       }}</Link>
       <span class="break-all"> v{{ status.versionTag }} </span>

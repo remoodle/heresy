@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { cn } from "@/shared/utils";
+import { cn, isEmptyString } from "@/shared/utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { Label } from "@/shared/ui/label";
@@ -23,9 +23,13 @@ const { toast } = useToast();
 
 const { run: submit, loading } = createAsyncProcess(async () => {
   const [data, error] = await api.register({
-    name_alias: form.value.name,
-    password: form.value.password,
     token: form.value.token,
+    ...(!isEmptyString(form.value.password) && {
+      password: form.value.password,
+    }),
+    ...(!isEmptyString(form.value.name) && {
+      name_alias: form.value.name,
+    }),
   });
 
   if (error) {
@@ -45,9 +49,25 @@ const { run: submit, loading } = createAsyncProcess(async () => {
       <div class="grid gap-5">
         <div class="grid gap-3">
           <div class="grid gap-1.5">
-            <Label for="name">Username</Label>
+            <Label for="token"> Moodle Token </Label>
             <Input
               v-focus
+              v-model="form.token"
+              placeholder="5f7a16ff7204ecb9bcd16bf0125d79d9"
+              id="token"
+              type="password"
+              auto-capitalize="none"
+              auto-correct="off"
+              :disabled="loading"
+              required
+            />
+            <span class="text-sm text-muted-foreground">
+              Where to find a Moodle Token?
+            </span>
+          </div>
+          <div class="grid gap-1.5">
+            <Label for="name">Username (recommended)</Label>
+            <Input
               v-model="form.name"
               placeholder="messi2009"
               id="name"
@@ -73,7 +93,7 @@ const { run: submit, loading } = createAsyncProcess(async () => {
             />
           </div> -->
           <div class="grid gap-1.5">
-            <Label for="password">Password</Label>
+            <Label for="password">Password (recommended)</Label>
             <Input
               v-model="form.password"
               placeholder="123123123"
@@ -84,23 +104,10 @@ const { run: submit, loading } = createAsyncProcess(async () => {
               :disabled="loading"
             />
           </div>
-          <div class="grid gap-1.5">
-            <Label for="token"> Moodle Token </Label>
-            <Input
-              v-model="form.token"
-              placeholder="5f7a16ff7204ecb9bcd16bf0125d79d9"
-              id="token"
-              type="password"
-              auto-capitalize="none"
-              auto-correct="off"
-              :disabled="loading"
-            />
-            <span class="text-sm text-muted-foreground">
-              Where to find a Moodle Token?
-            </span>
-          </div>
         </div>
-        <Button :disabled="loading"> Continue </Button>
+        <Button :disabled="loading || isEmptyString(form.token)">
+          Create Account
+        </Button>
       </div>
     </form>
   </div>

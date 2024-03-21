@@ -33,9 +33,8 @@ const routes: RouteRecordRaw[] = [
       { path: "course/:id", name: RouteName.Course, component: CoursePage },
     ],
   },
-
   {
-    path: "/login",
+    path: "/auth/login",
     name: RouteName.Login,
     meta: {
       auth: "forbidden",
@@ -43,12 +42,32 @@ const routes: RouteRecordRaw[] = [
     component: AuthPage,
   },
   {
-    path: "/sign-up",
+    path: "/auth/signup",
     name: RouteName.SignUp,
     meta: {
       auth: "forbidden",
     },
     component: AuthPage,
+  },
+  {
+    path: "/auth/one-tap",
+    name: RouteName.Token,
+    meta: {
+      auth: "forbidden",
+    },
+    component: AuthPage,
+  },
+  {
+    // TODO
+    path: "/terms",
+    name: RouteName.Terms,
+    component: NotFoundPage,
+  },
+  {
+    // TODO
+    path: "/privacy",
+    name: RouteName.Privacy,
+    component: NotFoundPage,
   },
   {
     path: "/:pathMatch(.*)*",
