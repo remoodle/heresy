@@ -11,7 +11,7 @@ const status = ref<{
 
 const pingServer = async (url: string) => {
   try {
-    const res = await fetch(`${url}/api/healthcheck`);
+    const res = await fetch(`${url}/health`);
 
     return {
       available: res.ok,

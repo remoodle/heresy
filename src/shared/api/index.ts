@@ -126,20 +126,20 @@ class API {
   }
 
   async getActiveCourses() {
-    return this.request<ActiveCourses>("user/course", {
+    return this.request<ActiveCourses>("user/courses", {
       method: "GET",
     });
   }
 
   async getCourseGrades(courseId: string) {
-    return this.request<Grade[]>(`api/user/course/${courseId}/grades`, {
+    return this.request<Grade[]>(`api/user/courses/${courseId}/grades`, {
       method: "GET",
     });
   }
 
   async getCourseContent(courseId: string) {
     return this.request<CourseContent[]>(
-      `api/user/course/${courseId}/contents`,
+      `api/user/course/${courseId}/content`,
       {
         method: "GET",
       },
@@ -147,10 +147,10 @@ class API {
   }
 
   async getCoursesOverall() {
-    return this.request<CoursesOverall>("user/course/overall", {
+    return this.request<CoursesOverall>("user/courses/overall", {
       method: "GET",
     });
   }
 }
 
-export const api = new API(`${API_URL}/api`);
+export const api = new API(`${API_URL}/rest`);
