@@ -5,6 +5,10 @@ import { useUserStore } from "@/shared/stores/user";
 import CoursesList from "./ui/CoursesList.vue";
 import DeadlinesList from "./ui/DeadlinesList.vue";
 
+defineOptions({
+  name: "DashboardPage",
+});
+
 const userStore = useUserStore();
 
 const { preferences } = storeToRefs(userStore);
@@ -16,12 +20,15 @@ const { preferences } = storeToRefs(userStore);
       <span> Overview </span>
     </template>
     <RoundedSection>
-      <div class="flex flex-col justify-between gap-x-4 gap-y-6 lg:flex-row">
+      <div
+        class="flex flex-col-reverse justify-between gap-x-4 gap-y-6 lg:flex-row"
+      >
         <div class="w-full lg:w-3/4">
           <CoursesList
             v-model:categories="preferences.toggledCourseCategories"
           />
         </div>
+        <hr />
         <div class="w-full flex-1 lg:w-1/4">
           <DeadlinesList />
         </div>

@@ -36,9 +36,22 @@ export function getInitials(name: string) {
     .join("");
 }
 
-export function splitCourseTitle(title: string) {
+export function splitCourseName(title?: string) {
+  if (!title) {
+    return { name: "", teacher: "" };
+  }
+
   const [name, teacher] = title.split(" | ");
+
+  if (!name || !teacher) {
+    return { name: title, teacher: "" };
+  }
+
   return { name, teacher };
+}
+
+export function formatAssignmentName(title: string) {
+  return title.replace("is due", "").trim();
 }
 
 export function isEmptyString(value: string) {

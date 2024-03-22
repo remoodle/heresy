@@ -78,11 +78,11 @@ onMounted(run);
     <div class="flex flex-col gap-5">
       <div v-for="[date, list] in objectEntries(deadlines)" :key="date">
         <div class="mb-1 flex justify-between">
-          <Badge variant="outline">
+          <span class="text-lg font-medium">
             {{ date }}
-          </Badge>
+          </span>
         </div>
-        <div class="flex flex-col gap-1.5 pl-1.5">
+        <div class="flex flex-col gap-1.5">
           <DeadlineCard
             v-for="deadline in list"
             :key="deadline.event_id"

@@ -2,7 +2,8 @@
 import type { Deadline } from "@/shared/types";
 import { RouteName } from "@/shared/types";
 import {
-  splitCourseTitle,
+  splitCourseName,
+  formatAssignmentName,
   formatDate,
   fromUnix,
   getRelativeTime,
@@ -12,27 +13,40 @@ import { Link } from "@/shared/ui/link";
 defineProps<{
   deadline: Deadline;
 }>();
-
-const formatDeadlineTitle = (title: string) => {
-  return title.replace("is due", "").trim();
-};
 </script>
 
 <template>
   <div class="flex items-center justify-between gap-2">
     <div class="flex flex-col">
-      <Link to="/" hover class="truncate">
-        {{ formatDeadlineTitle(deadline.name) }}
+      <Link
+        :to="{
+          name: RouteName.Assignment,
+          params: {
+            courseId: deadline.course_id,
+            assignmentId: deadline.event_id,
+          },
+          query: {
+            courseName: deadline.course_name,
+            assignmentName: formatAssignmentName(deadline.name),
+          },
+        }"
+        hover
+        class="truncate"
+      >
+        {{ formatAssignmentName(deadline.name) }}
       </Link>
       <Link
         :to="{
           name: RouteName.Course,
-          params: { id: deadline.course_id },
+          params: { courseId: deadline.course_id },
+          query: {
+            courseName: deadline.course_name,
+          },
         }"
         hover
         class="truncate text-sm text-muted-foreground"
       >
-        {{ splitCourseTitle(deadline.course_name).name }}
+        {{ splitCourseName(deadline.course_name).name }}
       </Link>
     </div>
     <span

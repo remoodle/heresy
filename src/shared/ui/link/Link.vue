@@ -9,6 +9,7 @@ const props = withDefaults(
     target?: string;
     underline?: boolean;
     decreaseOpacity?: boolean;
+    forceExactActive?: boolean;
     multiline?: boolean;
   }>(),
   {
@@ -16,6 +17,7 @@ const props = withDefaults(
     target: undefined,
     underline: false,
     decreaseOpacity: false,
+    forceExactActive: false,
     multiline: false,
   },
 );
@@ -30,6 +32,7 @@ const classes = computed(() => [
   { "link-hover hover:text-primary": props.hover },
   { "hover:opacity-80": props.decreaseOpacity },
   { "min-w-max": isExternal.value && !props.multiline },
+  { "router-link-exact-active": props.forceExactActive },
 ]);
 </script>
 

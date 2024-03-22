@@ -7,6 +7,8 @@ export enum RouteName {
   NotFound = "404",
   Account = "account",
   Course = "course",
+  Grades = "course-grades",
+  Assignment = "assignment",
   Terms = "terms",
   Privacy = "privacy",
 }

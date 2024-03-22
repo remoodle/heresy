@@ -27,7 +27,11 @@ const userStore = useUserStore();
   <div class="bg-secondary">
     <div class="my-10 flex-wrap justify-between sm:flex">
       <main class="flex w-full flex-col">
-        <RouterView></RouterView>
+        <RouterView v-slot="{ Component }">
+          <KeepAlive :include="['DashboardPage']">
+            <Component :is="Component" />
+          </KeepAlive>
+        </RouterView>
       </main>
     </div>
   </div>

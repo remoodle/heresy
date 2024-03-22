@@ -10,6 +10,9 @@ import HomePage from "@/pages/home/Page.vue";
 import NotFoundPage from "@/pages/404/Page.vue";
 import AccountPage from "@/pages/account/Page.vue";
 import CoursePage from "@/pages/course/Page.vue";
+import CourseOverviewPage from "@/pages/course/sub/Overview.vue";
+import CourseGradesPage from "@/pages/course/sub/Grades.vue";
+import CourseAssignmentPage from "@/pages/course/sub/Assignment.vue";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
@@ -21,40 +24,56 @@ declare module "vue-router" {
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    name: RouteName.Home,
-    meta: {
-      auth: "required",
-    },
+    meta: { auth: "required" },
     component: DashboardLayout,
-    redirect: { name: RouteName.Dashboard },
     children: [
-      { path: "", name: RouteName.Dashboard, component: HomePage },
+      { path: "", name: RouteName.Home, component: HomePage },
       { path: "account", name: RouteName.Account, component: AccountPage },
-      { path: "course/:id", name: RouteName.Course, component: CoursePage },
+      {
+        path: "course/:courseId",
+        component: CoursePage,
+        children: [
+          {
+            path: "",
+            name: RouteName.Course,
+            component: CourseOverviewPage,
+          },
+          {
+            path: "grades",
+            name: RouteName.Grades,
+            component: CourseGradesPage,
+            props: true,
+          },
+          {
+            path: "assignment/:assignmentId",
+            name: RouteName.Assignment,
+            component: CourseAssignmentPage,
+          },
+        ],
+      },
+      // {
+      //   path: "assignment/:assignmentId",
+      //   name: RouteName.Assignment,
+      //   component: CourseAssignmentPage,
+      // },
     ],
   },
   {
     path: "/auth/login",
     name: RouteName.Login,
-    meta: {
-      auth: "forbidden",
-    },
+    meta: { auth: "forbidden" },
     component: AuthPage,
   },
   {
     path: "/auth/signup",
     name: RouteName.SignUp,
-    meta: {
-      auth: "forbidden",
-    },
+    meta: { auth: "forbidden" },
     component: AuthPage,
   },
   {
     path: "/auth/one-tap",
     name: RouteName.Token,
-    meta: {
-      auth: "forbidden",
-    },
+    meta: { auth: "forbidden" },
     component: AuthPage,
   },
   {

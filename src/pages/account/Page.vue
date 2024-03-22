@@ -1,5 +1,18 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { RoundedSection, PageWrapper } from "@/entities/page";
+import { useUserStore } from "@/shared/stores/user";
+
+const userStore = useUserStore();
+
+const { preferences } = storeToRefs(userStore);
+</script>
 
 <template>
-  <div>empty</div>
+  <PageWrapper>
+    <template #title>
+      <span> Account </span>
+    </template>
+    <RoundedSection> empty </RoundedSection>
+  </PageWrapper>
 </template>

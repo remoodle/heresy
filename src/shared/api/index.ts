@@ -144,18 +144,16 @@ class API {
   }
 
   async getCourseGrades(courseId: string) {
-    return this.request<Grade[]>(`api/user/courses/${courseId}/grades`, {
+    return this.request<Grade[]>(`user/courses/${courseId}/grades`, {
       method: "GET",
     });
   }
 
-  async getCourseContent(courseId: string) {
-    return this.request<CourseContent[]>(
-      `api/user/course/${courseId}/content`,
-      {
-        method: "GET",
-      },
-    );
+  async getCourseContent(courseId: string, signal?: AbortSignal) {
+    return this.request<CourseContent[]>(`user/courses/${courseId}/content`, {
+      method: "GET",
+      signal,
+    });
   }
 
   async getCoursesOverall() {
