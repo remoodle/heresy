@@ -1,3 +1,7 @@
+* {
+  min-width: 0;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -29,7 +33,7 @@
     --destructive-foreground: 0 0% 98%;
 
     --border: 240 5.9% 90%;
-    --input: 240 5.9% 80%;
+    --input: 240 5.9% 86%;
     --ring: 208.8 84.54% 40.59%;
 
     --radius: 0.75rem;
@@ -62,7 +66,7 @@
 
     --border: 0 0% 17%;
     --input: 0 0% 17%;
-    --ring: 208.8 84.54% 40.59%;
+    --ring: 0 0% 17%;
 
     --radius: 0.75rem;
   }
@@ -74,5 +78,25 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .transition-border {
+    transition-property: border-color;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  .fullwidth {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
   }
 }

@@ -47,13 +47,29 @@ export const useUserStore = defineStore("user", () => {
     };
   };
 
+  const defaultPreferences = Object.freeze({
+    toggledCourseCategories: [] as string[],
+  });
+
+  const getDefaultPreferences = () => {
+    return Object.assign({}, defaultPreferences);
+  };
+
+  const preferences = useStorage(
+    getStorageKey("user-preferences"),
+    getDefaultPreferences(),
+  );
+
   const logout = () => {
     token.value = "";
     user.value = null;
+
+    preferences.value = getDefaultPreferences();
   };
 
   return {
     user,
+    preferences,
     token,
     setToken,
     authorized,

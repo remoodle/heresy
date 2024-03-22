@@ -1,11 +1,13 @@
-import { camelize, getCurrentInstance, toHandlerKey } from "vue";
 import { ref, type Ref } from "vue";
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { APIError } from "../types";
 import { GITHUB_ORG_URL } from "../config";
+import { dayjs, type TDate } from "./dayjs";
 
-export { camelize, getCurrentInstance, toHandlerKey };
+export { camelize, getCurrentInstance, toHandlerKey } from "vue";
+
+export { isObject, objectEntries } from "@vueuse/core";
 
 export function getBuildInfo() {
   return window.__BUILD_INFO__;
@@ -34,6 +36,11 @@ export function getInitials(name: string) {
     .join("");
 }
 
+export function splitCourseTitle(title: string) {
+  const [name, teacher] = title.split(" | ");
+  return { name, teacher };
+}
+
 export function isEmptyString(value: string) {
   return value.trim() === "";
 }
@@ -49,6 +56,43 @@ export function partition<T, U extends string>(
     target.push(el);
   }
   return res;
+}
+
+export function fromUnix(timestamp: TDate): Date {
+  return dayjs.unix(Number(timestamp)).toDate();
+}
+
+const DATE_FORMAT_OPTIONS = {
+  short: "L, LT",
+  medium: "lll",
+  long: "LLL Z",
+  full: "LLLL",
+  extraShortDate: "MMM 'YY",
+  superShortDate: "MMM D",
+  shortDate: "L",
+  mediumDate: "MMM D, YYYY",
+  longDate: "MMMM D, YYYY",
+  fullDate: "dddd, MMMM D, YYYY",
+  shortTime: "LT",
+  mediumTime: "LTS",
+  longTime: "LTS Z",
+  fullTime: "LTS ZZ",
+} as const;
+
+export function formatDate(
+  value: TDate,
+  format: keyof typeof DATE_FORMAT_OPTIONS,
+  options?: Partial<{ utc: boolean; unix: boolean }>,
+): string {
+  const { utc = false } = options || {};
+
+  const date = utc ? dayjs.utc(value) : dayjs(value);
+
+  return date.format(DATE_FORMAT_OPTIONS[format]);
+}
+
+export function getRelativeTime(date: TDate): string {
+  return dayjs(date).fromNow();
 }
 
 interface UseAsync<T extends (...args: unknown[]) => unknown, E = APIError> {

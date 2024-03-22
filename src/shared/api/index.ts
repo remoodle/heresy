@@ -119,8 +119,9 @@ class API {
       UserSettings & {
         moodle_token: string;
       }
-    >(`auth/token/${token}`, {
-      method: "GET",
+    >("auth/token", {
+      method: "POST",
+      json: { token },
     });
   }
 

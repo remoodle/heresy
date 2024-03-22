@@ -27,7 +27,7 @@ const { run: submit, loading } = createAsyncProcess(async () => {
     throw error;
   }
 
-  userStore.login(form.value.token, data);
+  userStore.login(data.moodle_token, data);
 });
 </script>
 
