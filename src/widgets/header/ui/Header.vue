@@ -69,7 +69,7 @@ const userStore = useUserStore();
         </svg>
       </Link>
       <!-- <div> -->
-      <div class="relative w-full max-w-sm items-center">
+      <div class="relative w-32 max-w-sm items-center md:w-56 lg:w-full">
         <Input
           id="search"
           type="text"
