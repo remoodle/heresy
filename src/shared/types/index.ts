@@ -13,6 +13,8 @@ export enum RouteName {
   Privacy = "privacy",
 }
 
+///
+
 export type APIError = {
   status: number;
   message: string;
@@ -23,6 +25,8 @@ export type APIErrorResponse = {
 };
 
 export type APIWrapper<T> = T | APIErrorResponse;
+
+///
 
 export type MoodleUser = {
   moodle_id: number;
@@ -66,7 +70,9 @@ export type ActiveCourse = {
   end_date: number;
 };
 
-export type ActiveCourses = ActiveCourse[];
+export type ExtendedCourse = ActiveCourse & {
+  grades: Grade[];
+};
 
 export type Grade = {
   grade_id: number;
@@ -78,21 +84,35 @@ export type Grade = {
   laravel_through_key: number;
 };
 
-export type ExtendedCourse = ActiveCourse & {
-  grades: Grade[];
+export type Course = {
+  course_id: number;
+  name: string;
+  coursecategory: string;
+  url: string;
+  start_date: number;
+  end_date: number;
+  content: CourseContent[];
 };
 
-export type CoursesOverall = MoodleUser & {
-  courses: ExtendedCourse[];
+export type CourseContent = {
+  id: number;
+  name: string;
+  visible: number;
+  summary: string;
+  summaryformat: number;
+  section: number;
+  hiddenbynumsections: number;
+  uservisible: boolean;
+  modules: CourseModule[];
 };
 
-type CourseModule = {
+export type CourseModule = {
   id: number;
   url: string;
   name: string;
   instance: number;
-  contextid: number;
   description?: string;
+  contextid: number;
   visible: number;
   uservisible: boolean;
   visibleoncoursepage: number;
@@ -144,17 +164,3 @@ type CourseModule = {
     repositorytype: string;
   };
 };
-
-export type CourseContent = {
-  id: number;
-  name: string;
-  visible: number;
-  summary: string;
-  summaryformat: number;
-  section: number;
-  hiddenbynumsections: number;
-  uservisible: boolean;
-  modules: CourseModule[];
-};
-
-export type CourseContents = CourseContent[];

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { watch, watchEffect } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { Footer } from "@/widgets/footer";
 import { useUserStore } from "@/shared/stores/user";
@@ -31,6 +31,11 @@ watch(
     }
   },
 );
+
+watchEffect(() => {
+  // set it as data-theme
+  document.documentElement.setAttribute("data-theme", appStore.theme);
+});
 </script>
 
 <template>

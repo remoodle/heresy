@@ -57,7 +57,8 @@ const { run, loading, error } = createAsyncProcess(async () => {
   }
 
   deadlines.value = partition(
-    data,
+    // data,
+    test,
     ({ timestart }) => `${formatDate(fromUnix(timestart), "fullDate")}`,
   );
 });

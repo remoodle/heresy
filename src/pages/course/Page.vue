@@ -9,32 +9,19 @@ import { useToast } from "@/shared/ui/toast";
 import { Link } from "@/shared/ui/link";
 import { createAsyncProcess, isDefined, splitCourseName } from "@/shared/utils";
 import { api } from "@/shared/api";
-import { type CourseContent, RouteName } from "@/shared/types";
+import { type CourseContent, RouteName, type Course } from "@/shared/types";
 
 const route = useRoute();
 const router = useRouter();
 
 const courseId = computed(() => route.params.courseId as string);
 
-const course = ref<{
-  name: string;
-  contents: CourseContent[];
-}>();
+const course = ref<Course>();
 
 const { toast } = useToast();
 
-const updateCourse = (data: CourseContent[] | undefined) => {
-  if (!data) {
-    course.value = undefined;
-    return;
-  }
-
-  course.value = {
-    // name: "Introduction to SRE",
-    // name: "Computational Mathematics",
-    name: courseId.value,
-    contents: data,
-  };
+const updateCourse = (data: Course | undefined) => {
+  course.value = data;
 };
 
 const {
@@ -81,6 +68,17 @@ onMounted(async () => {
 
   await fetchCourse(courseId.value, signal);
 
+  const hash = route.hash;
+
+  setTimeout(() => {
+    if (hash) {
+      const el = document.getElementById(hash.slice(1));
+      if (el) {
+        el.scrollIntoView();
+      }
+    }
+  }, 100);
+
   // await router.replace({
   //   query: {
   //     ...router.currentRoute.value.query,
@@ -106,43 +104,16 @@ const { preferences } = storeToRefs(userStore);
 <template>
   <PageWrapper>
     <template #title>
-      <div class="flex items-center">
-        <div>
-          <!-- {{ !route.query.courseName || loading }} -->
-          <template
-            v-if="!route.query.courseName && loading && !isDefined(course)"
-          >
-            Loading...
-          </template>
-          <template v-else>
-            {{ course?.name || (route.query.courseName as string) || "" }}
-            <!-- {{
-            splitCourseName(course?.name || (route.query.courseName as string))
-              ?.name
-          }} -->
-          </template>
-          <!-- <template v-if="route.name === RouteName.Assignment">
-          > {{ route.query.assignmentName }}
-        </template> -->
-
-          <!-- {{ $route.params.courseId }} -->
-          <!-- {{ !loading }} -->
-
-          <!-- <template v-if="route.query.courseName"> -->
-          <!-- {{ splitCourseName((route.query.courseName as string) || "").name }} -->
-          <!-- </template> -->
-          <!-- <template v-else-if="loading || !isDefined(course)">
+      <h1>
+        <template
+          v-if="!route.query.courseName && loading && !isDefined(course)"
+        >
           Loading...
         </template>
-        <template v-else> {{ splitCourseName(course.name).name }} </template> -->
-
-          <!-- {{ splitCourseName((route.query.courseName as string) || "").name }} > -->
-          <!-- {{ route.query.assignmentName }} -->
-        </div>
-        <!-- <template v-if="route.name === RouteName.Assignment">
-          {{ route.query.assignmentName }}
-        </template> -->
-      </div>
+        <template v-else>
+          {{ course?.name || (route.query.courseName as string) || "" }}
+        </template>
+      </h1>
     </template>
     <RoundedSection dense>
       <RouterNav>
@@ -160,7 +131,7 @@ const { preferences } = storeToRefs(userStore);
 
       <RouterView v-slot="{ Component }">
         <KeepAlive>
-          <Component :is="Component" :content="course?.contents" />
+          <Component :is="Component" :content="course?.content" />
         </KeepAlive>
       </RouterView>
       <!-- {{ course }} -->

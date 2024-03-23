@@ -11,7 +11,7 @@ const { preferences } = storeToRefs(userStore);
 <template>
   <PageWrapper>
     <template #title>
-      <span> Account </span>
+      <h1>Account</h1>
     </template>
     <RoundedSection> empty </RoundedSection>
   </PageWrapper>

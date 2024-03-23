@@ -7,7 +7,6 @@ import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import isoWeek from "dayjs/plugin/isoWeek";
 import utc from "dayjs/plugin/utc";
-import ru from "dayjs/locale/ru";
 import "dayjs/locale/en";
 
 dayjs.extend(relativeTime);

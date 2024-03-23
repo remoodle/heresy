@@ -45,7 +45,7 @@
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 208.8 84.54% 40.59%;
+    --primary: 208.8 84.54% 60.59%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 20 14.3% 4.1%;
@@ -73,7 +73,7 @@
     @apply min-w-0 border-border;
   }
   body {
-    @apply overflow-y-scroll bg-background text-foreground;
+    @apply bg-background text-foreground;
   }
 }
 
@@ -95,4 +95,34 @@
     table-layout: fixed;
     width: 100%;
   }
+}
+
+html {
+  margin: 0;
+  font-family:
+    "Roboto",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Lato",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    sans-serif;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-y: scroll;
+  scroll-padding-top: 5rem;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
 }

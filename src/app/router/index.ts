@@ -102,7 +102,7 @@ const router = createRouter({
     if (to.hash) {
       return new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ el: to.hash, top: 100 });
+          resolve({ el: to.hash, top: 80 });
         }, 150);
       });
     }

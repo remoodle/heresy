@@ -9,6 +9,8 @@ export { camelize, getCurrentInstance, toHandlerKey } from "vue";
 
 export { isObject, objectEntries } from "@vueuse/core";
 
+export { filesize } from "filesize";
+
 export function getBuildInfo() {
   return window.__BUILD_INFO__;
 }

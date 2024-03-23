@@ -87,8 +87,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>grades</div>
-  {{ grades }}
+  <!-- <div>grades</div> -->
+  <pre
+    >{{ JSON.stringify(grades, null, 2) }}
+  </pre>
 </template>
 
 <style scoped></style>

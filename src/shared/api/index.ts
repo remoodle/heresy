@@ -3,13 +3,14 @@ import { API_URL } from "@/shared/config";
 import type {
   APIError,
   APIWrapper,
-  ActiveCourses,
+  ActiveCourse,
   CourseContent,
-  CoursesOverall,
+  ExtendedCourse,
   Deadline,
   Grade,
   MoodleUser,
   UserSettings,
+  Course,
 } from "@/shared/types";
 import { getBuildInfo, isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
@@ -31,6 +32,8 @@ class API {
               request.headers.set("Auth-Token", token);
             }
 
+            request.headers.set("Connection", "keep-alive");
+
             const buildInfo = getBuildInfo();
 
             if (buildInfo) {
@@ -44,6 +47,12 @@ class API {
           },
 
           async (input, options, response) => {
+            if (response.status === 401) {
+              const userStore = useUserStore();
+
+              userStore.logout();
+            }
+
             console.log(response);
             if (response.status === 403) {
               // Get a fresh token
@@ -138,26 +147,29 @@ class API {
   }
 
   async getActiveCourses() {
-    return this.request<ActiveCourses>("user/courses", {
+    return this.request<ActiveCourse[]>("user/courses", {
       method: "GET",
+      searchParams: {
+        content: 1,
+      },
     });
   }
 
-  async getCourseGrades(courseId: string) {
-    return this.request<Grade[]>(`user/courses/${courseId}/grades`, {
+  async getCoursesOverall() {
+    return this.request<ExtendedCourse[]>("user/courses/overall", {
       method: "GET",
     });
   }
 
   async getCourseContent(courseId: string, signal?: AbortSignal) {
-    return this.request<CourseContent[]>(`user/courses/${courseId}/content`, {
+    return this.request<Course>(`course/${courseId}`, {
       method: "GET",
       signal,
     });
   }
 
-  async getCoursesOverall() {
-    return this.request<CoursesOverall>("user/courses/overall", {
+  async getCourseGrades(courseId: string) {
+    return this.request<Grade[]>(`user/course/${courseId}/grades`, {
       method: "GET",
     });
   }

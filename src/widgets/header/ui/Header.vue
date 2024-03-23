@@ -23,7 +23,7 @@ const userStore = useUserStore();
 
 <template>
   <header
-    class="border-base-300 bg-base-200 flex h-16 w-full flex-none justify-center shadow-md"
+    class="fixed top-0 z-[20] flex h-16 w-full flex-none justify-center bg-background shadow-sm"
   >
     <div class="container flex h-full w-full items-center justify-between">
       <Link :to="{ name: RouteName.Home }">
@@ -84,7 +84,7 @@ const userStore = useUserStore();
       </div>
       <!-- </div> -->
 
-      <DropdownMenu v-if="userStore.user">
+      <DropdownMenu v-if="userStore.user" :modal="false">
         <DropdownMenuTrigger>
           <!-- {{ userStore.user.name }} -->
           <Avatar>
