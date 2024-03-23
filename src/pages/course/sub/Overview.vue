@@ -8,6 +8,8 @@ defineProps<{
 }>();
 
 const userStore = useUserStore();
+
+// TODO: Skeleton loading
 </script>
 
 <template>

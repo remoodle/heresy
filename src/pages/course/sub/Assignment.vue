@@ -21,22 +21,5 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
-    ass
-    <!-- {{
-      formatAssignmentName(
-        assignmentName || (route.query.assignmentName as string),
-      )
-    }} -->
-
-    <!-- <template v-if="loading && route.query.courseName">
-          {{ splitCourseName((route.query.courseName as string) || "").name }}
-        </template>
-        <template v-else-if="loading || !isDefined(course)">
-          Loading...
-        </template>
-        <template v-else> {{ splitCourseName(course.name).name }} </template> -->
-  </div>
+  <div>ass</div>
 </template>
-
-<style scoped></style>

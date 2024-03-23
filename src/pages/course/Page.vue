@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect, onMounted, onBeforeUnmount } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { RoundedSection, PageWrapper } from "@/entities/page";
 import { useUserStore } from "@/shared/stores/user";
 import { RouterNav } from "@/shared/ui/router-nav";
-import { useToast } from "@/shared/ui/toast";
 import { Link } from "@/shared/ui/link";
-import { createAsyncProcess, isDefined, splitCourseName } from "@/shared/utils";
+import { createAsyncProcess, isDefined } from "@/shared/utils";
+import { RouteName } from "@/shared/types";
+import type { Course } from "@/shared/types";
 import { api } from "@/shared/api";
-import { type CourseContent, RouteName, type Course } from "@/shared/types";
 
 const route = useRoute();
-const router = useRouter();
 
 const courseId = computed(() => route.params.courseId as string);
 
 const course = ref<Course>();
-
-const { toast } = useToast();
 
 const updateCourse = (data: Course | undefined) => {
   course.value = data;
@@ -40,32 +37,11 @@ const {
   updateCourse(data);
 });
 
-// watchEffect(async (onCleanup) => {
-//   const abortController = new AbortController();
-
-//   const signal = abortController.signal;
-
-//   await fetchCourse(courseId.value, signal);
-
-//   await router.replace({
-//     query: {
-//       ...router.currentRoute.value.query,
-//       courseName: undefined,
-//     },
-//   });
-
-//   onCleanup(() => {
-//     abortController.abort();
-//   });
-// });
-
 const abortController = new AbortController();
 
 const signal = abortController.signal;
 
 onMounted(async () => {
-  // watchEffect(async (onCleanup) => {
-
   await fetchCourse(courseId.value, signal);
 
   const hash = route.hash;
@@ -78,18 +54,6 @@ onMounted(async () => {
       }
     }
   }, 100);
-
-  // await router.replace({
-  //   query: {
-  //     ...router.currentRoute.value.query,
-  //     courseName: undefined,
-  //   },
-  // });
-
-  // onCleanup(() => {
-  //   abortController.abort();
-  // });
-  // });
 });
 
 onBeforeUnmount(() => {
@@ -128,13 +92,11 @@ const { preferences } = storeToRefs(userStore);
           Grades
         </Link>
       </RouterNav>
-
       <RouterView v-slot="{ Component }">
         <KeepAlive>
           <Component :is="Component" :content="course?.content" />
         </KeepAlive>
       </RouterView>
-      <!-- {{ course }} -->
     </RoundedSection>
   </PageWrapper>
 </template>

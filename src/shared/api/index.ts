@@ -4,7 +4,6 @@ import type {
   APIError,
   APIWrapper,
   ActiveCourse,
-  CourseContent,
   ExtendedCourse,
   Deadline,
   Grade,
@@ -43,23 +42,10 @@ class API {
         ],
         afterResponse: [
           (_input, _options, response) => {
-            console.log({ response });
-          },
-
-          async (input, options, response) => {
             if (response.status === 401) {
               const userStore = useUserStore();
 
               userStore.logout();
-            }
-
-            console.log(response);
-            if (response.status === 403) {
-              // Get a fresh token
-              // const token = await ky('https://example.com/token').text();
-              // Retry with the token
-              // options.headers.set('Authorization', `token ${token}`);
-              // return ky(input, options);
             }
           },
         ],

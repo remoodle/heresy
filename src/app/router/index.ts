@@ -51,11 +51,6 @@ const routes: RouteRecordRaw[] = [
           },
         ],
       },
-      // {
-      //   path: "assignment/:assignmentId",
-      //   name: RouteName.Assignment,
-      //   component: CourseAssignmentPage,
-      // },
     ],
   },
   {
@@ -122,7 +117,7 @@ const router = createRouter({
   },
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach((to) => {
   const userStore = useUserStore();
 
   const authorized = userStore.authorized;

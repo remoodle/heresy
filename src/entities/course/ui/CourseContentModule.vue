@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { computedEager } from "@vueuse/core";
 import type { CourseModule } from "@/shared/types";
-import { Icon } from "@/shared/ui/icon";
 import { Link } from "@/shared/ui/link";
 import { Text } from "@/shared/ui/text";
+import { Alert } from "@/shared/ui/alert";
 import { filesize } from "@/shared/utils";
-import { isDefined } from "@/shared/utils";
 
 const props = defineProps<{
   module: CourseModule;
@@ -24,27 +22,30 @@ const prepareURL = (fileurl: string, type: string) => {
 </script>
 
 <template>
-  <!-- {{ module.modname }} -->
-  <div v-if="module.url" class="space-y-1">
-    <!-- <div class="flex items-center gap-2"> -->
+  <div class="space-y-1">
     <div class="flex items-center gap-2">
       <img :src="module.modicon" class="h-auto w-6 flex-none" />
       <span>
-        <Link
-          :to="
-            module.contents?.length === 1
-              ? prepareURL(module.contents[0].fileurl, module.contents[0].type)
-              : module.url
-          "
-          hover
-        >
-          {{ module.name }}
-        </Link>
+        <template v-if="module.url">
+          <Link
+            :to="
+              module.contents?.length === 1
+                ? prepareURL(
+                    module.contents[0].fileurl,
+                    module.contents[0].type,
+                  )
+                : module.url
+            "
+            hover
+          >
+            {{ module.name }}
+          </Link>
+        </template>
+        <template v-else>
+          <Text :msg="module.name" />
+        </template>
       </span>
     </div>
-
-    <!-- </div> -->
-    <!-- <div v-html="module.description" /> -->
     <Text
       v-if="module.description?.length"
       :msg="module.description"
@@ -64,10 +65,7 @@ const prepareURL = (fileurl: string, type: string) => {
         </template>
       </span>
       <span v-else>
-        <!-- {{ module.contents[0] }} -->
-        <!-- {{ module.contents[1] }} -->
-
-        Unsupported behavior (Contact us)
+        <Alert variant="destructive"> Unsupported behavior (Contact us) </Alert>
       </span>
     </template>
   </div>

@@ -1,19 +1,30 @@
 <script setup lang="ts">
-import type {
-  CourseContent,
-  CourseModule as ICourseModule,
-} from "@/shared/types";
-import CourseModule from "./CourseModule.vue";
+import type { CourseContent, CourseModule } from "@/shared/types";
+import CourseContentModule from "./CourseContentModule.vue";
 
-const props = defineProps<{
+defineProps<{
   content: CourseContent;
   token: string;
 }>();
 
-const sortModules = (a: ICourseModule, b: ICourseModule) => {
+const getPriority = (modname: string): number => {
+  const order = ["attendance", "assign", "quiz", "resource", "forum"];
+
+  const index = order.indexOf(modname);
+
+  return index === -1 ? order.length : index;
+};
+
+const moduleSorter = (a: CourseModule, b: CourseModule) => {
+  const priorityA = getPriority(a.modname);
+  const priorityB = getPriority(b.modname);
+
+  if (priorityA !== priorityB) {
+    return priorityA - priorityB;
+  }
+
   const aHasDescription = !!a.description;
   const bHasDescription = !!b.description;
-
   if (aHasDescription && !bHasDescription) {
     return 1;
   } else if (!aHasDescription && bHasDescription) {
@@ -25,9 +36,6 @@ const sortModules = (a: ICourseModule, b: ICourseModule) => {
 </script>
 
 <template>
-  <!-- <pre
-    >{{ JSON.stringify(content, null, 2) }}
-  </pre> -->
   <div
     v-show="content.visible === 1"
     class="space-y-5"
@@ -50,11 +58,10 @@ const sortModules = (a: ICourseModule, b: ICourseModule) => {
       class="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
     >
       <template
-        v-for="item in [...content.modules].sort(sortModules)"
+        v-for="item in [...content.modules].sort(moduleSorter)"
         :key="item.id"
       >
-        <!-- {{ item }} -->
-        <CourseModule :module="item" :token="token" />
+        <CourseContentModule :module="item" :token="token" />
       </template>
     </div>
   </div>

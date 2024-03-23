@@ -2,7 +2,6 @@
 import { onMounted, ref } from "vue";
 import { Error } from "@/entities/page";
 import { DeadlineCard } from "@/entities/deadline";
-import { Badge } from "@/shared/ui/badge";
 import { Skeleton } from "@/shared/ui/skeleton";
 import type { Deadline } from "@/shared/types";
 import { api } from "@/shared/api";
@@ -57,8 +56,8 @@ const { run, loading, error } = createAsyncProcess(async () => {
   }
 
   deadlines.value = partition(
-    // data,
-    test,
+    data,
+    // test,
     ({ timestart }) => `${formatDate(fromUnix(timestart), "fullDate")}`,
   );
 });
