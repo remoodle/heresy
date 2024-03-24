@@ -36,7 +36,7 @@ export const useAppStore = defineStore("app", () => {
 
   const provider: RemovableRef<string> = useStorage(
     getStorageKey("provider"),
-    "aitu",
+    Object.keys(availableProviders.value)[0],
   );
 
   const selectedProvider = computed<Provider | undefined>(() => {
