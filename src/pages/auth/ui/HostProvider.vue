@@ -42,9 +42,7 @@ defineModel<Providers>("providers", {
             </span>
           </span>
         </p>
-        <p v-else class="text-primary-foreground">
-          Click here to select API Provider
-        </p>
+        <p v-else>Click here to select API Provider</p>
       </div>
     </DialogTrigger>
     <DialogContent>
