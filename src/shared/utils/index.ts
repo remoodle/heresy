@@ -2,7 +2,6 @@ import { ref, type Ref } from "vue";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { APIError } from "../types";
-import { GITHUB_ORG_URL } from "../config";
 import { dayjs, type TDate } from "./dayjs";
 
 export { camelize, getCurrentInstance, toHandlerKey } from "vue";
@@ -11,12 +10,12 @@ export { isObject, objectEntries } from "@vueuse/core";
 
 export { filesize } from "filesize";
 
-export function getBuildInfo() {
-  return window.__BUILD_INFO__;
-}
-
 export function isDefined<T>(value: T): value is NonNullable<T> {
   return value !== undefined && value !== null;
+}
+
+export function isEmptyString(value: string) {
+  return value.trim() === "";
 }
 
 export function cn(...inputs: ClassValue[]) {
@@ -27,37 +26,12 @@ export function getStorageKey(key: string, storageVersion?: number) {
   return `remoodle-${key}` + (storageVersion ? `-${storageVersion}` : "");
 }
 
-export function getRepoURL(repo: string) {
-  return `${GITHUB_ORG_URL}/${repo}`;
-}
-
-export function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
-}
-
-export function splitCourseName(title?: string) {
-  if (!title) {
-    return { name: "", teacher: "" };
+export function getURLHost(url: string) {
+  try {
+    return new URL(url).host;
+  } catch (e) {
+    return url;
   }
-
-  const [name, teacher] = title.split(" | ");
-
-  if (!name || !teacher) {
-    return { name: title, teacher: "" };
-  }
-
-  return { name, teacher };
-}
-
-export function formatAssignmentName(title: string) {
-  return title.replace("is due", "").trim();
-}
-
-export function isEmptyString(value: string) {
-  return value.trim() === "";
 }
 
 export function partition<T, U extends string>(
@@ -108,6 +82,24 @@ export function formatDate(
 
 export function getRelativeTime(date: TDate): string {
   return dayjs(date).fromNow();
+}
+
+export function splitCourseName(title?: string) {
+  if (!title) {
+    return { name: "", teacher: "" };
+  }
+
+  const [name, teacher] = title.split(" | ");
+
+  if (!name || !teacher) {
+    return { name: title, teacher: "" };
+  }
+
+  return { name, teacher };
+}
+
+export function formatAssignmentName(title: string) {
+  return title.replace("is due", "").trim();
 }
 
 interface UseAsync<T extends (...args: unknown[]) => unknown, E = APIError> {

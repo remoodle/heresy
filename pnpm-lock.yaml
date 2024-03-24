@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@radix-icons/vue':
+    specifier: ^1.0.0
+    version: 1.0.0(vue@3.4.21)
   '@vueuse/core':
     specifier: ^10.7.1
     version: 10.7.1(vue@3.4.21)
@@ -625,6 +628,14 @@ packages:
     dependencies:
       validator: 13.11.0
     dev: true
+
+  /@radix-icons/vue@1.0.0(vue@3.4.21):
+    resolution: {integrity: sha512-gKWWk9tTK/laDRRNe5KLLR8A0qUwx4q4+DN8Fq48hJ904u78R82ayAO3TrxbNLgyn2D0h6rRiGdLzQWj7rPcvA==}
+    peerDependencies:
+      vue: '>= 3'
+    dependencies:
+      vue: 3.4.21(typescript@5.4.3)
+    dev: false
 
   /@rollup/rollup-android-arm-eabi@4.9.4:
     resolution: {integrity: sha512-ub/SN3yWqIv5CWiAZPHVS1DloyZsJbtXmX4HxUTIpS0BHm9pW5iYBo2mIZi+hE3AeiTzHz33blwSnhdUo+9NpA==}

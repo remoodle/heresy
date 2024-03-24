@@ -1,15 +1,26 @@
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { RouteName } from "@/shared/types";
 import { Link } from "@/shared/ui/link";
+import { useAppStore } from "@/shared/stores/app";
 import TokenForm from "./ui/TokenForm.vue";
 import LoginForm from "./ui/LoginForm.vue";
 import SignupForm from "./ui/SignupForm.vue";
+import HostProvider from "./ui/HostProvider.vue";
 
 const route = useRoute();
+
+const appStore = useAppStore();
+
+const { provider, availableProviders } = storeToRefs(appStore);
 </script>
 
 <template>
+  <HostProvider
+    v-model:provider="provider"
+    v-model:providers="availableProviders"
+  />
   <div
     class="container grid h-full grid-cols-1 flex-col items-center justify-center lg:max-w-none lg:px-0"
   >

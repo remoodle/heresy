@@ -1,5 +1,4 @@
 import ky, { HTTPError, type Options } from "ky";
-import { API_URL } from "@/shared/config";
 import type {
   APIError,
   APIWrapper,
@@ -11,15 +10,15 @@ import type {
   UserSettings,
   Course,
 } from "@/shared/types";
-import { getBuildInfo, isDefined, isEmptyString } from "@/shared/utils";
+import { isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
+import { useAppStore } from "@/shared/stores/app";
 
 class API {
   kyInstance;
 
-  constructor(baseURL: string) {
+  constructor() {
     this.kyInstance = ky.create({
-      prefixUrl: baseURL,
       retry: { limit: 1 },
       hooks: {
         beforeRequest: [
@@ -32,12 +31,6 @@ class API {
             }
 
             request.headers.set("Connection", "keep-alive");
-
-            const buildInfo = getBuildInfo();
-
-            if (buildInfo) {
-              request.headers.set("X-Requested-With", buildInfo.version);
-            }
           },
         ],
         afterResponse: [
@@ -86,13 +79,26 @@ class API {
     }
   }
 
+  private prepareURL(path: string) {
+    const appStore = useAppStore();
+
+    if (!appStore.selectedProvider) {
+      console.warn("API Provider is not set");
+      return path;
+    }
+
+    const host = appStore.selectedProvider.api;
+
+    return `${host}/v1/${path}`;
+  }
+
   async register(payload: {
     token: string;
     name_alias?: string;
     password?: string;
     email?: string;
   }) {
-    return this.request<MoodleUser>("auth/register", {
+    return this.request<MoodleUser>(this.prepareURL("auth/register"), {
       method: "POST",
       json: payload,
     });
@@ -103,7 +109,7 @@ class API {
       UserSettings & {
         moodle_token: string;
       }
-    >("auth/password", {
+    >(this.prepareURL("auth/password"), {
       method: "POST",
       json: payload,
     });
@@ -114,26 +120,26 @@ class API {
       UserSettings & {
         moodle_token: string;
       }
-    >("auth/token", {
+    >(this.prepareURL("auth/token"), {
       method: "POST",
       json: { token },
     });
   }
 
   async getUserSettings() {
-    return this.request<UserSettings>("user/settings", {
+    return this.request<UserSettings>(this.prepareURL("user/settings"), {
       method: "GET",
     });
   }
 
   async getDeadlines() {
-    return this.request<Deadline[]>("user/deadlines", {
+    return this.request<Deadline[]>(this.prepareURL("user/deadlines"), {
       method: "GET",
     });
   }
 
   async getActiveCourses() {
-    return this.request<ActiveCourse[]>("user/courses", {
+    return this.request<ActiveCourse[]>(this.prepareURL("user/courses"), {
       method: "GET",
       searchParams: {
         content: 1,
@@ -142,23 +148,29 @@ class API {
   }
 
   async getCoursesOverall() {
-    return this.request<ExtendedCourse[]>("user/courses/overall", {
-      method: "GET",
-    });
+    return this.request<ExtendedCourse[]>(
+      this.prepareURL("user/courses/overall"),
+      {
+        method: "GET",
+      },
+    );
   }
 
   async getCourseContent(courseId: string, signal?: AbortSignal) {
-    return this.request<Course>(`course/${courseId}`, {
+    return this.request<Course>(this.prepareURL(`course/${courseId}`), {
       method: "GET",
       signal,
     });
   }
 
   async getCourseGrades(courseId: string) {
-    return this.request<Grade[]>(`user/course/${courseId}/grades`, {
-      method: "GET",
-    });
+    return this.request<Grade[]>(
+      this.prepareURL(`user/course/${courseId}/grades`),
+      {
+        method: "GET",
+      },
+    );
   }
 }
 
-export const api = new API(`${API_URL}/v1`);
+export const api = new API();

@@ -12,10 +12,16 @@ import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Logo } from "@/widgets/logo";
 import { useUserStore } from "@/shared/stores/user";
 import { RouteName } from "@/shared/types";
-import { getInitials } from "@/shared/utils";
 import MagicSearch from "./MagicSearch.vue";
 
 const userStore = useUserStore();
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+}
 </script>
 
 <template>

@@ -1,23 +1,12 @@
 import { ref, computed } from "vue";
 import { defineStore } from "pinia";
-import {
-  useStorage,
-  StorageSerializers,
-  type RemovableRef,
-} from "@vueuse/core";
+import { useStorage, StorageSerializers } from "@vueuse/core";
+import type { RemovableRef } from "@vueuse/core";
 import { getStorageKey, isDefined } from "@/shared/utils";
-import type { MoodleUser } from "@/shared/types";
+import type { MoodleUser, User } from "@/shared/types";
 
 export const useUserStore = defineStore("user", () => {
   const token: RemovableRef<string> = useStorage(getStorageKey("token"), "");
-
-  type User = {
-    moodle_id: number;
-    barcode: string;
-    name: string;
-    name_alias?: string;
-    email?: string;
-  };
 
   const user: RemovableRef<User | undefined> = useStorage(
     getStorageKey("user"),

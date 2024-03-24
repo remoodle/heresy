@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { API_URL, WEB_SERVICES_REPO } from "@/shared/config";
-import { Link } from "@/shared/ui/link";
-import { getRepoURL } from "@/shared/utils";
+import { ref, watchEffect } from "vue";
+import { getURLHost } from "@/shared/utils";
+
+const props = defineProps<{ host: string }>();
 
 const status = ref<{
   available: boolean;
@@ -22,18 +22,15 @@ const pingServer = async (url: string) => {
   }
 };
 
-onMounted(async () => {
-  status.value = await pingServer(API_URL);
+watchEffect(async () => {
+  status.value = await pingServer(props.host);
 });
 </script>
 
 <template>
   <span v-if="status">
-    |
     <template v-if="status.available">
-      <Link :to="getRepoURL(WEB_SERVICES_REPO)" underline hover>{{
-        WEB_SERVICES_REPO
-      }}</Link>
+      {{ getURLHost(host) }}
       <span class="break-all"> v{{ status.versionTag }} </span>
     </template>
     <template v-else>Server is not responding</template>

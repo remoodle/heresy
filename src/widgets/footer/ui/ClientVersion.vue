@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { getBuildInfo, getRepoURL, isDefined } from "@/shared/utils";
-import { WEB_CLIENT_REPO } from "@/shared/config";
 import { Link } from "@/shared/ui/link";
+import { isDefined } from "@/shared/utils";
+import { WEB_CLIENT_REPO } from "@/shared/config";
+import { getRepoURL, getBuildInfo } from "../lib";
 
 const buildInfo = getBuildInfo() ?? {
   version: "0",

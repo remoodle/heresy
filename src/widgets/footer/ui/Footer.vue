@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { MonoLogo } from "@/widgets/logo";
 import { ThemeSwitcher } from "@/features/theme-switcher";
+import { useAppStore } from "@/shared/stores/app";
 import APIVersion from "./APIVersion.vue";
 import ClientVersion from "./ClientVersion.vue";
+
+const appStore = useAppStore();
 </script>
 
 <template>
@@ -13,10 +16,13 @@ import ClientVersion from "./ClientVersion.vue";
     <div
       class="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-3 border-t py-4"
     >
-      <p class="text-muted-foreground">
+      <div class="flex flex-wrap gap-2 text-muted-foreground">
         <ClientVersion />
-        <APIVersion />
-      </p>
+        <APIVersion
+          v-if="appStore.selectedProvider"
+          :host="appStore.selectedProvider.api"
+        />
+      </div>
       <ThemeSwitcher class="flex-none" />
     </div>
   </footer>

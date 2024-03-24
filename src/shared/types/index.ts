@@ -1,3 +1,5 @@
+/// Routing
+
 export enum RouteName {
   Home = "home",
   Dashboard = "dashboard",
@@ -13,7 +15,7 @@ export enum RouteName {
   Privacy = "privacy",
 }
 
-///
+/// HTTP
 
 export type APIError = {
   status: number;
@@ -26,7 +28,21 @@ export type APIErrorResponse = {
 
 export type APIWrapper<T> = T | APIErrorResponse;
 
-///
+/// Application
+
+export type User = {
+  moodle_id: number;
+  barcode: string;
+  name: string;
+  name_alias?: string;
+  email?: string;
+};
+
+export type Provider = { name: string; api: string };
+
+export type Providers = Record<string, Provider>;
+
+/// API
 
 export type MoodleUser = {
   moodle_id: number;

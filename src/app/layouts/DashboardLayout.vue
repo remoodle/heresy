@@ -1,6 +1,17 @@
 <script setup lang="ts">
+import { onMounted, onBeforeUnmount } from "vue";
 import { Header } from "@/widgets/header";
 import { Footer } from "@/widgets/footer";
+
+const attr = "data-dashboard";
+
+onMounted(() => {
+  document.documentElement.setAttribute(attr, "true");
+});
+
+onBeforeUnmount(() => {
+  document.documentElement.removeAttribute(attr);
+});
 </script>
 
 <template>
