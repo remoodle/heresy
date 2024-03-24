@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -34,7 +33,7 @@ defineModel<Providers>("providers", {
           )
         "
       >
-        <p v-if="provider">
+        <p v-if="provider && providers[provider]">
           Connected to
           <span>
             {{ providers[provider].name }}
@@ -42,6 +41,9 @@ defineModel<Providers>("providers", {
               {{ getURLHost(providers[provider].api) }}
             </span>
           </span>
+        </p>
+        <p v-else class="text-primary-foreground">
+          Click here to select API Provider
         </p>
       </div>
     </DialogTrigger>
