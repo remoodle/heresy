@@ -1,7 +1,7 @@
-import { GITHUB_ORG_URL } from "@/shared/config";
+import { githubOrgURL } from "@/shared/config";
 
 export function getRepoURL(repo: string) {
-  return `${GITHUB_ORG_URL}/${repo}`;
+  return `${githubOrgURL}/${repo}`;
 }
 
 export function getBuildInfo() {

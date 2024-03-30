@@ -1,12 +1,13 @@
+import { computed } from "vue";
+import { defineStore } from "pinia";
 import { useStorage, useColorMode } from "@vueuse/core";
 import type { RemovableRef } from "@vueuse/core";
-import { defineStore } from "pinia";
 import { getStorageKey } from "@/shared/utils";
 import type { Providers, Provider } from "@/shared/types";
-import { computed } from "vue";
+import { defaultProviders } from "@/shared/config";
 
 export const useAppStore = defineStore("app", () => {
-  const { store: theme } = useColorMode({
+  const { store: storedTheme, system: systemTheme } = useColorMode({
     modes: {
       light: "light",
       dark: "dark",
@@ -15,18 +16,15 @@ export const useAppStore = defineStore("app", () => {
   });
 
   const toggleTheme = () => {
-    theme.value = theme.value === "light" ? "dark" : "light";
+    storedTheme.value = storedTheme.value === "light" ? "dark" : "light";
   };
 
-  const defaultProviders: Providers = Object.freeze({
-    "aitu-341eb7e7-556a-4702-8c93-3423eadf94a2": {
-      name: "Astana IT University",
-      api: "https://aitu0.remoodle.app",
-    },
-    "nu-dc035a6f-099a-449a-bb87-0bac84f57e61": {
-      name: "Nazarbayev University",
-      api: "https://nu0.remoodle.app",
-    },
+  const theme = computed<"light" | "dark">(() => {
+    if (storedTheme.value === "auto") {
+      return systemTheme.value;
+    }
+
+    return storedTheme.value;
   });
 
   const availableProviders = useStorage<Providers>(
@@ -34,19 +32,19 @@ export const useAppStore = defineStore("app", () => {
     Object.assign({}, defaultProviders),
   );
 
-  const provider: RemovableRef<string> = useStorage(
+  const providerId: RemovableRef<string> = useStorage(
     getStorageKey("provider"),
     Object.keys(availableProviders.value)[0],
   );
 
   const selectedProvider = computed<Provider | undefined>(() => {
-    return availableProviders.value[provider.value];
+    return availableProviders.value[providerId.value];
   });
 
   return {
     theme,
     toggleTheme,
-    provider,
+    providerId,
     availableProviders,
     selectedProvider,
   };

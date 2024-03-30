@@ -141,9 +141,6 @@ class API {
   async getActiveCourses() {
     return this.request<ActiveCourse[]>(this.prepareURL("user/courses"), {
       method: "GET",
-      searchParams: {
-        content: 1,
-      },
     });
   }
 
@@ -160,6 +157,9 @@ class API {
     return this.request<Course>(this.prepareURL(`course/${courseId}`), {
       method: "GET",
       signal,
+      searchParams: {
+        content: 1,
+      },
     });
   }
 

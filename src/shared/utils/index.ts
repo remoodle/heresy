@@ -23,7 +23,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function getStorageKey(key: string, storageVersion?: number) {
-  return `remoodle-${key}` + (storageVersion ? `-${storageVersion}` : "");
+  return `h3-${key}` + (storageVersion ? `-${storageVersion}` : "");
 }
 
 export function getURLHost(url: string) {
@@ -45,6 +45,13 @@ export function partition<T, U extends string>(
     target.push(el);
   }
   return res;
+}
+
+export function getRandomInt(min: number, max: number) {
+  const minCeiled = Math.ceil(min);
+  const maxFloored = Math.floor(max);
+
+  return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled);
 }
 
 export function fromUnix(timestamp: TDate): Date {

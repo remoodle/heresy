@@ -1,15 +1,31 @@
 <script setup lang="ts">
-import { watch, watchEffect } from "vue";
+import { onMounted, watch } from "vue";
+import { storeToRefs } from "pinia";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/shared/stores/user";
 import { useAppStore } from "@/shared/stores/app";
 import { RouteName } from "@/shared/types";
+import { defaultProviders } from "@/shared/config";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const appStore = useAppStore();
 
-watchEffect(() => {
-  document.documentElement.setAttribute("data-theme", appStore.theme);
+const { availableProviders } = storeToRefs(appStore);
+
+watch(
+  () => appStore.theme,
+  (value) => {
+    document.documentElement.setAttribute("data-theme", value);
+  },
+  { immediate: true },
+);
+
+onMounted(() => {
+  Object.assign(
+    availableProviders.value,
+    defaultProviders,
+    availableProviders.value,
+  );
 });
 
 const route = useRoute();

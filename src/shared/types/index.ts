@@ -38,7 +38,22 @@ export type User = {
   email?: string;
 };
 
-export type Provider = { name: string; api: string };
+export type Provider = {
+  name: string;
+  api: string;
+  description?: string;
+  privacy?: string;
+  moodle: {
+    requiresTokenGeneration: boolean;
+  };
+  services?: {
+    [key: string]: {
+      name: string;
+      description: string;
+      url: string;
+    };
+  };
+};
 
 export type Providers = Record<string, Provider>;
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from "@/shared/ui/link";
 import { isDefined } from "@/shared/utils";
-import { WEB_CLIENT_REPO } from "@/shared/config";
+import { webClientRepo } from "@/shared/config";
 import { getRepoURL, getBuildInfo } from "../lib";
 
 const buildInfo = getBuildInfo() ?? {
@@ -11,8 +11,8 @@ const buildInfo = getBuildInfo() ?? {
 
 <template>
   <span>
-    <Link :to="getRepoURL(WEB_CLIENT_REPO)" underline hover>{{
-      WEB_CLIENT_REPO
+    <Link :to="getRepoURL(webClientRepo)" underline hover>{{
+      webClientRepo
     }}</Link>
     <span v-if="isDefined(buildInfo)"> v{{ buildInfo.version }} </span>
   </span>

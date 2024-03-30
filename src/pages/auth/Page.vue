@@ -1,26 +1,45 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
+import { ProviderDialog } from "@/entities/provider";
 import { RouteName } from "@/shared/types";
+import { getURLHost } from "@/shared/utils";
 import { Link } from "@/shared/ui/link";
 import { useAppStore } from "@/shared/stores/app";
 import TokenForm from "./ui/TokenForm.vue";
 import LoginForm from "./ui/LoginForm.vue";
 import SignupForm from "./ui/SignupForm.vue";
-import HostProvider from "./ui/HostProvider.vue";
 
 const route = useRoute();
 
 const appStore = useAppStore();
 
-const { provider, availableProviders } = storeToRefs(appStore);
+const { providerId, availableProviders } = storeToRefs(appStore);
 </script>
 
 <template>
-  <HostProvider
-    v-model:provider="provider"
+  <ProviderDialog
+    v-model:provider-id="providerId"
     v-model:providers="availableProviders"
-  />
+  >
+    <template #default="{ selectedProvider }">
+      <div
+        class="flex w-full items-center gap-2 border-b px-3 py-2 duration-300 hover:bg-accent"
+      >
+        <p v-if="selectedProvider">
+          Connected to
+          <span>
+            {{ selectedProvider.name }}
+            <span class="text-sm text-muted-foreground">
+              {{ getURLHost(selectedProvider.api) }}
+            </span>
+          </span>
+        </p>
+        <p v-else>Click here to select API Provider</p>
+      </div>
+    </template>
+  </ProviderDialog>
+
   <div
     class="container grid h-full grid-cols-1 flex-col items-center justify-center lg:max-w-none lg:px-0"
   >

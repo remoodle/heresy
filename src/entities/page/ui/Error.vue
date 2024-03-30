@@ -2,7 +2,7 @@
 import { Icon } from "@/shared/ui/icon";
 import { Link } from "@/shared/ui/link";
 import { Button } from "@/shared/ui/button";
-import { TELEGRAM_CHAT } from "@/shared/config";
+import { telegramChat } from "@/shared/config";
 
 withDefaults(
   defineProps<{
@@ -24,7 +24,7 @@ const emit = defineEmits(["retry"]);
         <span class="text-lg font-bold leading-6"> An error occurred </span>
         <p class="text-base-content/80 text-sm">
           Try again or
-          <Link :to="TELEGRAM_CHAT" underline hover> contact us </Link>
+          <Link :to="telegramChat" underline hover> contact us </Link>
         </p>
       </div>
       <Button class="w-fit px-4" @click="emit('retry')"> Try again </Button>

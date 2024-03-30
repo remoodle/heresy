@@ -5,4 +5,7 @@ export const icons = {
   search: "ic:sharp-search",
   sun: "material-symbols:sunny-rounded",
   moon: "material-symbols:dark-mode",
+  edit: "ic:round-edit",
+  add: "ic:round-add",
+  delete: "ic:round-delete",
 } as const;

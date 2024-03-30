@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CourseContent, CourseModule } from "@/shared/types";
 import CourseContentModule from "./CourseContentModule.vue";
+import ContentGrid from "./ContentGrid.vue";
 
 defineProps<{
   content: CourseContent;
@@ -54,15 +55,13 @@ const moduleSorter = (a: CourseModule, b: CourseModule) => {
     <p v-show="content.summary">
       {{ content.summary }}
     </p>
-    <div
-      class="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
-    >
+    <ContentGrid>
       <template
         v-for="item in [...content.modules].sort(moduleSorter)"
         :key="item.id"
       >
         <CourseContentModule :module="item" :token="token" />
       </template>
-    </div>
+    </ContentGrid>
   </div>
 </template>
