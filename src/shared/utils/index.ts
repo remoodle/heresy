@@ -14,6 +14,10 @@ export function isDefined<T>(value: T): value is NonNullable<T> {
   return value !== undefined && value !== null;
 }
 
+export function insertIf<T>(condition = true, ...elements: T[]) {
+  return condition ? elements : [];
+}
+
 export function isEmptyString(value: string) {
   return value.trim() === "";
 }

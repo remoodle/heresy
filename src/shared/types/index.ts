@@ -197,3 +197,24 @@ export type CourseModule = {
     repositorytype: string;
   };
 };
+
+export type AssignmentAttachment = {
+  filename: string;
+  filepath: string;
+  filesize: number;
+  fileurl: string;
+  timemodified: number;
+  mimetype: string;
+  isexternalfile: boolean;
+};
+
+export type Assignment = {
+  assignment_id: number;
+  course_id: number;
+  name: string;
+  nosubmissions: boolean;
+  duedate: number;
+  allowsubmissionsfromdate: number;
+  grade: number;
+  introattachments: AssignmentAttachment[];
+};

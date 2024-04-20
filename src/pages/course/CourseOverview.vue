@@ -5,7 +5,12 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { getRandomInt } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
 
+defineOptions({
+  name: "CourseOverview",
+});
+
 defineProps<{
+  courseId: number;
   content?: CourseContent[];
 }>();
 
@@ -18,7 +23,11 @@ const userStore = useUserStore();
   <div class="flex w-full flex-col gap-5">
     <template v-if="content">
       <template v-for="item in content" :key="item.id">
-        <CourseContentCard :content="item" :token="userStore.token" />
+        <CourseContentCard
+          :course-id="courseId"
+          :content="item"
+          :token="userStore.token"
+        />
         <hr />
       </template>
     </template>

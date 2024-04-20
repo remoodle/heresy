@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { CourseModule } from "@/shared/types";
+import { RouteName } from "@/shared/types";
 import { Link } from "@/shared/ui/link";
 import { Text } from "@/shared/ui/text";
 import { Alert } from "@/shared/ui/alert";
 import { filesize } from "@/shared/utils";
 
 const props = defineProps<{
+  courseId: number;
   module: CourseModule;
   token: string;
 }>();
@@ -34,7 +36,10 @@ const prepareURL = (fileurl: string, type: string) => {
                     module.contents[0].fileurl,
                     module.contents[0].type,
                   )
-                : module.url
+                : {
+                    name: RouteName.Assignment,
+                    params: { courseId: courseId, assignmentId: module.id },
+                  }
             "
             hover
           >

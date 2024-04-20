@@ -4,6 +4,7 @@ import CourseContentModule from "./CourseContentModule.vue";
 import ContentGrid from "./ContentGrid.vue";
 
 defineProps<{
+  courseId: number;
   content: CourseContent;
   token: string;
 }>();
@@ -60,7 +61,11 @@ const moduleSorter = (a: CourseModule, b: CourseModule) => {
         v-for="item in [...content.modules].sort(moduleSorter)"
         :key="item.id"
       >
-        <CourseContentModule :module="item" :token="token" />
+        <CourseContentModule
+          :course-id="courseId"
+          :module="item"
+          :token="token"
+        />
       </template>
     </ContentGrid>
   </div>

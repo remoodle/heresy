@@ -4,9 +4,9 @@ import { Avatar } from "@boringer-avatars/vue3";
 withDefaults(
   defineProps<{
     name: string | number;
-    indicator: boolean;
-    indicatorStyles: string;
-    size: number;
+    indicator?: boolean;
+    indicatorStyles?: string;
+    size?: number;
   }>(),
   {
     name: "",

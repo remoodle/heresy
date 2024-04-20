@@ -9,12 +9,7 @@ import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
 import NotFoundPage from "@/pages/404/Page.vue";
 import AccountPage from "@/pages/account/Page.vue";
-// import AccountProfilePage from "@/pages/account/AccountProfilePage.vue";
-// import AccountSecurityPage from "@/pages/account/AccountSecurityPage.vue";
 import CoursePage from "@/pages/course/Page.vue";
-import CourseOverviewPage from "@/pages/course/sub/Overview.vue";
-import CourseGradesPage from "@/pages/course/sub/Grades.vue";
-import CourseAssignmentPage from "@/pages/course/sub/Assignment.vue";
 import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
@@ -56,18 +51,17 @@ const routes: RouteRecordRaw[] = [
           {
             path: "",
             name: RouteName.Course,
-            component: CourseOverviewPage,
+            component: CoursePage,
           },
           {
             path: "grades",
             name: RouteName.Grades,
-            component: CourseGradesPage,
-            props: true,
+            component: CoursePage,
           },
           {
             path: "assignment/:assignmentId",
             name: RouteName.Assignment,
-            component: CourseAssignmentPage,
+            component: CoursePage,
           },
         ],
       },

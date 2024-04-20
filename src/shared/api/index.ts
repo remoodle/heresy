@@ -9,6 +9,7 @@ import type {
   MoodleUser,
   UserSettings,
   Course,
+  Assignment,
 } from "@/shared/types";
 import { isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
@@ -189,6 +190,16 @@ class API {
         content: 1,
       },
     });
+  }
+
+  async getCourseAssignments(courseId: string, signal?: AbortSignal) {
+    return this.request<Assignment[]>(
+      this.prepareURL(`course/${courseId}/assignments`),
+      {
+        method: "GET",
+        signal,
+      },
+    );
   }
 
   async getCourseGrades(courseId: string) {
