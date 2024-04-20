@@ -44,7 +44,7 @@ defineProps<{
           },
         }"
         hover
-        class="truncate text-sm text-muted-foreground"
+        class="truncate text-sm"
       >
         {{ splitCourseName(deadline.course_name).name }}
       </Link>

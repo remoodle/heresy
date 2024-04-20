@@ -8,6 +8,8 @@ export enum RouteName {
   Token = "token",
   NotFound = "404",
   Account = "account",
+  AccountProfile = "profile",
+  AccountNotifications = "notifications",
   Course = "course",
   Grades = "course-grades",
   Assignment = "assignment",
@@ -32,7 +34,7 @@ export type APIWrapper<T> = T | APIErrorResponse;
 
 export type User = {
   moodle_id: number;
-  barcode: string;
+  username: string;
   name: string;
   name_alias?: string;
   email?: string;
@@ -61,7 +63,7 @@ export type Providers = Record<string, Provider>;
 
 export type MoodleUser = {
   moodle_id: number;
-  barcode: string;
+  username: string;
   name: string;
   name_alias: string | null;
   email: string | null;
@@ -72,7 +74,7 @@ type NotifyMethod = "email" | "webhook";
 
 export type UserSettings = {
   moodle_id: number;
-  barcode: string;
+  username: string;
   name: string;
   name_alias: string | null;
   has_password: boolean;

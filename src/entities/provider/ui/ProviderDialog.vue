@@ -26,7 +26,12 @@ defineModel<Providers>("providers", {
   required: true,
 });
 
-const defaultProvider = Object.freeze({
+type TempProvider = Provider & { id: string };
+
+const editingMode = ref(false);
+
+const defaultProvider: TempProvider = Object.freeze({
+  id: "",
   name: "",
   description: "",
   api: "",
@@ -39,7 +44,7 @@ const defaultProvider = Object.freeze({
 
 const getDefaults = () => Object.assign({}, defaultProvider);
 
-const tempProvider = ref<Provider>(getDefaults());
+const tempProvider = ref<TempProvider>(getDefaults());
 
 const resetTempProvider = () => {
   Object.assign(tempProvider.value, getDefaults());
@@ -50,8 +55,6 @@ const generateId = (name: string) => {
 };
 
 const showProviderModal = ref(false);
-
-const editingMode = ref(false);
 </script>
 
 <template>
@@ -82,7 +85,7 @@ const editingMode = ref(false);
                   size="icon"
                   @click="
                     () => {
-                      tempProvider = Object.assign({}, v);
+                      tempProvider = Object.assign({}, v, { id: k });
                       showProviderModal = true;
                       editingMode = true;
                     }
@@ -141,10 +144,17 @@ const editingMode = ref(false);
                     () => {
                       const id = generateId(tempProvider.name);
 
-                      $emit('update:providers', {
-                        ...providers,
-                        [id]: Object.assign({}, tempProvider),
-                      });
+                      if (editingMode) {
+                        $emit('update:providers', {
+                          ...providers,
+                          [tempProvider.id]: Object.assign({}, tempProvider),
+                        });
+                      } else {
+                        $emit('update:providers', {
+                          ...providers,
+                          [id]: Object.assign({}, tempProvider),
+                        });
+                      }
 
                       resetTempProvider();
                       showProviderModal = false;

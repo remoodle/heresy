@@ -50,23 +50,24 @@ onMounted(run);
     <Error @retry="run" />
   </template>
   <template v-else>
-    <ToggleGroup
-      class="flex items-start justify-start"
-      v-model="toggledCourseCategories"
-      type="multiple"
-      size="sm"
-      variant="outline"
-    >
-      <ToggleGroupItem
-        v-for="category in courseCategories"
-        :key="category"
-        :value="category"
-        :aria-label="`Toggle ${category}`"
+    <template v-if="courseCategories.length > 1">
+      <ToggleGroup
+        class="flex flex-wrap items-start justify-start"
+        v-model="toggledCourseCategories"
+        type="multiple"
+        variant="primary"
       >
-        {{ category }}
-      </ToggleGroupItem>
-    </ToggleGroup>
-    <div class="py-2" />
+        <ToggleGroupItem
+          v-for="category in courseCategories"
+          :key="category"
+          :value="category"
+          :aria-label="`Toggle ${category}`"
+        >
+          {{ category }}
+        </ToggleGroupItem>
+      </ToggleGroup>
+      <div class="py-2" />
+    </template>
     <div class="flex flex-col gap-3">
       <CourseListCard
         v-for="course in toggledCourseCategories.flatMap(

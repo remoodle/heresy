@@ -2,8 +2,8 @@
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { ProviderDialog } from "@/entities/provider";
+import { Footer } from "@/widgets/footer";
 import { RouteName } from "@/shared/types";
-import { getURLHost } from "@/shared/utils";
 import { Link } from "@/shared/ui/link";
 import { useAppStore } from "@/shared/stores/app";
 import TokenForm from "./ui/TokenForm.vue";
@@ -26,16 +26,18 @@ const { providerId, availableProviders } = storeToRefs(appStore);
       <div
         class="flex w-full items-center gap-2 border-b px-3 py-2 duration-300 hover:bg-accent"
       >
-        <p v-if="selectedProvider">
-          Connected to
-          <span>
-            {{ selectedProvider.name }}
-            <span class="text-sm text-muted-foreground">
-              {{ getURLHost(selectedProvider.api) }}
+        <div class="container mx-auto">
+          <p v-if="selectedProvider">
+            Connected to
+            <span>
+              {{ selectedProvider.name }}
+              <!-- <span class="text-sm text-muted-foreground">
+                {{ getURLHost(selectedProvider.api) }}
+              </span> -->
             </span>
-          </span>
-        </p>
-        <p v-else>Click here to select API Provider</p>
+          </p>
+          <p v-else>Click here to select API Provider</p>
+        </div>
       </div>
     </template>
   </ProviderDialog>
@@ -104,4 +106,5 @@ const { providerId, availableProviders } = storeToRefs(appStore);
       </div>
     </div>
   </div>
+  <Footer slim />
 </template>

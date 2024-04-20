@@ -6,11 +6,21 @@ import APIVersion from "./APIVersion.vue";
 import ClientVersion from "./ClientVersion.vue";
 
 const appStore = useAppStore();
+
+withDefaults(
+  defineProps<{
+    slim?: boolean;
+  }>(),
+  {
+    slim: false,
+  },
+);
 </script>
 
 <template>
   <footer
-    class="container flex flex-wrap items-center justify-between gap-x-4 gap-y-3 py-6"
+    class="container flex flex-wrap items-center justify-between gap-x-4 gap-y-3"
+    :class="{ 'py-6': !slim }"
   >
     <MonoLogo />
     <div

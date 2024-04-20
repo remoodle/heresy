@@ -1,7 +1,10 @@
 import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, loadEnv, splitVendorChunkPlugin } from "vite";
+import { defineConfig, loadEnv } from "vite";
+import tailwind from "tailwindcss";
+import autoprefixer from "autoprefixer";
 import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
 import { partytownVite } from "@builder.io/partytown/utils";
 import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
 import injectCDNPrefix, {
@@ -24,6 +27,11 @@ export default defineConfig((config) => {
   });
 
   return {
+    css: {
+      postcss: {
+        plugins: [tailwind(), autoprefixer()],
+      },
+    },
     resolve: {
       alias: {
         "@": resolve("./src"),
@@ -34,8 +42,8 @@ export default defineConfig((config) => {
     },
     plugins: [
       vue(),
+      vueDevTools(),
       validateEnv(),
-      splitVendorChunkPlugin(),
       injectCDNPrefix({ cdnPrefixUrl }),
       injectBuildInfo({
         sha: env.COMMIT_SHA || env.CF_PAGES_COMMIT_SHA,

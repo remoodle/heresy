@@ -39,7 +39,7 @@ const test = [
   },
   {
     event_id: 123,
-    timestart: 1711389600,
+    timestart: 1713565721,
     instance: 104300,
     name: "Final Exam is due",
     visible: 1,
@@ -55,9 +55,11 @@ const { run, loading, error } = createAsyncProcess(async () => {
     throw error;
   }
 
+  // const sorted = test.sort((a, b) => a.timestart - b.timestart);
+  const sorted = data.sort((a, b) => a.timestart - b.timestart);
+
   deadlines.value = partition(
-    data,
-    // test,
+    sorted,
     ({ timestart }) => `${formatDate(fromUnix(timestart), "fullDate")}`,
   );
 });
@@ -75,14 +77,15 @@ onMounted(run);
     <Error @retry="run" />
   </template>
   <template v-else>
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-6">
       <div v-for="[date, list] in objectEntries(deadlines)" :key="date">
-        <div class="mb-1 flex justify-between">
-          <span class="text-lg font-medium">
+        <div class="mb-2 flex justify-between">
+          <span class="text-sm font-medium text-muted-foreground">
+            <span v-if="formatDate(Date.now(), 'fullDate') === date"> 🔥 </span>
             {{ date }}
           </span>
         </div>
-        <div class="flex flex-col gap-1.5">
+        <div class="flex flex-col gap-2.5">
           <DeadlineCard
             v-for="deadline in list"
             :key="deadline.event_id"

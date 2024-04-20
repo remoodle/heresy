@@ -45,5 +45,3 @@ onMounted(async () => {
     >{{ JSON.stringify(grades, null, 2) }}
   </pre>
 </template>
-
-<style scoped></style>

@@ -19,13 +19,13 @@ defineProps<{
         {{ provider.name }}
       </Label>
     </div>
-    <span class="mt-1 text-left text-sm">
-      {{ provider.description }}
-      <br />
+    <span class="mt-1 flex flex-col text-left text-sm">
+      <template v-if="provider.description">
+        {{ provider.description }}
+      </template>
       <strong>
         {{ getURLHost(provider.api) }}
       </strong>
-      <br />
       <template v-if="provider.privacy">
         <Link underline hover :to="provider.privacy"> Privacy Policy </Link>
       </template>

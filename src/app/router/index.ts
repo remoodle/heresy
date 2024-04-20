@@ -9,6 +9,8 @@ import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
 import NotFoundPage from "@/pages/404/Page.vue";
 import AccountPage from "@/pages/account/Page.vue";
+// import AccountProfilePage from "@/pages/account/AccountProfilePage.vue";
+// import AccountSecurityPage from "@/pages/account/AccountSecurityPage.vue";
 import CoursePage from "@/pages/course/Page.vue";
 import CourseOverviewPage from "@/pages/course/sub/Overview.vue";
 import CourseGradesPage from "@/pages/course/sub/Grades.vue";
@@ -28,7 +30,25 @@ const routes: RouteRecordRaw[] = [
     component: DashboardLayout,
     children: [
       { path: "", name: RouteName.Home, component: HomePage },
-      { path: "account", name: RouteName.Account, component: AccountPage },
+      {
+        path: "/account",
+        name: RouteName.Account,
+        meta: { auth: "required" },
+        redirect: { name: RouteName.AccountProfile },
+        component: AccountPage,
+        children: [
+          {
+            path: "",
+            name: RouteName.AccountProfile,
+            component: AccountPage,
+          },
+          {
+            path: "security",
+            name: RouteName.AccountNotifications,
+            component: AccountPage,
+          },
+        ],
+      },
       {
         path: "course/:courseId",
         component: CoursePage,

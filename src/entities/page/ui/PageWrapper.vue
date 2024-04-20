@@ -50,7 +50,7 @@ const elBanner = ref();
               </Link>
               <h1
                 data-testid="page-title"
-                class="break-all text-2xl font-semibold md:text-3xl"
+                class="break-all text-2xl font-medium md:text-3xl"
               >
                 <slot name="title"></slot>
               </h1>

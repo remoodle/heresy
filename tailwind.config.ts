@@ -4,6 +4,8 @@ import typography from "@tailwindcss/typography";
 
 export default {
   darkMode: ["class"],
+  safelist: ["dark"],
+  prefix: "",
 
   content: [
     "./pages/**/*.{ts,tsx,vue}",

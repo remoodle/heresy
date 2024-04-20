@@ -28,7 +28,7 @@ export const useUserStore = defineStore("user", () => {
     user.value = {
       moodle_id: userData.moodle_id,
       name: userData.name,
-      barcode: userData.barcode,
+      username: userData.username,
       ...(isDefined(userData.name_alias) && {
         name_alias: userData.name_alias,
       }),

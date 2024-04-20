@@ -83,7 +83,7 @@ class API {
     const appStore = useAppStore();
 
     if (!appStore.selectedProvider) {
-      console.warn("API Provider is not set");
+      alert("API Provider is not set");
       return path;
     }
 
@@ -126,9 +126,37 @@ class API {
     });
   }
 
+  async deleteUser() {
+    return this.request<{}>(this.prepareURL("user"), {
+      method: "DELETE",
+    });
+  }
+
   async getUserSettings() {
     return this.request<UserSettings>(this.prepareURL("user/settings"), {
       method: "GET",
+    });
+  }
+
+  async updateUserSettings({
+    name_alias,
+    password,
+    deadlines_notification,
+    grades_notification,
+  }: {
+    name_alias?: string;
+    password?: string;
+    deadlines_notification?: boolean;
+    grades_notification?: boolean;
+  }) {
+    return this.request<UserSettings>(this.prepareURL("user/settings"), {
+      method: "POST",
+      json: {
+        name_alias,
+        password,
+        deadlines_notification,
+        grades_notification,
+      },
     });
   }
 
