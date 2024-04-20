@@ -17,13 +17,6 @@ export const defaultProviders: Providers = Object.freeze({
     moodle: {
       requiresTokenGeneration: false,
     },
-    // services: {
-    //   "schedule-0": {
-    //     name: "Schedule",
-    //     description: "AITU Schedule",
-    //     url: "https://aitu0.remoodle.app/schedule",
-    //   },
-    // },
   },
   "nu-dc035a6f-099a-449a-bb87-0bac84f57e61": {
     name: "Nazarbayev University",

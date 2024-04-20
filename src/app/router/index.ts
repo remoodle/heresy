@@ -14,7 +14,8 @@ import DashboardLayout from "../layouts/DashboardLayout.vue";
 
 declare module "vue-router" {
   interface RouteMeta {
-    auth: "required" | "forbidden" | "none";
+    auth?: "required" | "forbidden" | "none";
+    unstickyHeader?: boolean;
   }
 }
 
@@ -47,6 +48,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: "course/:courseId",
         component: CoursePage,
+        meta: { unstickyHeader: true },
         children: [
           {
             path: "",

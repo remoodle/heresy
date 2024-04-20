@@ -139,6 +139,16 @@ export type CourseContent = {
   modules: CourseModule[];
 };
 
+export type AssignmentAttachment = {
+  filename: string;
+  filepath: string;
+  filesize: number;
+  fileurl: string;
+  timemodified: number;
+  mimetype: string;
+  isexternalfile: boolean;
+};
+
 export type CourseModule = {
   id: number;
   url: string;
@@ -174,21 +184,21 @@ export type CourseModule = {
     timestamp: number;
   }[];
   availabilityinfo?: string;
-  contents?: {
+  contents?: (AssignmentAttachment & {
+    // filename: string;
+    // filepath: string;
+    // filesize: number;
+    // fileurl: string;
+    // timemodified: number;
+    // mimetype: string;
+    // isexternalfile: boolean;
     type: string;
-    filename: string;
-    filepath: string;
-    filesize: number;
-    fileurl: string;
     timecreated: number;
-    timemodified: number;
     sortorder: number;
-    mimetype: string;
-    isexternalfile: boolean;
     userid: number;
     author: string;
     license: string;
-  }[];
+  })[];
   contentsinfo?: {
     filescount: number;
     filessize: number;
@@ -196,16 +206,6 @@ export type CourseModule = {
     mimetypes: string[];
     repositorytype: string;
   };
-};
-
-export type AssignmentAttachment = {
-  filename: string;
-  filepath: string;
-  filesize: number;
-  fileurl: string;
-  timemodified: number;
-  mimetype: string;
-  isexternalfile: boolean;
 };
 
 export type Assignment = {

@@ -27,7 +27,8 @@ function getInitials(name: string) {
 
 <template>
   <header
-    class="fixed top-0 z-[20] flex h-16 w-full flex-none justify-center bg-background shadow-sm"
+    class="top-0 z-[20] flex h-16 w-full flex-none justify-center bg-background shadow-sm"
+    :class="{ sticky: !$route.meta.unstickyHeader }"
   >
     <div class="container flex h-full w-full items-center justify-between">
       <div class="inline-flex w-1/2 items-center justify-start">

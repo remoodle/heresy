@@ -27,7 +27,6 @@ defineProps<{
           },
           query: {
             courseName: deadline.course_name,
-            assignmentName: formatAssignmentName(deadline.name),
           },
         }"
         hover

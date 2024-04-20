@@ -2,7 +2,27 @@
 import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { Assignment } from "@/shared/types";
-import { formatAssignmentName } from "@/shared/utils";
+import { FileIcon } from "@/entities/attachment";
+import { RouteName } from "@/shared/types";
+import { Link } from "@/shared/ui/link";
+// import { toRoutePath } from "@/shared/utils";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/shared/ui/breadcrumb";
+import {
+  splitCourseName,
+  formatAssignmentName,
+  filesize,
+  formatDate,
+  fromUnix,
+  prepareFileURL,
+  getRelativeTime,
+} from "@/shared/utils";
 
 defineOptions({
   name: "CourseAssignment",
@@ -11,6 +31,7 @@ defineOptions({
 const props = defineProps<{
   assignment?: Assignment;
   loadingAssignments: boolean;
+  token: string;
 }>();
 
 const route = useRoute();
@@ -31,6 +52,53 @@ onMounted(async () => {
 </script>
 
 <template>
-  {{ assignment }}
-  {{ loadingAssignments }}
+  <div class="p-6">
+    <template v-if="assignment">
+      <span class="text-3xl">
+        {{ assignment.name }}
+      </span>
+
+      <div class="my-6 flex flex-col gap-2">
+        <!-- <span> Max grade: {{ assignment.grade }} </span> -->
+        <p>
+          <strong> Opened: </strong>
+          <span>
+            {{
+              formatDate(fromUnix(assignment.allowsubmissionsfromdate), "full")
+            }}
+          </span>
+        </p>
+        <p>
+          <strong> Due: </strong>
+          <span>
+            {{ formatDate(fromUnix(assignment.duedate), "full") }}
+          </span>
+        </p>
+      </div>
+
+      <ul v-if="assignment.introattachments.length" class="flex flex-col gap-4">
+        <li
+          v-for="file in assignment.introattachments"
+          :key="file.filename"
+          class="flex flex-col gap-0.5"
+        >
+          <div class="flex items-center gap-2">
+            <FileIcon :mimetype="file.mimetype" class="w-7" />
+            <Link
+              :to="prepareFileURL(file.fileurl, token)"
+              hover
+              class="text-primary"
+            >
+              {{ file.filename }}
+            </Link>
+          </div>
+          <span class="pl-9 text-sm">
+            {{ formatDate(fromUnix(file.timemodified), "full") }}
+            ({{ filesize(file.filesize) }})
+          </span>
+        </li>
+      </ul>
+    </template>
+    <!-- {{ loadingAssignments }} -->
+  </div>
 </template>

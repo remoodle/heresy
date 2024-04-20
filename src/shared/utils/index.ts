@@ -1,5 +1,6 @@
 import { ref, type Ref } from "vue";
 import { clsx, type ClassValue } from "clsx";
+import { type RouteLocationRaw } from "vue-router";
 import { twMerge } from "tailwind-merge";
 import type { APIError } from "../types";
 import { dayjs, type TDate } from "./dayjs";
@@ -36,6 +37,14 @@ export function getURLHost(url: string) {
   } catch (e) {
     return url;
   }
+}
+
+export function prepareFileURL(fileurl: string, token: string) {
+  const url = new URL(fileurl);
+
+  url.searchParams.set("token", token);
+
+  return url.toString();
 }
 
 export function partition<T, U extends string>(

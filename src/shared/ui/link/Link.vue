@@ -27,7 +27,6 @@ const isExternal = computed(
 );
 
 const classes = computed(() => [
-  "link",
   [props.underline ? "underline underline-offset-4" : "no-underline"],
   { "link-hover hover:text-primary": props.hover },
   { "hover:opacity-80": props.decreaseOpacity },

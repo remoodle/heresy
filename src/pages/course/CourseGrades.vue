@@ -47,19 +47,22 @@ onMounted(async () => {
 </script>
 
 <template>
-  {{ loadingCourse }}
-  {{ grades }}
-  <div v-if="grades">
-    <li v-for="item in grades" :key="item.cmid">
-      <Link
-        :to="{
-          name: RouteName.Assignment,
-          params: { courseId: courseId, assignmentId: item.cmid },
-        }"
-      >
-        Grades
-      </Link>
-    </li>
+  <!-- {{ loadingCourse }}
+  {{ grades }} -->
+  <div class="p-6">
+    {{ grades }}
+    <div v-if="grades">
+      <li v-for="item in grades" :key="item.cmid">
+        <Link
+          :to="{
+            name: RouteName.Assignment,
+            params: { courseId: courseId, assignmentId: item.cmid },
+          }"
+        >
+          Grades
+        </Link>
+      </li>
+    </div>
   </div>
   <!-- 
   <pre

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { prepareFileURL } from "@/shared/utils";
 import type { CourseModule } from "@/shared/types";
 import { RouteName } from "@/shared/types";
 import { Link } from "@/shared/ui/link";
 import { Text } from "@/shared/ui/text";
-import { Alert } from "@/shared/ui/alert";
 import { filesize } from "@/shared/utils";
 
 const props = defineProps<{
@@ -11,16 +11,6 @@ const props = defineProps<{
   module: CourseModule;
   token: string;
 }>();
-
-const prepareURL = (fileurl: string, type: string) => {
-  const url = new URL(fileurl);
-
-  if (type === "file") {
-    url.searchParams.set("token", props.token);
-  }
-
-  return url.toString();
-};
 </script>
 
 <template>
@@ -32,13 +22,13 @@ const prepareURL = (fileurl: string, type: string) => {
           <Link
             :to="
               module.contents?.length === 1
-                ? prepareURL(
-                    module.contents[0].fileurl,
-                    module.contents[0].type,
-                  )
+                ? prepareFileURL(module.contents[0].fileurl, token)
                 : {
                     name: RouteName.Assignment,
-                    params: { courseId: courseId, assignmentId: module.id },
+                    params: {
+                      courseId: courseId,
+                      assignmentId: module.instance,
+                    },
                   }
             "
             hover
@@ -57,21 +47,21 @@ const prepareURL = (fileurl: string, type: string) => {
       class="prose prose-sm my-0.5 border-l-4 pl-2 text-foreground"
     />
     <template v-if="module.contents && module.contents.length">
-      <span
-        v-if="module.contents.length === 1"
-        class="break-all text-sm text-muted-foreground"
-      >
-        <template v-if="module.contents[0].type === 'url'">
-          {{ module.contents[0].fileurl }}
+      <ul class="flex flex-col gap-2">
+        <template v-for="item in module.contents" :key="item.timecreated">
+          <span class="break-all text-sm text-muted-foreground">
+            <template v-if="item.type === 'url'">
+              {{ item.fileurl }}
+            </template>
+            <template v-else-if="item.type === 'file'">
+              <Link :to="prepareFileURL(item.fileurl, token)" hover underline>
+                {{ item.filename }},
+                {{ filesize(item.filesize) }}
+              </Link>
+            </template>
+          </span>
         </template>
-        <template v-else-if="module.contents[0].type === 'file'">
-          {{ module.contents[0].filename }},
-          {{ filesize(module.contents[0].filesize) }}
-        </template>
-      </span>
-      <span v-else>
-        <Alert variant="destructive"> Unsupported behavior (Contact us) </Alert>
-      </span>
+      </ul>
     </template>
   </div>
 </template>
