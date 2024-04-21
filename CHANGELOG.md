@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.4](https://github.com/remoodle/heresy/compare/v0.0.3...v0.0.4) (2024-04-21)
+
+
+### Bug Fixes
+
+* add grades table view ([44c23c5](https://github.com/remoodle/heresy/commit/44c23c5f51cc64dfae85d8411a44b9aee490f5d5))
+
 ## [0.0.3](https://github.com/remoodle/heresy/compare/v0.0.2...v0.0.3) (2024-04-21)
 
 
