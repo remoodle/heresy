@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.3](https://github.com/remoodle/heresy/compare/v0.0.2...v0.0.3) (2024-04-21)
+
+
+### Bug Fixes
+
+* properly generate profile pictures ([dfb075e](https://github.com/remoodle/heresy/commit/dfb075edd58e9d59751216a8fc18de5004679b7f))
+
 ## [0.0.2](https://github.com/remoodle/heresy/compare/v0.0.1...v0.0.2) (2024-04-21)
 
 
