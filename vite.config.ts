@@ -1,10 +1,11 @@
 import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type ResolvedConfig } from "vite";
 import tailwind from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
+import { visualizer } from "rollup-plugin-visualizer";
 import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
 import injectCDNPrefix, {
   extractPrefixConfig,
@@ -56,6 +57,23 @@ export default defineConfig((config) => {
           chunkFileNames: "[name].js",
           assetFileNames: "assets/[name][extname]",
         },
+        plugins: [
+          {
+            name: "visualizer",
+            apply: "build",
+            enforce: "post",
+            configResolved(config: ResolvedConfig) {
+              // @ts-ignore
+              config.plugins.push(
+                visualizer({
+                  open: false,
+                  template: "treemap",
+                  filename: `${config.build.outDir}/___bundle.html`,
+                }),
+              );
+            },
+          },
+        ],
       },
     },
   };
