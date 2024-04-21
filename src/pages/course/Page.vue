@@ -234,7 +234,11 @@ const { preferences } = storeToRefs(userStore);
               />
             </template>
             <template v-else-if="route.name === RouteName.Grades">
-              <CourseGrades :course-id="courseId" :loading-course="loading" />
+              <CourseGrades
+                :course-id="courseId"
+                :loading-course="loading"
+                :assignment-ids="assignments?.map((a) => a.assignment_id)"
+              />
             </template>
             <template v-else-if="route.name === RouteName.Assignment">
               <CourseAssignment

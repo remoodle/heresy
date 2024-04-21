@@ -3,13 +3,14 @@ import type {
   APIError,
   APIWrapper,
   ActiveCourse,
-  ExtendedCourse,
+  // ExtendedCourse,
   Deadline,
   Grade,
   MoodleUser,
   UserSettings,
   Course,
   Assignment,
+  CourseGrades,
 } from "@/shared/types";
 import { isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
@@ -173,14 +174,14 @@ class API {
     });
   }
 
-  async getCoursesOverall() {
-    return this.request<ExtendedCourse[]>(
-      this.prepareURL("user/courses/overall"),
-      {
-        method: "GET",
-      },
-    );
-  }
+  // async getCoursesOverall() {
+  //   return this.request<ExtendedCourse[]>(
+  //     this.prepareURL("user/courses/overall"),
+  //     {
+  //       method: "GET",
+  //     },
+  //   );
+  // }
 
   async getCourseContent(courseId: string, signal?: AbortSignal) {
     return this.request<Course>(this.prepareURL(`course/${courseId}`), {
@@ -203,7 +204,7 @@ class API {
   }
 
   async getCourseGrades(courseId: string) {
-    return this.request<Grade[]>(
+    return this.request<CourseGrades>(
       this.prepareURL(`user/course/${courseId}/grades`),
       {
         method: "GET",

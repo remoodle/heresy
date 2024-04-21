@@ -107,9 +107,9 @@ export type ActiveCourse = {
   end_date: number;
 };
 
-export type ExtendedCourse = ActiveCourse & {
-  grades: Grade[];
-};
+// export type ExtendedCourse = ActiveCourse & {
+//   grades: Grade[];
+// };
 
 export type Grade = {
   grade_id: number;
@@ -141,6 +141,49 @@ export type CourseContent = {
   hiddenbynumsections: number;
   uservisible: boolean;
   modules: CourseModule[];
+};
+
+export type CourseGradeItem = {
+  id: number;
+  itemname: string;
+  itemtype: string;
+  itemmodule?: string;
+  iteminstance?: number;
+  itemnumber?: number;
+  idnumber: string;
+  categoryid?: number;
+  outcomeid: any;
+  scaleid: any;
+  locked: any;
+  graderaw?: number;
+  gradedatesubmitted: any;
+  gradedategraded?: number;
+  gradehiddenbydate: boolean;
+  gradeneedsupdate: boolean;
+  gradeishidden: boolean;
+  gradeislocked: any;
+  gradeisoverridden: any;
+  gradeformatted: string;
+  grademin: number;
+  grademax: number;
+  rangeformatted: string;
+  percentageformatted: string;
+  feedback: string;
+  feedbackformat: number;
+  cmid?: number;
+};
+
+export type CourseGrades = {
+  usergrades: {
+    courseid: number;
+    courseidnumber: string;
+    userid: number;
+    userfullname: string;
+    useridnumber: string;
+    maxdepth: number;
+    gradeitems: CourseGradeItem[];
+  }[];
+  warnings: any[];
 };
 
 export type AssignmentAttachment = {

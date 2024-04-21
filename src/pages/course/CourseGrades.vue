@@ -5,9 +5,18 @@ import { storeToRefs } from "pinia";
 import { RoundedSection, PageWrapper } from "@/entities/page";
 import { useUserStore } from "@/shared/stores/user";
 import { RouterNav } from "@/shared/ui/router-nav";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/shared/ui/table";
 import { useToast } from "@/shared/ui/toast";
 import { Link } from "@/shared/ui/link";
-import { RouteName } from "@/shared/types";
+import { RouteName, type CourseGrades } from "@/shared/types";
 import { createAsyncProcess, isDefined, splitCourseName } from "@/shared/utils";
 import { api } from "@/shared/api";
 import { type Grade } from "@/shared/types";
@@ -19,11 +28,12 @@ defineOptions({
 const props = defineProps<{
   courseId: string;
   loadingCourse: boolean;
+  assignmentIds: number[] | undefined;
 }>();
 
-const grades = ref<Grade[]>();
+const grades = ref<CourseGrades>();
 
-const updateGrade = (data: Grade[] | undefined) => {
+const updateGrade = (data: CourseGrades | undefined) => {
   grades.value = data;
 };
 
@@ -50,22 +60,73 @@ onMounted(async () => {
   <!-- {{ loadingCourse }}
   {{ grades }} -->
   <div class="p-6">
+    <Table v-if="grades">
+      <!-- <TableCaption>A list of your recent invoices.</TableCaption> -->
+      <TableHeader>
+        <TableRow>
+          <TableHead class="w-[300px]"> Grade Item </TableHead>
+          <TableHead> Grade </TableHead>
+          <TableHead>Percentage</TableHead>
+          <TableHead>Range</TableHead>
+          <TableHead class="w-[20px] text-right"> Feedback </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <template
+          v-for="item in grades.usergrades[0].gradeitems"
+          :key="item.id"
+        >
+          <TableRow
+            v-if="item.itemtype !== 'category' && item.itemtype !== 'course'"
+          >
+            <!-- {{ item }} -->
+            <TableCell class="font-medium">
+              <component
+                :is="
+                  item.itemmodule === 'assign' &&
+                  item.iteminstance &&
+                  assignmentIds &&
+                  assignmentIds?.includes(item.iteminstance)
+                    ? Link
+                    : 'span'
+                "
+                :to="{
+                  name: RouteName.Assignment,
+                  params: {
+                    courseId: courseId,
+                    assignmentId: item.iteminstance,
+                  },
+                }"
+                hover
+                underline
+              >
+                <!-- {{ item }} -->
+                {{ item.itemname }}
+              </component>
+              <!-- <Link>
+              </Link> -->
+            </TableCell>
+            <TableCell>
+              {{ item.graderaw }}
+            </TableCell>
+            <TableCell>
+              {{ item.percentageformatted }}
+            </TableCell>
+            <TableCell> {{ item.grademin }} - {{ item.grademax }} </TableCell>
+            <TableCell class="text-right">
+              {{ item.feedback }}
+            </TableCell>
+          </TableRow>
+        </template>
+      </TableBody>
+    </Table>
     <!-- {{ grades }} -->
-    <div v-if="grades">
+    <!-- <div v-if="grades">
       <pre
         >{{ JSON.stringify(grades, null, 2) }}
   </pre
       >
-      <!-- <li v-for="item in grades" :key="item.cmid">
-        <Link
-          :to="{
-            name: RouteName.Assignment,
-            params: { courseId: courseId, assignmentId: item.cmid },
-          }"
-        >
-          Grades
-        </Link>
-      </li> -->
-    </div>
+   
+    </div> -->
   </div>
 </template>
