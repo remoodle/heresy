@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.5](https://github.com/remoodle/heresy/compare/v0.0.4...v0.0.5) (2024-04-21)
+
+
+### Bug Fixes
+
+* remove partytown ([739bc01](https://github.com/remoodle/heresy/commit/739bc01ed418927b327fe04a2631a1a91bec841c))
+
 ## [0.0.4](https://github.com/remoodle/heresy/compare/v0.0.3...v0.0.4) (2024-04-21)
 
 
