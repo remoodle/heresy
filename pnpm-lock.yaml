@@ -69,9 +69,6 @@ dependencies:
     version: 3.22.4
 
 devDependencies:
-  '@builder.io/partytown':
-    specifier: ^0.10.0
-    version: 0.10.0
   '@iconify/vue':
     specifier: ^4.1.1
     version: 4.1.1(vue@3.4.21)
@@ -537,12 +534,6 @@ packages:
       vue: 3.4.21(typescript@5.4.3)
     dev: false
     patched: true
-
-  /@builder.io/partytown@0.10.0:
-    resolution: {integrity: sha512-OS/o9lAmK5rZZLkjFmghPNmp3P40uTF5yu2rFY3TVlnSie7CQhwrQ+5lycUkHqrDVyI4NOnOiA655Q1eGPE2pw==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
-    dev: true
 
   /@colors/colors@1.5.0:
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}

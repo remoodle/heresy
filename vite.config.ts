@@ -5,7 +5,6 @@ import tailwind from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
-import { partytownVite } from "@builder.io/partytown/utils";
 import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
 import injectCDNPrefix, {
   extractPrefixConfig,
@@ -48,9 +47,6 @@ export default defineConfig((config) => {
       injectBuildInfo({
         sha: env.COMMIT_SHA || env.CF_PAGES_COMMIT_SHA,
         packageJson,
-      }),
-      partytownVite({
-        dest: join(__dirname, "dist", "~partytown"),
       }),
     ],
     build: {
