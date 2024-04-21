@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.2](https://github.com/remoodle/heresy/compare/v0.0.1...v0.0.2) (2024-04-21)
+
+
+### Bug Fixes
+
+* hide search (for now) ([419c611](https://github.com/remoodle/heresy/commit/419c61152caa513202d427cdc1cf1cd00f96d11a))
+
 ## 0.0.1 (2024-04-21)
 
 
