@@ -87,6 +87,7 @@ onMounted(async () => {
             <Link
               :to="prepareFileURL(file.fileurl, token)"
               hover
+              download="filename"
               class="text-primary"
             >
               {{ file.filename }}

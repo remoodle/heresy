@@ -21,6 +21,8 @@ const route = useRoute();
 const courseId = computed(() => route.params.courseId as string);
 const assignmentId = computed(() => route.params.assignmentId as string);
 
+const courseName = ref("");
+
 const { lgOrLarger } = useBreakpoints();
 
 const abortController = new AbortController();
@@ -29,6 +31,10 @@ const signal = abortController.signal;
 const course = ref<Course>();
 const updateCourse = (data: Course | undefined) => {
   course.value = data;
+
+  if (data) {
+    courseName.value = data.name;
+  }
 };
 const {
   run: fetchCourse,
@@ -104,6 +110,10 @@ const assignment = computed(() => {
 });
 
 onMounted(async () => {
+  if (route.query.courseName) {
+    courseName.value = route.query.courseName as string;
+  }
+
   await Promise.all([
     loadCourse(),
     loadAssignments(),
@@ -124,13 +134,11 @@ const { preferences } = storeToRefs(userStore);
   <PageWrapper sticky-header>
     <template #title>
       <h1>
-        <template
-          v-if="!route.query.courseName && loading && !isDefined(course)"
-        >
+        <template v-if="!courseName && loading && !isDefined(course)">
           Loading...
         </template>
         <template v-else>
-          {{ course?.name || (route.query.courseName as string) || "" }}
+          {{ courseName }}
         </template>
       </h1>
     </template>

@@ -14,12 +14,25 @@ const props = defineProps<{
 </script>
 
 <template>
+  <!-- {{ module.modname }} -->
   <div class="space-y-1">
-    <div class="flex items-center gap-2">
+    <div
+      class="flex items-center gap-2"
+      :class="[
+        {
+          'opacity-50': module.modname === 'assign' && !module.uservisible,
+        },
+      ]"
+    >
+      <!-- {{ module.uservisible }}
+      {{ module.visibleoncoursepage }} -->
       <img :src="module.modicon" class="h-auto w-6 flex-none" />
       <span>
         <template v-if="module.url">
-          <Link
+          <component
+            :is="
+              module.modname === 'assign' && module.uservisible ? Link : 'span'
+            "
             :to="
               module.contents?.length === 1
                 ? prepareFileURL(module.contents[0].fileurl, token)
@@ -34,13 +47,16 @@ const props = defineProps<{
             hover
           >
             {{ module.name }}
-          </Link>
+          </component>
         </template>
         <template v-else>
           <Text :msg="module.name" />
         </template>
       </span>
     </div>
+    <template v-if="module.availabilityinfo">
+      <Text :msg="module.availabilityinfo" class="text-sm" />
+    </template>
     <Text
       v-if="module.description?.length"
       :msg="module.description"

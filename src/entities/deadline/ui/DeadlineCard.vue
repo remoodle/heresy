@@ -23,7 +23,7 @@ defineProps<{
           name: RouteName.Assignment,
           params: {
             courseId: deadline.course_id,
-            assignmentId: deadline.event_id,
+            assignmentId: deadline.assignment.assignment_id,
           },
           query: {
             courseName: deadline.course_name,

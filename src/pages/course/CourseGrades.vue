@@ -50,9 +50,13 @@ onMounted(async () => {
   <!-- {{ loadingCourse }}
   {{ grades }} -->
   <div class="p-6">
-    {{ grades }}
+    <!-- {{ grades }} -->
     <div v-if="grades">
-      <li v-for="item in grades" :key="item.cmid">
+      <pre
+        >{{ JSON.stringify(grades, null, 2) }}
+  </pre
+      >
+      <!-- <li v-for="item in grades" :key="item.cmid">
         <Link
           :to="{
             name: RouteName.Assignment,
@@ -61,11 +65,7 @@ onMounted(async () => {
         >
           Grades
         </Link>
-      </li>
+      </li> -->
     </div>
   </div>
-  <!-- 
-  <pre
-    >{{ JSON.stringify(grades, null, 2) }}
-  </pre> -->
 </template>

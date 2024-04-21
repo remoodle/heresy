@@ -84,6 +84,7 @@ export type UserSettings = {
   webhook_secret: string | null;
 };
 
+// TODO: Complete types
 export type Deadline = {
   event_id: number;
   timestart: number;
@@ -92,6 +93,9 @@ export type Deadline = {
   visible: number;
   course_id: number;
   course_name: string;
+  assignment: {
+    assignment_id: number;
+  };
 };
 
 export type ActiveCourse = {

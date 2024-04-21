@@ -43,6 +43,7 @@ export function prepareFileURL(fileurl: string, token: string) {
   const url = new URL(fileurl);
 
   url.searchParams.set("token", token);
+  url.searchParams.set("forcedownload", "1");
 
   return url.toString();
 }
