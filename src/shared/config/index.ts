@@ -18,13 +18,13 @@ export const defaultProviders: Providers = Object.freeze({
       requiresTokenGeneration: false,
     },
   },
-  "nu-dc035a6f-099a-449a-bb87-0bac84f57e61": {
-    name: "Nazarbayev University",
-    description: "Experimental NU instance",
-    api: "https://nu0.remoodle.app",
-    // privacy: "https://ext.remoodle.app/cz0",
-    moodle: {
-      requiresTokenGeneration: true,
-    },
-  },
+  // "nu-dc035a6f-099a-449a-bb87-0bac84f57e61": {
+  //   name: "Nazarbayev University",
+  //   description: "Experimental NU instance",
+  //   api: "https://nu0.remoodle.app",
+  //   // privacy: "https://ext.remoodle.app/cz0",
+  //   moodle: {
+  //     requiresTokenGeneration: true,
+  //   },
+  // },
 });
