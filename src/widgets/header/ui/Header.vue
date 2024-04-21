@@ -37,7 +37,7 @@ function getInitials(name: string) {
         </Link>
       </div>
       <div class="flex-shrink-1 hidden h-full w-full justify-center lg:flex">
-        <MagicSearch />
+        <!-- <MagicSearch /> -->
       </div>
       <div class="ml-auto inline-flex w-1/2 items-center justify-end">
         <DropdownMenu v-if="userStore.user" :modal="false">
