@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.6](https://github.com/remoodle/heresy/compare/v0.0.5...v0.0.6) (2024-04-23)
+
+
+### Bug Fixes
+
+* support new grades format ([8bb4a4e](https://github.com/remoodle/heresy/commit/8bb4a4efff2ea792f33ccad66f0df5689bfe2211))
+
 ## [0.0.5](https://github.com/remoodle/heresy/compare/v0.0.4...v0.0.5) (2024-04-21)
 
 
