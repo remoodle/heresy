@@ -144,47 +144,33 @@ export type CourseContent = {
 };
 
 export type CourseGradeItem = {
-  id: number;
-  itemname: string;
+  grade_id: number;
+  name: string;
+  moodle_id: number;
   itemtype: string;
-  itemmodule?: string;
-  iteminstance?: number;
-  itemnumber?: number;
-  idnumber: string;
-  categoryid?: number;
-  outcomeid: any;
-  scaleid: any;
-  locked: any;
-  graderaw?: number;
-  gradedatesubmitted: any;
-  gradedategraded?: number;
-  gradehiddenbydate: boolean;
-  gradeneedsupdate: boolean;
-  gradeishidden: boolean;
-  gradeislocked: any;
-  gradeisoverridden: any;
-  gradeformatted: string;
   grademin: number;
   grademax: number;
-  rangeformatted: string;
-  percentageformatted: string;
-  feedback: string;
   feedbackformat: number;
-  cmid?: number;
+  iteminstance: number;
+  itemmodule: string;
+  cmid: number;
+  graderaw?: number;
+  feedback: string;
+  percentage?: number;
 };
 
-export type CourseGrades = {
-  usergrades: {
-    courseid: number;
-    courseidnumber: string;
-    userid: number;
-    userfullname: string;
-    useridnumber: string;
-    maxdepth: number;
-    gradeitems: CourseGradeItem[];
-  }[];
-  warnings: any[];
-};
+// export type CourseGrades = {
+//   usergrades: {
+//     courseid: number;
+//     courseidnumber: string;
+//     userid: number;
+//     userfullname: string;
+//     useridnumber: string;
+//     maxdepth: number;
+//     gradeitems: CourseGradeItem[];
+//   }[];
+//   warnings: any[];
+// };
 
 export type AssignmentAttachment = {
   filename: string;

@@ -16,7 +16,7 @@ import {
 } from "@/shared/ui/table";
 import { useToast } from "@/shared/ui/toast";
 import { Link } from "@/shared/ui/link";
-import { RouteName, type CourseGrades } from "@/shared/types";
+import { RouteName, type CourseGradeItem } from "@/shared/types";
 import { createAsyncProcess, isDefined, splitCourseName } from "@/shared/utils";
 import { api } from "@/shared/api";
 import { type Grade } from "@/shared/types";
@@ -31,9 +31,9 @@ const props = defineProps<{
   assignmentIds: number[] | undefined;
 }>();
 
-const grades = ref<CourseGrades>();
+const grades = ref<CourseGradeItem[]>();
 
-const updateGrade = (data: CourseGrades | undefined) => {
+const updateGrade = (data: CourseGradeItem[] | undefined) => {
   grades.value = data;
 };
 
@@ -72,10 +72,7 @@ onMounted(async () => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <template
-          v-for="item in grades.usergrades[0].gradeitems"
-          :key="item.id"
-        >
+        <template v-for="item in grades" :key="item.id">
           <TableRow
             v-if="item.itemtype !== 'category' && item.itemtype !== 'course'"
           >
@@ -101,7 +98,7 @@ onMounted(async () => {
                 underline
               >
                 <!-- {{ item }} -->
-                {{ item.itemname }}
+                {{ item.name }}
               </component>
               <!-- <Link>
               </Link> -->
@@ -110,7 +107,7 @@ onMounted(async () => {
               {{ item.graderaw }}
             </TableCell>
             <TableCell>
-              {{ item.percentageformatted }}
+              {{ item.percentage }}
             </TableCell>
             <TableCell> {{ item.grademin }} - {{ item.grademax }} </TableCell>
             <TableCell class="text-right">

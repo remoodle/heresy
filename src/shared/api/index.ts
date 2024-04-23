@@ -10,7 +10,8 @@ import type {
   UserSettings,
   Course,
   Assignment,
-  CourseGrades,
+  // CourseGrades,
+  CourseGradeItem,
 } from "@/shared/types";
 import { isDefined, isEmptyString } from "@/shared/utils";
 import { useUserStore } from "@/shared/stores/user";
@@ -204,7 +205,7 @@ class API {
   }
 
   async getCourseGrades(courseId: string) {
-    return this.request<CourseGrades>(
+    return this.request<CourseGradeItem[]>(
       this.prepareURL(`user/course/${courseId}/grades`),
       {
         method: "GET",
