@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.7](https://github.com/remoodle/heresy/compare/v0.0.6...v0.0.7) (2024-04-27)
+
+
+### Bug Fixes
+
+* hide server version ([d154d4a](https://github.com/remoodle/heresy/commit/d154d4a962f1c7bb791c597028e5bd409e50a0c5))
+
 ## [0.0.6](https://github.com/remoodle/heresy/compare/v0.0.5...v0.0.6) (2024-04-23)
 
 
