@@ -31,7 +31,6 @@ watchEffect(async () => {
   <span v-if="status">
     <template v-if="status.available">
       {{ getURLHost(host) }}
-      <span class="break-all"> v{{ status.versionTag }} </span>
     </template>
     <template v-else>Server is not responding</template>
   </span>
