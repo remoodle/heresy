@@ -18,36 +18,6 @@ const deadlines = ref<{
   [date: string]: Deadline[] | undefined;
 }>();
 
-const test = [
-  {
-    event_id: 461532,
-    timestart: 1711303200,
-    instance: 104300,
-    name: "Final Exam is due 12312312312312313121231312",
-    visible: 1,
-    course_id: 3919,
-    course_name: "Computational Mathematics | Anar Rakhymzhanova",
-  },
-  {
-    event_id: 123,
-    timestart: 1711281600,
-    instance: 104300,
-    name: "Final Exam is due",
-    visible: 1,
-    course_id: 3919,
-    course_name: "Computational Mathematics | Anar Rakhymzhanova",
-  },
-  {
-    event_id: 123,
-    timestart: 1713565721,
-    instance: 104300,
-    name: "Final Exam is due",
-    visible: 1,
-    course_id: 3919,
-    course_name: "Computational Mathematics | Anar Rakhymzhanova",
-  },
-];
-
 const { run, loading, error } = createAsyncProcess(async () => {
   const [data, error] = await api.getDeadlines();
 
@@ -55,7 +25,6 @@ const { run, loading, error } = createAsyncProcess(async () => {
     throw error;
   }
 
-  // const sorted = test.sort((a, b) => a.timestart - b.timestart);
   const sorted = data.sort((a, b) => a.timestart - b.timestart);
 
   deadlines.value = partition(

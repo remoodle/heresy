@@ -2,10 +2,6 @@ import type { Providers } from "../types";
 
 export const githubOrgURL = "https://github.com/remoodle";
 
-export const webClientRepo = "heresy";
-
-export const webServicesRepo = "core";
-
 export const telegramChat = "https://t.me/remoodle";
 
 export const defaultProviders: Providers = Object.freeze({

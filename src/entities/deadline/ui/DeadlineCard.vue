@@ -18,12 +18,13 @@ defineProps<{
 <template>
   <div class="flex items-center justify-between gap-2">
     <div class="flex flex-col">
-      <Link
+      <component
+        :is="deadline.assignment ? Link : 'span'"
         :to="{
           name: RouteName.Assignment,
           params: {
             courseId: deadline.course_id,
-            assignmentId: deadline.assignment.assignment_id,
+            assignmentId: deadline.assignment?.assignment_id,
           },
           query: {
             courseName: deadline.course_name,
@@ -33,7 +34,7 @@ defineProps<{
         class="truncate"
       >
         {{ formatAssignmentName(deadline.name) }}
-      </Link>
+      </component>
       <Link
         :to="{
           name: RouteName.Course,

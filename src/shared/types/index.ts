@@ -93,7 +93,7 @@ export type Deadline = {
   visible: number;
   course_id: number;
   course_name: string;
-  assignment: {
+  assignment?: {
     assignment_id: number;
   };
 };
