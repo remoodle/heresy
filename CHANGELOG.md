@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.8](https://github.com/remoodle/heresy/compare/v0.0.7...v0.0.8) (2024-05-05)
+
+
+### Bug Fixes
+
+* just to trigger ([ba9a1b2](https://github.com/remoodle/heresy/commit/ba9a1b2c757e99719fb049bac8b426cb689f1d3e))
+
 ## [0.0.7](https://github.com/remoodle/heresy/compare/v0.0.6...v0.0.7) (2024-04-27)
 
 
