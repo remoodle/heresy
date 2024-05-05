@@ -8,6 +8,12 @@ import {
   fromUnix,
   getRelativeTime,
 } from "@/shared/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/ui/tooltip";
 import { Link } from "@/shared/ui/link";
 
 defineProps<{
@@ -49,11 +55,17 @@ defineProps<{
         {{ splitCourseName(deadline.course_name).name }}
       </Link>
     </div>
-    <span
-      class="flex-shrink-0 text-sm"
-      :title="formatDate(fromUnix(deadline.timestart), 'full')"
-    >
-      {{ getRelativeTime(fromUnix(deadline.timestart)) }}
+    <span class="flex-shrink-0 text-sm">
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger>
+            {{ getRelativeTime(fromUnix(deadline.timestart)) }}
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{{ formatDate(fromUnix(deadline.timestart), "full") }}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </span>
   </div>
 </template>

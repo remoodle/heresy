@@ -4,7 +4,7 @@ import { Error } from "@/entities/page";
 import { CourseListCard } from "@/entities/course";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type { ActiveCourse } from "@/shared/types";
+import type { ExtendedCourse } from "@/shared/types";
 import { createAsyncProcess, isDefined, partition } from "@/shared/utils";
 import { api } from "@/shared/api";
 
@@ -13,13 +13,13 @@ const toggledCourseCategories = defineModel<string[]>("categories", {
 });
 
 const courses = ref<{
-  [category: string]: ActiveCourse[] | undefined;
+  [category: string]: ExtendedCourse[] | undefined;
 }>();
 
 const courseCategories = computed(() => Object.keys(courses.value || {}));
 
 const { run, loading, error } = createAsyncProcess(async () => {
-  const [data, error] = await api.getActiveCourses();
+  const [data, error] = await api.getCoursesOverall();
 
   if (error) {
     throw error;

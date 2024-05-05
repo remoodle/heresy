@@ -12,8 +12,9 @@ const route = useRoute();
 
 <template>
   <div
-    class="container grid h-full grid-cols-1 flex-col items-center justify-center bg-secondary lg:max-w-none lg:px-0"
+    class="container grid h-full grid-cols-1 flex-col items-center justify-center lg:max-w-none lg:px-0"
   >
+    <div></div>
     <div
       class="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[420px]"
     >
@@ -31,7 +32,7 @@ const route = useRoute();
           <template v-else> Fill in your details to get started </template>
         </p>
       </div>
-      <div class="rounded-lg border bg-background p-10">
+      <div class="rounded-lg lg:p-10">
         <template v-if="route.name === RouteName.Login">
           <LoginForm />
         </template>
@@ -76,6 +77,6 @@ const route = useRoute();
         </p>
       </template>
     </div>
+    <Footer slim class="mt-auto" />
   </div>
-  <Footer slim class="bg-secondary" />
 </template>

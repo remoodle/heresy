@@ -26,7 +26,7 @@ const { providerId, availableProviders } = storeToRefs(appStore);
     <footer class="py-6">
       <div class="mx-auto flex w-full items-center justify-center">
         <ul
-          class="flex flex-wrap divide-x-2 divide-secondary-foreground/50 leading-4 [&>*]:px-3"
+          class="flex flex-wrap items-center justify-center gap-y-2 divide-secondary-foreground/50 leading-4 lg:divide-x-2 [&>*]:px-3"
         >
           <li>
             <ClientVersion />
@@ -64,10 +64,21 @@ const { providerId, availableProviders } = storeToRefs(appStore);
       >
         <div class="flex flex-wrap gap-2 text-muted-foreground">
           <ClientVersion />
-          <APIVersion
+          <ProviderDialog
+            v-model:provider-id="providerId"
+            v-model:providers="availableProviders"
+          >
+            <template #default="{ selectedProvider }">
+              <APIVersion
+                v-if="selectedProvider"
+                :host="selectedProvider.api"
+              />
+            </template>
+          </ProviderDialog>
+          <!-- <APIVersion
             v-if="appStore.selectedProvider"
             :host="appStore.selectedProvider.api"
-          />
+          /> -->
         </div>
         <ThemeSwitcher class="flex-none" />
       </div>

@@ -49,5 +49,6 @@ export const icons = {
   add: "ic:round-add",
   delete: "ic:round-delete",
   file: "vscode-icons:default-file",
+  people: "fluent:people-add-20-filled",
   ...fileIcons,
 } as const;

@@ -29,9 +29,7 @@ watchEffect(async () => {
 
 <template>
   <span v-if="status">
-    <template v-if="status.available">
-      {{ getURLHost(host) }}
-    </template>
-    <template v-else>Server is not responding</template>
+    {{ getURLHost(host) }}
+    <template v-if="!status.available">(server is not responding)</template>
   </span>
 </template>

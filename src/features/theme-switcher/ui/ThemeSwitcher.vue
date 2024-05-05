@@ -11,7 +11,7 @@ const toggleTheme = () => {
 </script>
 
 <template>
-  <slot :toggleTheme="toggleTheme" :theme="appStore.theme">
+  <slot :toggle-theme="toggleTheme" :theme="appStore.theme">
     <Button variant="secondary" size="icon" @click="toggleTheme">
       <Icon
         class="h-6 w-6"

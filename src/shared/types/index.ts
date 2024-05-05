@@ -107,18 +107,24 @@ export type ActiveCourse = {
   end_date: number;
 };
 
-// export type ExtendedCourse = ActiveCourse & {
-//   grades: Grade[];
-// };
+export type ExtendedCourse = ActiveCourse & {
+  grades?: Grade[];
+};
 
 export type Grade = {
+  id: number;
   grade_id: number;
-  moodle_id: number;
   cmid: number;
-  course_id: number;
   name: string;
-  percentage: number;
-  laravel_through_key: number;
+  percentage: number | null;
+  itemtype: string;
+  itemmodule: string;
+  iteminstance: number;
+  grademin: number;
+  grademax: number;
+  feedbackformat: 1 | 0;
+  graderaw: number | null;
+  feedback: string;
 };
 
 export type Course = {
@@ -172,7 +178,7 @@ export type CourseGradeItem = {
 //   warnings: any[];
 // };
 
-export type AssignmentAttachment = {
+export type Attachment = {
   filename: string;
   filepath: string;
   filesize: number;
@@ -217,7 +223,7 @@ export type CourseModule = {
     timestamp: number;
   }[];
   availabilityinfo?: string;
-  contents?: (AssignmentAttachment & {
+  contents?: (Attachment & {
     // filename: string;
     // filepath: string;
     // filesize: number;
@@ -241,13 +247,42 @@ export type CourseModule = {
   };
 };
 
+// export type Assignment = {
+//   assignment_id: number;
+//   course_id: number;
+//   name: string;
+//   nosubmissions: boolean;
+//   duedate: number;
+//   allowsubmissionsfromdate: number;
+//   grade: number;
+//   introattachments: Attachment[];
+// };
+
 export type Assignment = {
   assignment_id: number;
   course_id: number;
+  cmid: number;
   name: string;
   nosubmissions: boolean;
   duedate: number;
   allowsubmissionsfromdate: number;
   grade: number;
-  introattachments: AssignmentAttachment[];
+  introattachments: Attachment[];
+  introformat: number;
+  intro: string;
+  gradeEntity?: {
+    grade_id: number;
+    name: string;
+    moodle_id: number;
+    itemtype: string;
+    grademin: number;
+    grademax: number;
+    feedbackformat: number;
+    itemmodule: string;
+    iteminstance: number;
+    cmid: number;
+    graderaw: number;
+    feedback: string;
+    percentage: number;
+  };
 };

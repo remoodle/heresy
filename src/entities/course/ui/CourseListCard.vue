@@ -1,13 +1,29 @@
 <script setup lang="ts">
-import type { ActiveCourse } from "@/shared/types";
+import { computed } from "vue";
+import type { ExtendedCourse } from "@/shared/types";
 import { RouteName } from "@/shared/types";
 import { splitCourseName } from "@/shared/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/ui/tooltip";
 import { Link } from "@/shared/ui/link";
+import { Icon } from "@/shared/ui/icon";
 
-defineProps<{
-  course: ActiveCourse;
+const props = defineProps<{
+  course: ExtendedCourse;
   showCategory: boolean;
 }>();
+
+const splitted = computed(() => {
+  return splitCourseName(props.course.name);
+});
+
+const attendance = computed(() => {
+  return props.course.grades?.find((g) => g.itemmodule === "attendance");
+});
 </script>
 
 <template>
@@ -17,16 +33,33 @@ defineProps<{
       params: { courseId: course.course_id },
       query: { courseName: course.name },
     }"
-    class="flex flex-col items-start rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent"
+    class="flex items-center justify-between rounded-lg border p-3 text-left transition-all hover:bg-secondary"
   >
-    <div v-show="showCategory" class="text-xs text-muted-foreground">
-      {{ course.coursecategory }}
+    <div class="flex flex-col">
+      <div v-show="showCategory" class="text-xs text-muted-foreground">
+        {{ course.coursecategory }}
+      </div>
+      <span class="text-lg font-medium">
+        {{ splitted.name }}
+      </span>
+      <div class="text-sm text-muted-foreground">
+        {{ splitted.teacher }}
+      </div>
     </div>
-    <span class="text-lg font-medium">
-      {{ splitCourseName(course.name).name }}
-    </span>
-    <div class="text-sm">
-      {{ splitCourseName(course.name).teacher }}
+    <div v-if="course.grades" class="flex gap-1">
+      <TooltipProvider v-if="attendance?.percentage">
+        <Tooltip>
+          <TooltipTrigger>
+            <div class="flex items-center gap-2 rounded-md border p-2">
+              <Icon name="people" class="h-5 w-5" />
+              {{ attendance.percentage }}%
+            </div>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Attendance</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     </div>
   </Link>
 </template>

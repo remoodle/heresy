@@ -5,6 +5,7 @@ import type { Assignment } from "@/shared/types";
 import { FileIcon } from "@/entities/attachment";
 import { RouteName } from "@/shared/types";
 import { Link } from "@/shared/ui/link";
+import { Text } from "@/shared/ui/text";
 // import { toRoutePath } from "@/shared/utils";
 import {
   Breadcrumb,
@@ -59,7 +60,6 @@ onMounted(async () => {
       </span>
 
       <div class="my-6 flex flex-col gap-2">
-        <!-- <span> Max grade: {{ assignment.grade }} </span> -->
         <p>
           <strong> Opened: </strong>
           <span>
@@ -74,7 +74,18 @@ onMounted(async () => {
             {{ formatDate(fromUnix(assignment.duedate), "full") }}
           </span>
         </p>
+        <template v-if="assignment.gradeEntity">
+          <p v-if="assignment.gradeEntity.percentage">
+            <strong> Grade: </strong>
+            <span> {{ assignment.gradeEntity.percentage }}% </span>
+          </p>
+        </template>
       </div>
+
+      <Text
+        class="prose prose-sm my-1 text-foreground"
+        :msg="assignment.intro"
+      />
 
       <ul v-if="assignment.introattachments.length" class="flex flex-col gap-4">
         <li
@@ -83,7 +94,7 @@ onMounted(async () => {
           class="flex flex-col gap-0.5"
         >
           <div class="flex items-center gap-2">
-            <FileIcon :mimetype="file.mimetype" class="w-7" />
+            <FileIcon :mimetype="file.mimetype" class="w-5" />
             <Link
               :to="prepareFileURL(file.fileurl, token)"
               hover

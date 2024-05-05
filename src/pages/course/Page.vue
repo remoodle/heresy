@@ -7,6 +7,7 @@ import { useUserStore } from "@/shared/stores/user";
 import { RouterNav } from "@/shared/ui/router-nav";
 import { Link } from "@/shared/ui/link";
 import { Button } from "@/shared/ui/button";
+import { Skeleton } from "@/shared/ui/skeleton";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { api } from "@/shared/api";
 import { createAsyncProcess, isDefined, insertIf, cn } from "@/shared/utils";
@@ -199,8 +200,11 @@ const { preferences } = storeToRefs(userStore);
       >
         <aside class="mt-6 h-32 rounded-2xl border p-2 lg:h-fit lg:w-1/5">
           <ScrollArea class="h-full">
-            <nav class="flex flex-wrap lg:flex-col lg:space-y-1">
-              <template v-if="assignments">
+            <nav class="flex flex-wrap lg:flex-col">
+              <template v-if="loading">
+                <Skeleton v-for="i in 4" :key="i" class="my-1 h-9 w-full" />
+              </template>
+              <template v-else-if="assignments?.length">
                 <Link
                   v-for="item in assignments"
                   :key="item.assignment_id"
