@@ -190,11 +190,6 @@ const { preferences } = storeToRefs(userStore);
       </RouterNav>
     </template>
     <RoundedSection dense>
-      <!-- <RouterNav>
-        <Link :to="{ name: RouteName.Course }">Overview</Link>
-        <Link :to="{ name: RouteName.Grades }"> Grades </Link>
-        <Link :to="{ name: RouteName.Assignment }"> Grades </Link>
-      </RouterNav> -->
       <div
         class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0"
       >
