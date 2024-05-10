@@ -24,16 +24,9 @@ const createCBPlugin = (options: CBPluginOptions): Plugin => {
     generateBundle(_options, bundle) {
       for (const [filename, chunk] of Object.entries(bundle)) {
         if (extname(filename) === ".js" && "code" in chunk && chunk.code) {
-          // replace regular imports
           chunk.code = chunk.code.replace(
-            /(from\s*['"][^"')]+\.js)(['"])/g,
-            (_, $1, $2) => `${$1}?v=${version}${$2}`,
-          );
-
-          // replace dynamic imports and regular imports without 'from'
-          chunk.code = chunk.code.replace(
-            /(import\(?['"][^"')]+\.js)(['"]\)?)/g,
-            (_, $1, $2) => `${$1}?v=${version}${$2}`,
+            /(from\s*|import\(?)(['"][^"')]+\.js)(['"]\)?)/g,
+            (_, $1, $2, $3) => `${$1}${$2}?v=${version}${$3}`,
           );
         }
       }
