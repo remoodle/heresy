@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.1.0](https://github.com/remoodle/heresy/compare/v0.0.9...v0.1.0) (2024-05-10)
+
+
+### Features
+
+* add favicon ([f831a75](https://github.com/remoodle/heresy/commit/f831a755a90302a7757fc9ae919ce293e14b93db))
+
+
+### Bug Fixes
+
+* load only required fonts ([a906f1e](https://github.com/remoodle/heresy/commit/a906f1e0dc94d731aef1f15767c36d1f53ede2c5))
+
 ## [0.0.9](https://github.com/remoodle/heresy/compare/v0.0.8...v0.0.9) (2024-05-10)
 
 
