@@ -44,33 +44,17 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
 
-      - name: Get shorten commit SHA
-        id: short-sha
-        uses: actions/github-script@v3
-        with:
-          result-encoding: string
-          script: return context.sha.slice(0, 8);
-
       - name: Install dependencies
         run: pnpm install
 
       - name: Build app
         env:
           COMMIT_SHA: ${{ github.sha }}
-          CDN_HOST: ${{ vars.CDN_HOST }}
-          CDN_PREFIX: ${{ steps.short-sha.outputs.result }}
         run: pnpm build-only
-
-      - name: Deploy bundle on CDN with prefix
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CF_API_TOKEN }}
-          accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=remoodle --branch=${{ steps.short-sha.outputs.result }}
 
       - name: Deploy on production
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=remoodle --branch="production"
+          command: pages deploy dist --project-name="remoodle" --branch="production"

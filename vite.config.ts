@@ -1,17 +1,18 @@
-import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig, loadEnv, type ResolvedConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import tailwind from "tailwindcss";
 import autoprefixer from "autoprefixer";
 import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
-import { visualizer } from "rollup-plugin-visualizer";
 import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
-import injectCDNPrefix, {
-  extractPrefixConfig,
+import injectBuildInfo, { getBuildInfo } from "./plugins/build-info";
+import injectCacheBusting, {
   createRenderBuiltUrl,
-} from "./plugins/cdn-prefix";
-import injectBuildInfo from "./plugins/build-info";
+} from "./plugins/cache-busting";
+import {
+  getRollupOutputOptions,
+  getRollupPlugins,
+} from "./plugins/rollup-options";
 import packageJson from "./package.json";
 
 const resolve = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -21,9 +22,9 @@ export default defineConfig((config) => {
 
   const env = loadEnv(mode, process.cwd(), "");
 
-  const { cdnPrefixUrl = env.CF_PAGES_URL ?? null } = extractPrefixConfig({
-    host: env.CDN_HOST,
-    prefix: env.CDN_PREFIX,
+  const buildInfo = getBuildInfo({
+    sha: env.COMMIT_SHA,
+    packageJson,
   });
 
   return {
@@ -38,42 +39,20 @@ export default defineConfig((config) => {
       },
     },
     experimental: {
-      renderBuiltUrl: (...args) => createRenderBuiltUrl(cdnPrefixUrl, ...args),
+      renderBuiltUrl: (...args) =>
+        createRenderBuiltUrl(buildInfo.version, ...args),
     },
     plugins: [
       vue(),
       vueDevTools(),
       validateEnv(),
-      injectCDNPrefix({ cdnPrefixUrl }),
-      injectBuildInfo({
-        sha: env.COMMIT_SHA || env.CF_PAGES_COMMIT_SHA,
-        packageJson,
-      }),
+      injectCacheBusting({ version: buildInfo.version }),
+      injectBuildInfo(buildInfo),
     ],
     build: {
       rollupOptions: {
-        output: {
-          entryFileNames: "[name].js",
-          chunkFileNames: "[name].js",
-          assetFileNames: "assets/[name][extname]",
-        },
-        plugins: [
-          {
-            name: "visualizer",
-            apply: "build",
-            enforce: "post",
-            configResolved(config: ResolvedConfig) {
-              // @ts-ignore
-              config.plugins.push(
-                visualizer({
-                  open: false,
-                  template: "treemap",
-                  filename: `${config.build.outDir}/___bundle.html`,
-                }),
-              );
-            },
-          },
-        ],
+        output: getRollupOutputOptions(),
+        plugins: getRollupPlugins(),
       },
     },
   };
