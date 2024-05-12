@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/remoodle/heresy/compare/v0.1.0...v0.1.1) (2024-05-12)
+
+
+### Bug Fixes
+
+* get rid of cache busting overhead ([74eb0af](https://github.com/remoodle/heresy/commit/74eb0af3665b3e6267ef2c0fddc2087b7f220df2))
+
 ## [0.1.0](https://github.com/remoodle/heresy/compare/v0.0.9...v0.1.0) (2024-05-10)
 
 
