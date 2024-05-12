@@ -6,13 +6,7 @@ import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
 import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
 import injectBuildInfo, { getBuildInfo } from "./plugins/build-info";
-import injectCacheBusting, {
-  createRenderBuiltUrl,
-} from "./plugins/cache-busting";
-import {
-  getRollupOutputOptions,
-  getRollupPlugins,
-} from "./plugins/rollup-options";
+import { getRollupPlugins } from "./plugins/rollup-options";
 import packageJson from "./package.json";
 
 const resolve = (path: string) => fileURLToPath(new URL(path, import.meta.url));
@@ -38,20 +32,9 @@ export default defineConfig((config) => {
         "@": resolve("./src"),
       },
     },
-    experimental: {
-      renderBuiltUrl: (...args) =>
-        createRenderBuiltUrl(buildInfo.version, ...args),
-    },
-    plugins: [
-      vue(),
-      vueDevTools(),
-      validateEnv(),
-      injectCacheBusting({ version: buildInfo.version }),
-      injectBuildInfo(buildInfo),
-    ],
+    plugins: [vue(), vueDevTools(), validateEnv(), injectBuildInfo(buildInfo)],
     build: {
       rollupOptions: {
-        output: getRollupOutputOptions(),
         plugins: getRollupPlugins(),
       },
     },

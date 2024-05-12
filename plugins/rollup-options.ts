@@ -1,14 +1,6 @@
 import type { ResolvedConfig } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
 
-export const getRollupOutputOptions = () => {
-  return {
-    entryFileNames: "[name].js",
-    chunkFileNames: "[name].js",
-    assetFileNames: "assets/[name][extname]",
-  };
-};
-
 export const getRollupPlugins = () => {
   return [
     {
