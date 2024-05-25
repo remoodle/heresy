@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/remoodle/heresy/compare/v0.1.1...v0.2.0) (2024-05-25)
+
+
+### Features
+
+* webmanifest ([0244447](https://github.com/remoodle/heresy/commit/024444707bb57a8c04fa4d804f2bf46937aadfc3))
+
 ## [0.1.1](https://github.com/remoodle/heresy/compare/v0.1.0...v0.1.1) (2024-05-12)
 
 
