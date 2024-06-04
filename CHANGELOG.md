@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/remoodle/heresy/compare/v0.2.0...v0.2.1) (2024-06-04)
+
+
+### Bug Fixes
+
+* always show api provider ([bfaf526](https://github.com/remoodle/heresy/commit/bfaf526280b2272634a8115bd72c393d26cf263d))
+
 ## [0.2.0](https://github.com/remoodle/heresy/compare/v0.1.1...v0.2.0) (2024-05-25)
 
 
