@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/remoodle/heresy/compare/v0.2.1...v0.2.2) (2024-06-07)
+
+
+### Bug Fixes
+
+* remove extra space ([2b6b47f](https://github.com/remoodle/heresy/commit/2b6b47fda5d94a54893f557ddf3239e2813dce5f))
+
 ## [0.2.1](https://github.com/remoodle/heresy/compare/v0.2.0...v0.2.1) (2024-06-04)
 
 
