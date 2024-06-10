@@ -22,7 +22,6 @@ const { providerId, availableProviders } = storeToRefs(appStore);
 </script>
 
 <template>
-  1 23123
   <template v-if="slim">
     <footer class="py-6">
       <div class="mx-auto flex w-full items-center justify-center">
