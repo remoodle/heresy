@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.5](https://github.com/remoodle/heresy/compare/v0.2.4...v0.2.5) (2024-06-10)
+
+
+### Bug Fixes
+
+* remove cringe ([6b3c56b](https://github.com/remoodle/heresy/commit/6b3c56b84708dcf8a2f85c425f72083aa57f54eb))
+
 ## [0.2.4](https://github.com/remoodle/heresy/compare/v0.2.3...v0.2.4) (2024-06-08)
 
 
