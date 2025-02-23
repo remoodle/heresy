@@ -151,7 +151,7 @@ const AVAILABLE_THRESHOLDS = [
                   ? false
                   : settings.notifications['gradeUpdates::telegram'] === 1
               "
-              @update:checked="
+              @update:model-value="
                 (value) =>
                   (settings.notifications['gradeUpdates::telegram'] = value
                     ? 1
@@ -190,7 +190,7 @@ const AVAILABLE_THRESHOLDS = [
                           'deadlineReminders::telegram'
                         ] === 0
                       "
-                      @update:checked="
+                      @update:model-value="
                         (value) =>
                           (settings.deadlineReminders.thresholds = value
                             ? [
@@ -220,7 +220,7 @@ const AVAILABLE_THRESHOLDS = [
                   ? false
                   : settings.notifications['deadlineReminders::telegram'] === 1
               "
-              @update:checked="
+              @update:model-value="
                 (value) =>
                   (settings.notifications['deadlineReminders::telegram'] = value
                     ? 1
