@@ -4,13 +4,14 @@
   "typescript": true,
   "tailwind": {
     "config": "tailwind.config.ts",
-    "css": "src/app/styles/base.css",
+    "css": "src/shared/assets/base.css",
     "baseColor": "slate",
-    "cssVariables": true
+    "cssVariables": true,
+    "prefix": ""
   },
-  "framework": "vite",
   "aliases": {
     "components": "@/shared",
     "utils": "@/shared/ui/utils"
-  }
+  },
+  "iconLibrary": "lucide"
 }
