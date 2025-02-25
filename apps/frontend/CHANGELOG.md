@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.8.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.7...remoodle/frontend-v1.8.8) (2025-02-25)
+
+
+### Bug Fixes
+
+* migrate on reka-ui ([cdc7604](https://github.com/remoodle/remoodle/commit/cdc7604056f91496b480b09ad615a2073c46cec9))
+* **reka-ui:** upgrade `shadcn-vue` config ([de327ab](https://github.com/remoodle/remoodle/commit/de327ab0875f465f4b9bb24b3b5c2a913e597c5d))
+* **reka-ui:** use new `Switch` emits ([9375914](https://github.com/remoodle/remoodle/commit/9375914a1a41ac117c4441f04eea7210c519b36a))
+
 ## [1.8.7](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.6...remoodle/frontend-v1.8.7) (2025-02-15)
 
 
