@@ -1,55 +1,93 @@
 import type { MoodleGrade } from "@remoodle/types";
 
-export interface GradeChangeDiff {
-  courseId: number;
-  courseName: string;
-  /** [name, old, new, max] */
-  changes: [string, number | null, number | null, number][];
-}
+export type GradeDiff = [null, number] | [number, number] | [number, null];
 
-export interface GradeChangeEvent {
-  userId: string;
-  payload: GradeChangeDiff[];
-}
+export type GradeChange = {
+  name: string;
+  max: number;
+  diff: GradeDiff;
+};
+
+export type CourseGradeChanges = {
+  course_id: number;
+  course_name: string;
+  changes: GradeChange[];
+};
 
 export const trackCourseDiff = (
   oldGrades: MoodleGrade[],
   newGrades: MoodleGrade[],
-): GradeChangeDiff["changes"] => {
+): GradeChange[] => {
   const oldGradesMap = new Map(oldGrades.map((item) => [item.id, item]));
 
-  let diff: GradeChangeDiff["changes"] = [];
+  let gradeChanges: GradeChange[] = [];
 
   for (const newGrade of newGrades) {
     if (!newGrade.itemname.trim()) {
-      continue; // Skip grades with empty names
+      continue;
     }
+
     const oldGrade = oldGradesMap.get(newGrade.id);
 
     const previous = oldGrade?.graderaw ?? null;
-    const updated = newGrade.graderaw;
-    // Explicitly ignore differences between null and 0
+    const updated = newGrade.graderaw ?? null;
+
     if (
       (previous === null && updated === 0) ||
       (previous === 0 && updated === null)
     ) {
       continue;
     }
-    // Ignore if both values are null
+
     if (previous === null && updated === null) {
       continue;
     }
-    if (!oldGrade || previous !== updated) {
-      diff.push([
-        newGrade.itemname,
-        previous,
-        updated ?? null,
-        newGrade.grademax,
-      ]);
+
+    if (previous === updated) {
+      continue;
+    }
+
+    const base = {
+      name: newGrade.itemname,
+      max: newGrade.grademax,
+    };
+
+    if (!previous && updated) {
+      gradeChanges.push({
+        ...base,
+        diff: [null, updated],
+      });
+    }
+
+    if (previous && updated) {
+      gradeChanges.push({
+        ...base,
+        diff: [previous, updated],
+      });
+    }
+
+    if (previous && !updated) {
+      gradeChanges.push({
+        ...base,
+        diff: [previous, null],
+      });
     }
   }
 
-  return diff;
+  return gradeChanges;
+};
+
+export const trackCourseGradeChanges = (
+  courseId: number,
+  courseName: string,
+  oldGrades: MoodleGrade[],
+  newGrades: MoodleGrade[],
+): CourseGradeChanges => {
+  return {
+    course_id: courseId,
+    course_name: courseName,
+    changes: trackCourseDiff(oldGrades, newGrades),
+  };
 };
 
 const formatGrade = (num: number | null) => {
@@ -63,15 +101,15 @@ const formatPostfix = (max: number) => {
   return max !== 100 ? ` (out of ${max})` : "";
 };
 
-export const formatCourseDiffs = (data: GradeChangeDiff[]): string => {
+export const formatGradeChanges = (data: CourseGradeChanges[]): string => {
   let message = "Updated grades:\n";
 
   for (const diff of data) {
-    message += `\n📘 ${diff.courseName.split(" | ")[0]}:\n`;
+    message += `\n📘 ${diff.course_name.split(" | ")[0]}:\n`;
     const gradeChanges = diff.changes;
     for (const change of gradeChanges) {
-      const [gradeName, previous, updated, max] = change;
-      message += `  • ${gradeName}: <b>${formatGrade(previous)} → ${formatGrade(updated)}</b>${formatPostfix(max)}\n`;
+      const { name, diff, max } = change;
+      message += `  • ${name}: <b>${formatGrade(diff[0])} → ${formatGrade(diff[1])}</b>${formatPostfix(max)}\n`;
     }
   }
 

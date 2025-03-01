@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from "vitest";
 import { fromPartial } from "@total-typescript/shoehorn";
 import type { IEvent } from "@remoodle/types";
-import type { DeadlineReminderDiff } from "./deadlines";
+import type { CourseDeadlineReminders } from "./deadlines";
 import { trackDeadlineReminders, formatDeadlineReminders } from "./deadlines";
 
 describe("deadlines notifications", () => {
@@ -35,18 +35,17 @@ describe("deadlines notifications", () => {
       },
     ]);
 
-    const diff: DeadlineReminderDiff[] = [
+    const diff: CourseDeadlineReminders[] = [
       {
-        courseId: 4911,
-        courseName: "Research Methods and Tools | Omirgaliyev Ruslan",
-        deadlines: [
-          [
-            515515,
-            "Assignment 1 is due",
-            1726426740000,
-            "06:35:00",
-            "12 hours",
-          ],
+        course_id: 4911,
+        course_name: "Research Methods and Tools | Omirgaliyev Ruslan",
+        reminders: [
+          {
+            event_id: 515515,
+            event_name: "Assignment 1 is due",
+            event_timestart: 1726426740,
+            threshold: "12 hours",
+          },
         ],
       },
     ];
@@ -72,7 +71,7 @@ describe("deadlines notifications", () => {
       },
     ]);
 
-    const diff: DeadlineReminderDiff[] = [];
+    const diff: CourseDeadlineReminders[] = [];
 
     expect(trackDeadlineReminders(events, ["6 hours"])).toStrictEqual(diff);
   });
@@ -94,31 +93,47 @@ describe("deadlines notifications", () => {
       },
     ]);
 
-    const diff: DeadlineReminderDiff[] = [];
+    const diff: CourseDeadlineReminders[] = [];
 
     expect(trackDeadlineReminders(events, ["12 hours"])).toStrictEqual(diff);
   });
 
   test("formatDeadlineReminders", () => {
-    const diffs: DeadlineReminderDiff[] = [
+    const diffs: CourseDeadlineReminders[] = [
       {
-        courseId: 515515,
-        courseName: "Research Methods and Tools | Omirgaliyev Ruslan",
-        deadlines: [
-          [1, "Assignment 1 is due", 1726426740000, "06:35:00", "12 hours"],
-          [2, "Assignment 2 is due", 1726426740000, "06:35:00", "12 hours"],
+        course_id: 515515,
+        course_name: "Research Methods and Tools | Omirgaliyev Ruslan",
+        reminders: [
+          {
+            event_id: 1,
+            event_name: "Assignment 1 is due",
+            event_timestart: 1726426740000,
+            threshold: "12 hours",
+          },
+          {
+            event_id: 2,
+            event_name: "Assignment 2 is due",
+            event_timestart: 1726426740000,
+            threshold: "12 hours",
+          },
         ],
       },
       {
-        courseId: 515515,
-        courseName: "Writing | Barak Omaba",
-        deadlines: [
-          [1, "Assignment 1 is due", 1726426740000, "06:35:00", "12 hours"],
+        course_id: 515515,
+        course_name: "Writing | Barak Omaba",
+        reminders: [
+          {
+            event_id: 1,
+            event_name: "Assignment 1 is due",
+            event_timestart: 1726426740000,
+            threshold: "12 hours",
+          },
         ],
       },
     ];
 
-    expect(formatDeadlineReminders(diffs)).toMatchInlineSnapshot(`
+    expect(formatDeadlineReminders(diffs, () => "06:35:00"))
+      .toMatchInlineSnapshot(`
       "🔔 Upcoming deadlines 🔔
 
       🗓 Research Methods and Tools | Omirgaliyev Ruslan

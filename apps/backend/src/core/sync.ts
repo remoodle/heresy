@@ -5,8 +5,6 @@ import type {
 } from "@remoodle/types";
 import { Moodle } from "../library/moodle";
 import { db } from "../library/db";
-import { trackCourseDiff } from "./events/grades";
-import type { GradeChangeDiff } from "./events/grades";
 
 const handleTokenError = async (error: { message: string }, user: IUser) => {
   if (error.message.includes("Invalid token")) {
@@ -132,7 +130,6 @@ export const syncCourses = async (
 export const syncCourseGrades = async (
   userId: string,
   courseId: number,
-  courseName: string,
   trackDiff: boolean,
 ) => {
   const user = await db.user.findById(userId);
@@ -193,16 +190,8 @@ export const syncCourseGrades = async (
     },
   });
 
-  const changes = trackCourseDiff(
-    currentGrades.map((grade) => grade.data),
-    updatedGrades.map((grade) => grade.data),
-  );
-
-  const gradeChangeDiff: GradeChangeDiff = {
-    courseId,
-    courseName,
-    changes,
+  return {
+    currentGradesData: currentGrades.map((grade) => grade.data),
+    updatedGradesData: updatedGrades.map((grade) => grade.data),
   };
-
-  return gradeChangeDiff;
 };

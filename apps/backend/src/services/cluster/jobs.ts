@@ -4,17 +4,16 @@ import { Telegram, getValues, partition } from "@remoodle/utils";
 import { config } from "../../config";
 import { db } from "../../library/db";
 import { logger } from "../../library/logger";
-import type {
-  GradeChangeDiff,
-  GradeChangeEvent,
-} from "../../core/events/grades";
-import { formatCourseDiffs } from "../../core/events/grades";
-import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import {
-  type DeadlineReminderEvent,
+  type CourseGradeChanges,
+  formatGradeChanges,
+  trackCourseGradeChanges,
+} from "../../core/events/grades";
+import {
   formatDeadlineReminders,
   trackDeadlineReminders,
 } from "../../core/events/deadlines";
+import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
 
 export type ClusterJob = {
@@ -269,7 +268,18 @@ export const jobs: Record<JobName, ClusterJob> = {
     run: async (job) => {
       const { userId, courseId, courseName, trackDiff } = job.data;
 
-      return await syncCourseGrades(userId, courseId, courseName, trackDiff);
+      const result = await syncCourseGrades(userId, courseId, trackDiff);
+
+      if (!result) {
+        return null;
+      }
+
+      return trackCourseGradeChanges(
+        courseId,
+        courseName,
+        result.currentGradesData,
+        result.updatedGradesData,
+      );
     },
   },
   [JobName.COMBINE_GRADES]: {
@@ -282,18 +292,15 @@ export const jobs: Record<JobName, ClusterJob> = {
       );
 
       const childrenValues = await job.getChildrenValues<
-        GradeChangeDiff | undefined
+        CourseGradeChanges | undefined
       >();
 
-      const gradeChangeEvent: GradeChangeEvent = {
-        userId,
-        payload: getValues(childrenValues)
-          .filter(Boolean)
-          .filter((course) => !!course?.changes.length)
-          .map((value) => value) as GradeChangeDiff[],
-      };
+      const gradeChanges: CourseGradeChanges[] = getValues(childrenValues)
+        .filter(Boolean)
+        .filter((course) => !!course?.changes.length)
+        .map((value) => value) as CourseGradeChanges[];
 
-      if (!gradeChangeEvent.payload.length) {
+      if (!gradeChanges.length) {
         return "no grade changes";
       }
 
@@ -307,7 +314,7 @@ export const jobs: Record<JobName, ClusterJob> = {
         user.telegramId &&
         user.settings.notifications["gradeUpdates::telegram"] !== 0
       ) {
-        const message = formatCourseDiffs(gradeChangeEvent.payload);
+        const message = formatGradeChanges(gradeChanges);
 
         const job = await queues[QueueName.TELEGRAM].add(
           QueueName.TELEGRAM,
@@ -330,7 +337,7 @@ export const jobs: Record<JobName, ClusterJob> = {
         return job.data;
       }
 
-      return gradeChangeEvent.payload;
+      return gradeChanges;
     },
   },
   [JobName.CHECK_REMINDERS]: {
@@ -356,21 +363,21 @@ export const jobs: Record<JobName, ClusterJob> = {
         return "no events";
       }
 
-      const deadlineReminderDiffs = trackDeadlineReminders(
+      const deadlineReminders = trackDeadlineReminders(
         events,
         user.settings.deadlineReminders.thresholds,
       );
 
-      if (!deadlineReminderDiffs.length) {
+      if (!deadlineReminders.length) {
         return "no deadline reminders";
       }
 
-      const reminders = deadlineReminderDiffs.flatMap(
-        (reminder) => reminder.deadlines,
+      const reminders = deadlineReminders.flatMap(
+        (deadlineReminder) => deadlineReminder.reminders,
       );
 
-      for (const [id, name, date, remaining, threshold] of reminders) {
-        const event = events.find(({ data }) => data.id === id);
+      for (const { event_id, threshold } of reminders) {
+        const event = events.find(({ data }) => data.id === event_id);
 
         if (!event) {
           continue;
@@ -382,21 +389,12 @@ export const jobs: Record<JobName, ClusterJob> = {
 
         await db.event.findOneAndUpdate(
           { userId, "data.id": event.data.id },
-          {
-            $set: {
-              reminders: updatedReminders,
-            },
-          },
+          { $set: { reminders: updatedReminders } },
           { upsert: true },
         );
       }
 
-      const deadlineReminderEvent: DeadlineReminderEvent = {
-        userId,
-        payload: deadlineReminderDiffs,
-      };
-
-      if (!deadlineReminderEvent.payload.length) {
+      if (!deadlineReminders.length) {
         return "no deadline reminders";
       }
 
@@ -404,7 +402,7 @@ export const jobs: Record<JobName, ClusterJob> = {
         user.telegramId &&
         user.settings.notifications["deadlineReminders::telegram"] !== 0
       ) {
-        const message = formatDeadlineReminders(deadlineReminderEvent.payload);
+        const message = formatDeadlineReminders(deadlineReminders);
 
         const job = await queues[QueueName.TELEGRAM].add(
           QueueName.TELEGRAM,
@@ -427,7 +425,7 @@ export const jobs: Record<JobName, ClusterJob> = {
         return job.data;
       }
 
-      return deadlineReminderEvent.payload;
+      return deadlineReminders;
     },
   },
   [JobName.SEND_TELEGRAM_MESSAGE]: {

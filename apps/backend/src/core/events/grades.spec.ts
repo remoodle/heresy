@@ -1,18 +1,24 @@
 import { describe, expect, test } from "vitest";
-import type { GradeChangeDiff } from "./grades";
-import { formatCourseDiffs } from "./grades";
+import type { CourseGradeChanges } from "./grades";
+import { formatGradeChanges } from "./grades";
 
 describe("grades notifications", () => {
-  test("formatCourseDiffs: single", () => {
-    const diffs: GradeChangeDiff[] = [
+  test("formatGradeChanges: single", () => {
+    const diffs: CourseGradeChanges[] = [
       {
-        courseId: 1234,
-        courseName: "Introduction to SRE | Meirmanova Aigul",
-        changes: [["Final exam documentation submission", null, 100, 100]],
+        course_id: 1234,
+        course_name: "Introduction to SRE | Meirmanova Aigul",
+        changes: [
+          {
+            name: "Final exam documentation submission",
+            max: 100,
+            diff: [null, 100],
+          },
+        ],
       },
     ];
 
-    expect(formatCourseDiffs(diffs)).toMatchInlineSnapshot(`
+    expect(formatGradeChanges(diffs)).toMatchInlineSnapshot(`
       "Updated grades:
 
       📘 Introduction to SRE:
@@ -21,24 +27,38 @@ describe("grades notifications", () => {
     `);
   });
 
-  test("formatCourseDiffs: multiple courses and grades", () => {
-    const diffs: GradeChangeDiff[] = [
+  test("formatGradeChanges: multiple courses and grades", () => {
+    const diffs: CourseGradeChanges[] = [
       {
-        courseId: 1,
-        courseName: "Course 1",
-        changes: [["Midterm", null, 100, 100]],
+        course_id: 1,
+        course_name: "Course 1",
+        changes: [
+          {
+            name: "Midterm",
+            max: 100,
+            diff: [null, 100],
+          },
+        ],
       },
       {
-        courseId: 2,
-        courseName: "Course 2",
+        course_id: 2,
+        course_name: "Course 2",
         changes: [
-          ["Midterm", null, 92.85714, 100],
-          ["Endterm", null, 23, 50],
+          {
+            name: "Midterm",
+            max: 100,
+            diff: [null, 92.85714],
+          },
+          {
+            name: "Endterm",
+            max: 50,
+            diff: [null, 23],
+          },
         ],
       },
     ];
 
-    expect(formatCourseDiffs(diffs)).toMatchInlineSnapshot(`
+    expect(formatGradeChanges(diffs)).toMatchInlineSnapshot(`
       "Updated grades:
 
       📘 Course 1:

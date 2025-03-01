@@ -1,17 +1,16 @@
 import type { IEvent } from "@remoodle/types";
 import { getTimeLeft } from "@remoodle/utils";
 
-export interface DeadlineReminderDiff {
-  courseId: number;
-  courseName: string;
-  /** [id, name, date, remaining, threshold] */
-  deadlines: [number, string, number, string, string][];
-}
-
-export interface DeadlineReminderEvent {
-  userId: string;
-  payload: DeadlineReminderDiff[];
-}
+export type CourseDeadlineReminders = {
+  course_id: number;
+  course_name: string;
+  reminders: {
+    event_id: number;
+    event_name: string;
+    event_timestart: number;
+    threshold: string;
+  }[];
+};
 
 const convertThresholdToMs = (value: string): number => {
   const [amount, unit] = value.split(" ");
@@ -58,10 +57,10 @@ const convertThresholds = (thresholds: string[]): number[] => {
   return thresholds.map(convertThresholdToMs).sort((a, b) => a - b);
 };
 
-export const calculateRemainingTime = (
+export const calculateRemainingThreshold = (
   dueDate: number,
   thresholds: string[],
-): [string, string] | null => {
+): string | null => {
   const thresholdsMs = convertThresholds(thresholds);
 
   const now = Date.now();
@@ -73,7 +72,7 @@ export const calculateRemainingTime = (
 
   for (let i = 0; i < thresholdsMs.length; i++) {
     if (remainingMs <= thresholdsMs[i]) {
-      return [getTimeLeft(dueDate), convertMsToThreshold(thresholdsMs[i])];
+      return convertMsToThreshold(thresholdsMs[i]);
     }
   }
 
@@ -83,59 +82,65 @@ export const calculateRemainingTime = (
 export const trackDeadlineReminders = (
   events: IEvent[],
   thresholds: string[],
-): DeadlineReminderDiff[] => {
-  const diff: DeadlineReminderDiff[] = [];
+): CourseDeadlineReminders[] => {
+  const deadlineReminders: CourseDeadlineReminders[] = [];
 
-  for (const { data, reminders } of events) {
-    const { id, name, timestart, course } = data;
+  for (const { data: event, reminders } of events) {
+    const { id, name, timestart, course } = event;
 
     const dueDate = timestart * 1000; // Convert to milliseconds
 
-    const result = calculateRemainingTime(dueDate, thresholds);
+    const threshold = calculateRemainingThreshold(dueDate, thresholds);
 
-    if (!result) {
+    if (!threshold) {
       continue;
     }
-
-    const [remaining, threshold] = result;
-    // [ '1 day, 00:10:46', '2 days' ]
 
     if (reminders && reminders[threshold]) {
       continue;
     }
 
-    const existingCourseReminder = diff.find((item) => item.courseId === id);
+    const existingCourseReminder = deadlineReminders.find(
+      (item) => item.course_id === course.id,
+    );
 
     if (!existingCourseReminder) {
-      diff.push({
-        courseId: course.id,
-        courseName: course.fullname,
-        deadlines: [[id, name, dueDate, remaining, threshold]],
+      deadlineReminders.push({
+        course_id: course.id,
+        course_name: course.fullname,
+        reminders: [
+          {
+            event_id: id,
+            event_name: name,
+            event_timestart: timestart,
+            threshold,
+          },
+        ],
       });
     } else {
-      existingCourseReminder.deadlines.push([
-        id,
-        name,
-        dueDate,
-        remaining,
+      existingCourseReminder.reminders.push({
+        event_id: id,
+        event_name: name,
+        event_timestart: timestart,
         threshold,
-      ]);
+      });
     }
   }
 
-  return diff;
+  return deadlineReminders;
 };
 
 export const formatDeadlineReminders = (
-  data: DeadlineReminderDiff[],
+  data: CourseDeadlineReminders[],
+  formatter = (timestart: number) => getTimeLeft(timestart * 1000),
 ): string => {
   let message = "🔔 Upcoming deadlines 🔔\n\n";
 
   for (const diff of data) {
-    message += `🗓 ${diff.courseName}\n`;
+    message += `🗓 ${diff.course_name}\n`;
 
-    for (const [_id, name, date, remaining, _threshold] of diff.deadlines) {
-      const formattedDate = new Date(date).toLocaleString("en-US", {
+    for (const { event_name, event_timestart } of diff.reminders) {
+      const formattedDate = new Date(event_timestart).toLocaleString("en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
@@ -145,7 +150,7 @@ export const formatDeadlineReminders = (
         hour12: false,
         timeZone: "Asia/Almaty",
       });
-      message += `  • ${name}: <b>${remaining}</b>, ${formattedDate}\n`;
+      message += `  • ${event_name}: <b>${formatter(event_timestart)}</b>, ${formattedDate}\n`;
     }
     message += "\n";
   }
