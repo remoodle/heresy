@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { defineStore } from "pinia";
 import { useStorage, StorageSerializers } from "@vueuse/core";
@@ -52,6 +53,8 @@ export const useUserStore = defineStore("user", () => {
     showTelegramBanner.value = false;
   };
 
+  const queryClient = useQueryClient();
+
   const logout = () => {
     user.value = null;
     accessToken.value = "";
@@ -60,6 +63,8 @@ export const useUserStore = defineStore("user", () => {
     preferences.value = getDefaultPreferences();
 
     showTelegramBanner.value = true;
+
+    queryClient.removeQueries({ queryKey: ["private"] });
   };
 
   return {
