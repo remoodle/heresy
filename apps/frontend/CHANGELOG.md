@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.9](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.8...remoodle/frontend-v1.8.9) (2025-03-03)
+
+
+### Bug Fixes
+
+* **auth:** call `queryClient` in a `vue` context ([c117eb2](https://github.com/remoodle/remoodle/commit/c117eb2ebb56f3c029d136eeafc242b34f102be1))
+
 ## [1.8.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.7...remoodle/frontend-v1.8.8) (2025-02-25)
 
 
