@@ -71,10 +71,10 @@ const { mutate: handleTelegramAuth } = useMutation({
           <div class="grid gap-1.5">
             <Label for="name">Username</Label>
             <Input
-              v-focus
-              v-model="form.name"
-              placeholder="messi2009 / 222666@astanait.edu.kz"
               id="name"
+              v-model="form.name"
+              v-focus
+              placeholder="messi2009 / 222666@astanait.edu.kz"
               type="text"
               autocomplete="username"
               auto-capitalize="none"
@@ -86,9 +86,9 @@ const { mutate: handleTelegramAuth } = useMutation({
           <div class="grid gap-1.5">
             <Label for="password">Password</Label>
             <Input
+              id="password"
               v-model="form.password"
               placeholder="•••••••••••••"
-              id="password"
               type="password"
               auto-capitalize="none"
               auto-correct="off"

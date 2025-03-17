@@ -30,11 +30,11 @@ const formattedText = computed(() => {
     :class="{ 'whitespace-wrap break-words': wrap }"
   /> -->
   <div
-    v-bind="$attrs"
     v-dompurify="formattedText"
-    v-html="formattedText"
+    v-bind="$attrs"
     :class="{
       'whitespace-wrap break-words': wrap,
     }"
+    v-html="formattedText"
   ></div>
 </template>

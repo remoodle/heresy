@@ -52,7 +52,7 @@ watchEffect(() => {
         <Skeleton class="h-9 w-24" />
       </div>
       <div class="flex flex-col gap-3">
-        <Skeleton class="h-20 w-full" v-for="i in 5" :key="i" />
+        <Skeleton v-for="i in 5" :key="i" class="h-20 w-full" />
       </div>
     </div>
   </template>
@@ -62,8 +62,8 @@ watchEffect(() => {
   <template v-else>
     <template v-if="courseCategories.length > 1">
       <ToggleGroup
-        class="flex flex-wrap items-start justify-start"
         v-model="toggledCourseCategories"
+        class="flex flex-wrap items-start justify-start"
         type="multiple"
         variant="primary"
       >

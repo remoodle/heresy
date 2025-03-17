@@ -132,9 +132,9 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
     <div class="grid gap-2">
       <Label for="name">Handle</Label>
       <Input
+        id="name"
         v-model="handle"
         placeholder="user-177"
-        id="name"
         type="string"
         auto-capitalize="none"
         auto-correct="off"
@@ -173,18 +173,18 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
               {{ hasPassword ? "Change" : "Set" }} password
             </DialogTitle>
             <DialogDescription>
-              <p class="break-words" v-if="!hasPassword">
+              <p v-if="!hasPassword" class="break-words">
                 for <strong>{{ account.handle }}</strong>
               </p>
             </DialogDescription>
           </DialogHeader>
 
-          <form @submit.prevent="updatePassword()" class="space-y-6">
+          <form class="space-y-6" @submit.prevent="updatePassword()">
             <div class="grid gap-2">
               <Label for="user_new_password">New password</Label>
               <Input
-                v-model="newPassword"
                 id="user_new_password"
+                v-model="newPassword"
                 placeholder="••••••••••••"
                 type="password"
                 passwordrules="minlength: 15; allowed: unicode;"

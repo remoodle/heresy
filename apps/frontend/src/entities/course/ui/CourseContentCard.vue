@@ -51,12 +51,12 @@ const moduleSorter = (
 <template>
   <div v-show="content.visible === 1" class="space-y-5">
     <a
+      v-show="content.section !== 0"
       :id="`${content.id}`"
       :href="`#${content.id}`"
       :aria-label="`Permalink to ${content.name}`"
       tabindex="-1"
       class="group text-2xl text-primary"
-      v-show="content.section !== 0"
     >
       {{ content.name }}
     </a>

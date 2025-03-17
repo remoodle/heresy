@@ -128,8 +128,8 @@ const {
               <template v-else-if="assignments?.length">
                 <Link
                   v-for="item in assignments"
-                  :key="item.cmid"
                   :id="item.cmid"
+                  :key="item.cmid"
                   :to="{
                     name: RouteName.Assignment,
                     params: { courseId, assignmentId: item.cmid },

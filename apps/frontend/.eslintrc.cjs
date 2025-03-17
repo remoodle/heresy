@@ -10,7 +10,7 @@ module.exports = {
     es2022: true,
   },
   extends: [
-    "plugin:vue/vue3-strongly-recommended",
+    "plugin:vue/vue3-recommended",
     "eslint:recommended",
     "@vue/eslint-config-typescript",
     "@vue/eslint-config-prettier/skip-formatting",

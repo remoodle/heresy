@@ -151,13 +151,13 @@ const AVAILABLE_THRESHOLDS = [
                   ? false
                   : settings.notifications['gradeUpdates::telegram'] === 1
               "
+              :disabled="!telegramId || updatingNotifications"
               @update:model-value="
                 (value) =>
                   (settings.notifications['gradeUpdates::telegram'] = value
                     ? 1
                     : 0)
               "
-              :disabled="!telegramId || updatingNotifications"
             />
           </TableCell>
         </TableRow>
@@ -220,13 +220,13 @@ const AVAILABLE_THRESHOLDS = [
                   ? false
                   : settings.notifications['deadlineReminders::telegram'] === 1
               "
+              :disabled="!telegramId || updatingNotifications"
               @update:model-value="
                 (value) =>
                   (settings.notifications['deadlineReminders::telegram'] = value
                     ? 1
                     : 0)
               "
-              :disabled="!telegramId || updatingNotifications"
             />
           </TableCell>
         </TableRow>
@@ -241,7 +241,7 @@ const AVAILABLE_THRESHOLDS = [
       </div>
       <Dialog v-model:open="showOtpModal">
         <DialogTrigger as-child>
-          <Button @click="connect" size="sm">
+          <Button size="sm" @click="connect">
             {{ telegramId ? "Change Telegram" : "Connect Telegram" }}
           </Button>
         </DialogTrigger>

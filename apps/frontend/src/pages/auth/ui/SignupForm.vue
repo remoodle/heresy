@@ -57,10 +57,10 @@ const { mutate: submit, isPending } = useMutation({
           <div class="grid gap-1.5">
             <Label for="token"> Moodle Token </Label>
             <Input
-              v-focus
-              v-model="form.token"
-              placeholder="5f7a16ff7204ecb9bcd16bf0125d79d9"
               id="token"
+              v-model="form.token"
+              v-focus
+              placeholder="5f7a16ff7204ecb9bcd16bf0125d79d9"
               type="password"
               auto-capitalize="none"
               auto-correct="off"
@@ -78,9 +78,9 @@ const { mutate: submit, isPending } = useMutation({
           <div class="grid gap-1.5">
             <Label for="name">Username (recommended)</Label>
             <Input
+              id="name"
               v-model="form.name"
               placeholder="messi2009"
-              id="name"
               type="text"
               autocomplete="username"
               auto-capitalize="none"
@@ -91,9 +91,9 @@ const { mutate: submit, isPending } = useMutation({
           <div class="grid gap-1.5">
             <Label for="password">Password (recommended)</Label>
             <Input
+              id="password"
               v-model="form.password"
               placeholder="123123123"
-              id="password"
               type="password"
               auto-capitalize="none"
               auto-correct="off"

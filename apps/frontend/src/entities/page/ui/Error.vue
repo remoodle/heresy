@@ -20,7 +20,7 @@ const emit = defineEmits(["retry"]);
   <div class="flex w-fit flex-row gap-2 pr-4">
     <Icon name="error" class="h-9 w-9 flex-none" />
     <div class="flex flex-col gap-2">
-      <div class="flex flex-col" v-if="!compact">
+      <div v-if="!compact" class="flex flex-col">
         <span class="text-lg font-bold leading-6"> An error occurred </span>
         <p class="text-base-content/80 text-sm">
           Try again or
