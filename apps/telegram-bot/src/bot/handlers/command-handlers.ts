@@ -122,15 +122,23 @@ async function deadlines(ctx: Context) {
     return;
   }
 
+  if (ctx.chat.type === "group") {
+    return await ctx.reply(
+      "You are not connected to ReMoodle. Ask me in private chat.",
+    );
+  }
+
   const userId = ctx.from?.id;
 
   const short = ctx.message.text.startsWith("/ds");
+
+  const daysLimit = short ? "2" : "21";
 
   const [data, error] = await request((client) =>
     client.v2.deadlines.$get(
       {
         query: {
-          daysLimit: short ? "2" : "21",
+          daysLimit,
         },
       },
       {
@@ -139,34 +147,24 @@ async function deadlines(ctx: Context) {
     ),
   );
 
-  if (error && error.status === 401) {
-    switch (ctx.chat.type) {
-      case "private":
-        await ctx.reply(
-          "You are not connected to ReMoodle. Send /start to connect.",
-        );
-        break;
-      case "group":
-        await ctx.reply(
-          "You are not connected to ReMoodle. Ask me in private chat.",
-        );
-        break;
-    }
-    return;
+  if (error && error.status === 401 && ctx.chat.type === "private") {
+    return await ctx.reply(
+      "You are not connected to ReMoodle. Send /start to connect.",
+    );
   } else if (error) {
     await ctx.reply("An error occurred. Try again later.");
     return;
   }
 
-  if (data.length === 0) {
+  if (!data.length) {
     await ctx.reply(
-      `You have no active deadlines ${short ? "in the next 2 days " : ""}🥰`,
+      `You have no active deadlines in the next ${daysLimit} days 🥰`,
     );
     return;
   }
 
   const text =
-    `Upcoming deadlines${short ? " [2 days]" : ""}:\n\n` +
+    `Upcoming deadlines${short ? ` [${daysLimit} days]` : ""}:\n\n` +
     data.map(getDeadlineText).join("\n");
 
   if (ctx.chat.type === "private") {

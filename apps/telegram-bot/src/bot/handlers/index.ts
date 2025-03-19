@@ -73,7 +73,6 @@ callbacksHandler.callbackQuery("remove_message", callbacks.other.clearMessage);
 callbacksHandler.callbackQuery("back_to_menu", callbacks.back.toMenu);
 
 // Extra
-callbacksHandler.callbackQuery("donate", callbacks.other.donate);
 callbacksHandler.callbackQuery(
   "schedule_coming_soon",
   callbacks.other.schedule,

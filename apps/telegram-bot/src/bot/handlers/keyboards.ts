@@ -7,11 +7,11 @@ const keyboards = {
     .text("Courses", "grades")
     .row()
     .webApp("Map", "https://aitumap.remoodle.app")
-    // .webApp("Schedule", "https://remoodle.app/schedule")
+    // .webApp("Schedule", "https://calendar.remoodle.app")
     .text("Schedule", "schedule_coming_soon")
     .row()
     .text("⚙️", "settings")
-    .text("More", "others")
+    .text("About", "others")
     .row(),
 
   single_grade: new InlineKeyboard().row().text("Back ←", "back_to_grades"),
@@ -25,14 +25,7 @@ const keyboards = {
     "refresh_deadlines_single",
   ),
 
-  others: new InlineKeyboard()
-    .url("Contact Us", "https://t.me/remoodle")
-    .url("Docs", "https://ext.remoodle.app/docs")
-    .row()
-    .url("Privacy Policy", "https://ext.remoodle.app/privacy-policy")
-    .text("Donate 💵", "donate")
-    .row()
-    .text("Back ←", "back_to_menu"),
+  others: new InlineKeyboard().text("Back ←", "back_to_menu"),
 
   delete_profile: new InlineKeyboard()
     .text("Yes", "delete_profile_yes")

@@ -14,7 +14,20 @@ import { config } from "../../config";
 
 // Menu buttons
 async function others(ctx: Context) {
-  await ctx.editMessageText("More", { reply_markup: keyboards.others });
+  await ctx.reply(
+    "Here is some important information:\n\n" +
+      "💬\\ **Community Chat**: @remoodle \n\n" +
+      "⭐\\ **Give us a Star**: https://github\\.com/remoodle/remoodle \n\n" +
+      "🫰\\ **Donate**: ReMoodle is absolutely free and we depend on your support to keep it running\\! Help us <3 @donateremoodle \n\n" +
+      "💁‍♂️\\ **More**: [Docs](https://ext\\.remoodle\\.app/docs) \\| [Privacy Policy](https://ext\\.remoodle\\.app/privacy\\-policy)",
+    {
+      parse_mode: "MarkdownV2",
+      reply_markup: keyboards.others,
+      link_preview_options: {
+        is_disabled: true,
+      },
+    },
+  );
 }
 
 async function settings(ctx: Context) {
@@ -43,7 +56,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  if (deadlines.length === 0) {
+  if (!deadlines.length) {
     await ctx.editMessageText("You have no active deadlines 🥰", {
       reply_markup: keyboards.deadlines,
     });
@@ -549,16 +562,6 @@ async function deleteProfileYes(ctx: Context) {
   await ctx.reply("Your ReMoodle profile has been deleted.");
 }
 
-// Donate button
-async function donate(ctx: Context) {
-  await ctx.reply(
-    "Our project, ReMoodle, is completely free to use and supported by donations.\nSupport us 💵 (click to copy)\n\n*Kaspi*  →  `4400430319119613`\n\n*Halyk*  →  `5522042707904355`",
-    {
-      parse_mode: "Markdown",
-    },
-  );
-}
-
 async function comingSoon(ctx: Context) {
   await ctx.answerCallbackQuery({
     text: "Schedules will be available very soon! Stay updated on our channel :D",
@@ -871,7 +874,6 @@ const callbacks = {
     toMenu: backToMenu,
   },
   other: {
-    donate: donate,
     schedule: comingSoon,
     clearMessage: clearMessage,
   },
