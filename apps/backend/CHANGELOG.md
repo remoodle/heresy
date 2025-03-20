@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.3...remoodle/backend-v2.2.4) (2025-03-20)
+
+
+### Code Refactoring
+
+* **cluster:** standardize event payloads ([68f7d74](https://github.com/remoodle/remoodle/commit/68f7d74aad344d75357190a8cec281cc3c9a8a58))
+
 ## [2.2.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.2...remoodle/backend-v2.2.3) (2025-02-16)
 
 
