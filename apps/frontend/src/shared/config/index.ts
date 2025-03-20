@@ -8,6 +8,10 @@ export const TELEGRAM_BOT_NAME = import.meta.env.VITE_TELEGRAM_BOT_NAME;
 
 export const TELEGRAM_BOT_URL = `https://t.me/${TELEGRAM_BOT_NAME}`;
 
+export const DONATE_URL = "https://t.me/donateremoodle";
+
+export const GITHUB_REPO_URL = "https://github.com/remoodle/remoodle";
+
 export const API_PRODUCTION_URL = "https://api.remoodle.app";
 
 export const API_URL =

@@ -51,6 +51,7 @@ export const icons = {
   file: "vscode-icons:default-file",
   people: "fluent:people-add-20-filled",
   telegram: "cib:telegram-plane",
+  github: "mdi:github",
   close: "ic:round-close",
   ...fileIcons,
 } as const;

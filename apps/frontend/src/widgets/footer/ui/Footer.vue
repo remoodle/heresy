@@ -5,7 +5,13 @@ import { RouteName } from "@/shared/lib/routes";
 import { ThemeSwitcher } from "@/features/theme-switcher";
 import { Icon } from "@/shared/ui/icon";
 import { Button } from "@/shared/ui/button";
-import { TELEGRAM_CHAT_URL, TELEGRAM_BOT_URL, MODE } from "@/shared/config";
+import {
+  TELEGRAM_CHAT_URL,
+  TELEGRAM_BOT_URL,
+  GITHUB_REPO_URL,
+  MODE,
+  DONATE_URL,
+} from "@/shared/config";
 import ClientVersion from "./ClientVersion.vue";
 
 withDefaults(
@@ -16,6 +22,14 @@ withDefaults(
     slim: false,
   },
 );
+
+const getBuildInfo = () => {
+  return __BUILD_INFO__;
+};
+
+const buildInfo = getBuildInfo() ?? {
+  version: "0",
+};
 </script>
 
 <template>
@@ -59,6 +73,30 @@ withDefaults(
               </Button>
               <span class="text-xs text-muted-foreground"> bot </span>
             </div>
+
+            <div class="flex flex-col items-center justify-center gap-0.5">
+              <Button
+                variant="secondary"
+                size="icon"
+                :as="Link"
+                :to="DONATE_URL"
+              >
+                <Icon class="h-6 w-6" name="telegram" />
+              </Button>
+              <span class="text-xs text-muted-foreground"> donate </span>
+            </div>
+
+            <div class="flex flex-col items-center justify-center gap-0.5">
+              <Button
+                variant="secondary"
+                size="icon"
+                :as="Link"
+                :to="GITHUB_REPO_URL"
+              >
+                <Icon class="h-6 w-6" name="github" />
+              </Button>
+              <span class="text-xs text-muted-foreground"> ⭐ </span>
+            </div>
           </div>
 
           <div class="flex flex-col items-center justify-center gap-0.5">
@@ -68,7 +106,7 @@ withDefaults(
         </div>
 
         <span class="text-xs text-muted-foreground">
-          <ClientVersion />
+          <ClientVersion :version="buildInfo.version" />
           {{ MODE }}
         </span>
       </div>
