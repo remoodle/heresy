@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.10](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v1.0.9...remoodle/telegram-bot-v1.0.10) (2025-03-20)
+
+
+### Bug Fixes
+
+* **bot:** change `reply` to `editMessageText` method ([932e0b1](https://github.com/remoodle/remoodle/commit/932e0b1de25e7b642fafd4df2cbbb179a4b08fb6))
+
 ## [1.0.9](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v1.0.8...remoodle/telegram-bot-v1.0.9) (2025-03-20)
 
 
