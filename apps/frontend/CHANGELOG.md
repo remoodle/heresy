@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.8.10](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.9...remoodle/frontend-v1.8.10) (2025-03-20)
+
+
+### Bug Fixes
+
+* **web:** update info ([dba729c](https://github.com/remoodle/remoodle/commit/dba729c0cc2b7f4898d8e00263a2e4d70bb55baa))
+
+
+### Miscellaneous Chores
+
+* enforce stronger eslint rules ([9c7eb18](https://github.com/remoodle/remoodle/commit/9c7eb1808729ff791787eb1adf14b8bd9a2afe10))
+
 ## [1.8.9](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.8...remoodle/frontend-v1.8.9) (2025-03-03)
 
 
