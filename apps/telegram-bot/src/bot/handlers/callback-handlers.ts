@@ -14,7 +14,7 @@ import { config } from "../../config";
 
 // Menu buttons
 async function others(ctx: Context) {
-  await ctx.reply(
+  await ctx.editMessageText(
     "Here is some important information:\n\n" +
       "💬\\ **Community Chat**: @remoodle \n\n" +
       "⭐\\ **Give us a Star**: https://github\\.com/remoodle/remoodle \n\n" +
