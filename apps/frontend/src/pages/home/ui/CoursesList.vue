@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect } from "vue";
 import { useQuery } from "@tanstack/vue-query";
-import type { ExtendedCourse } from "@remoodle/types";
+import type {
+  ExtendedCourse,
+  MoodleCourseClassification,
+} from "@remoodle/types";
 import { Error } from "@/entities/page";
 import { CourseListCard } from "@/entities/course";
 import { ToggleGroup, ToggleGroupItem } from "@/shared/ui/toggle-group";
@@ -9,9 +12,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { isDefined, partition } from "@/shared/lib/helpers";
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 
-const toggledCourseCategories = defineModel<string[]>("categories", {
-  required: true,
-});
+const toggledCourseCategories = ref<string[]>([]);
 
 const courses = ref<{
   [category: string]: ExtendedCourse[] | undefined;
@@ -19,12 +20,14 @@ const courses = ref<{
 
 const courseCategories = computed(() => Object.keys(courses.value || {}));
 
-const { isPending, isError, data, error, refetch } = useQuery({
-  queryKey: ["private", "courses"],
+const classification = ref<MoodleCourseClassification>("inprogress");
+
+const { isFetching, isError, data, error, refetch } = useQuery({
+  queryKey: ["private", "courses.overall", classification],
   queryFn: async () =>
     await requestUnwrap((client) =>
       client.v2.courses.overall.$get(
-        { query: { status: "inprogress" } },
+        { query: { status: classification.value } },
         { headers: getAuthHeaders() },
       ),
     ),
@@ -45,7 +48,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <template v-if="isPending">
+  <template v-if="isFetching">
     <div class="space-y-3">
       <div class="flex gap-2">
         <Skeleton class="h-9 w-24" />
@@ -60,7 +63,7 @@ watchEffect(() => {
     <Error @retry="refetch" />
   </template>
   <template v-else>
-    <template v-if="courseCategories.length > 1">
+    <template v-if="courseCategories.length">
       <ToggleGroup
         v-model="toggledCourseCategories"
         class="flex flex-wrap items-start justify-start"

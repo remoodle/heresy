@@ -31,19 +31,6 @@ export const useUserStore = defineStore("user", () => {
     user.value = userData;
   };
 
-  const defaultPreferences = Object.freeze({
-    toggledCourseCategories: [] as string[],
-  });
-
-  const getDefaultPreferences = () => {
-    return Object.assign({}, defaultPreferences);
-  };
-
-  const preferences = useStorage(
-    getStorageKey("user-preferences", 1.1),
-    getDefaultPreferences(),
-  );
-
   const showTelegramBanner = useStorage(
     getStorageKey("telegram-notifications-banner"),
     true,
@@ -60,8 +47,6 @@ export const useUserStore = defineStore("user", () => {
     accessToken.value = "";
     refreshToken.value = "";
 
-    preferences.value = getDefaultPreferences();
-
     showTelegramBanner.value = true;
 
     queryClient.removeQueries({ queryKey: ["private"] });
@@ -69,7 +54,6 @@ export const useUserStore = defineStore("user", () => {
 
   return {
     user,
-    preferences,
     accessToken,
     refreshToken,
     authorized,
