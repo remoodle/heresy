@@ -7,6 +7,7 @@ import { useUserStore } from "@/shared/stores/user";
 import { RouteName } from "@/shared/lib/routes";
 import AuthPage from "@/pages/auth/Page.vue";
 import HomePage from "@/pages/home/Page.vue";
+import CoursesPage from "@/pages/courses/Page.vue";
 import NotFoundPage from "@/pages/404/Page.vue";
 import AccountPage from "@/pages/account/Page.vue";
 import CoursePage from "@/pages/course/Page.vue";
@@ -26,7 +27,11 @@ const routes: RouteRecordRaw[] = [
     meta: { auth: "required" },
     component: DashboardLayout,
     children: [
-      { path: "", name: RouteName.Home, component: HomePage },
+      {
+        path: "",
+        name: RouteName.Home,
+        component: HomePage,
+      },
       {
         path: "/account",
         name: RouteName.Account,
@@ -45,6 +50,11 @@ const routes: RouteRecordRaw[] = [
             component: AccountPage,
           },
         ],
+      },
+      {
+        path: "courses",
+        name: RouteName.Courses,
+        component: CoursesPage,
       },
       {
         path: "course/:courseId",

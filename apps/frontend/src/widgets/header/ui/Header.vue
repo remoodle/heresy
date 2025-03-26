@@ -44,6 +44,9 @@ const { logout } = useLogout();
             <RouterLink :to="{ name: RouteName.Account }">
               <DropdownMenuItem> Account </DropdownMenuItem>
             </RouterLink>
+            <RouterLink :to="{ name: RouteName.Courses }">
+              <DropdownMenuItem> Courses </DropdownMenuItem>
+            </RouterLink>
             <DropdownMenuItem @click="logout()"> Logout </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
