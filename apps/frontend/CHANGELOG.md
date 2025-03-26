@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.10...remoodle/frontend-v1.9.0) (2025-03-26)
+
+
+### Features
+
+* add radio-card-group ([e678500](https://github.com/remoodle/remoodle/commit/e6785005ef390237573d65a84911ce94e6ff1d98))
+
+
+### Bug Fixes
+
+* add courses page ([7127d3a](https://github.com/remoodle/remoodle/commit/7127d3aa8490f580de55117da7533999f8e1ffc7))
+* add empty state for deadlines ([31810db](https://github.com/remoodle/remoodle/commit/31810db5d67155c8a4b3c609bc7525085094fc24))
+* update lucide-vue ([8bf7c55](https://github.com/remoodle/remoodle/commit/8bf7c5500b0ed90964f759abd3564aec8f8745ab))
+* use local state for course categories ([df1ed64](https://github.com/remoodle/remoodle/commit/df1ed64f8cf0e80bb329d4b0c37c268c5bca0f08))
+
 ## [1.8.10](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.9...remoodle/frontend-v1.8.10) (2025-03-20)
 
 
