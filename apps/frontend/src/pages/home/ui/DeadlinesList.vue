@@ -18,7 +18,7 @@ const deadlines = ref<{
   [date: string]: MoodleEvent[] | undefined;
 }>();
 
-const { isPending, isError, data, error, refetch } = useQuery({
+const { isFetching, isError, data, error, refetch } = useQuery({
   queryKey: ["private", "deadlines"],
   queryFn: async () =>
     await requestUnwrap((client) =>
@@ -39,7 +39,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <template v-if="isPending">
+  <template v-if="isFetching">
     <div class="flex flex-col gap-2">
       <Skeleton v-for="i in 3" :key="i" class="h-16" />
     </div>
@@ -48,7 +48,7 @@ watchEffect(() => {
     <Error @retry="refetch" />
   </template>
   <template v-else>
-    <div class="flex flex-col gap-6">
+    <div v-if="deadlines.length" class="flex flex-col gap-6">
       <div v-for="[date, list] in objectEntries(deadlines)" :key="date">
         <div class="mb-2 flex justify-between">
           <span class="text-sm font-medium text-muted-foreground">
@@ -64,6 +64,13 @@ watchEffect(() => {
           />
         </div>
       </div>
+    </div>
+    <div
+      v-else
+      class="flex flex-col items-center justify-center text-muted-foreground"
+    >
+      <span class="text-3xl"> 🌴 </span>
+      <p class="text-base font-medium">You dont't any deadlines</p>
     </div>
   </template>
 </template>
