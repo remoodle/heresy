@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.0...remoodle/frontend-v1.9.1) (2025-03-26)
+
+
+### Bug Fixes
+
+* change loading condition ([56efffb](https://github.com/remoodle/remoodle/commit/56efffb27ae66e9c24fa495cedd98f562df653a6))
+
 ## [1.9.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.8.10...remoodle/frontend-v1.9.0) (2025-03-26)
 
 
