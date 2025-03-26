@@ -11,7 +11,7 @@ import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 
 const classification = ref<MoodleCourseClassification>("past");
 
-const { isFetching, isError, data, error, refetch } = useQuery({
+const { isPending, isError, data, error, refetch } = useQuery({
   queryKey: ["private", "courses", classification],
   queryFn: async () =>
     await requestUnwrap((client) =>
@@ -30,12 +30,12 @@ const { isFetching, isError, data, error, refetch } = useQuery({
     </template>
     <RoundedSection>
       <div class="flex w-full flex-col gap-y-6 lg:w-3/4">
-        <RadioCardGroup v-model="classification" :disabled="isFetching">
+        <RadioCardGroup v-model="classification" :disabled="isPending">
           <RadioCardItem value="past"> Past </RadioCardItem>
           <RadioCardItem value="inprogress"> In progress </RadioCardItem>
         </RadioCardGroup>
 
-        <template v-if="isFetching">
+        <template v-if="isPending">
           <div class="flex flex-col gap-3">
             <Skeleton v-for="i in 5" :key="i" class="h-20 w-full" />
           </div>
