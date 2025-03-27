@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RoundedSection, PageWrapper } from "@/entities/page";
-import { ref } from "vue";
+import { useRouteQuery } from "@vueuse/router";
 import { useQuery } from "@tanstack/vue-query";
 import type { MoodleCourseClassification } from "@remoodle/types";
 import { Error } from "@/entities/page";
@@ -9,7 +9,7 @@ import { RadioCardGroup, RadioCardItem } from "@/shared/ui/radio-card-group";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 
-const classification = ref<MoodleCourseClassification>("past");
+const classification = useRouteQuery<MoodleCourseClassification>("c", "past");
 
 const { isPending, isError, data, error, refetch } = useQuery({
   queryKey: ["private", "courses", classification],
