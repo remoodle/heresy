@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.9.2](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.1...remoodle/frontend-v1.9.2) (2025-03-27)
+
+
+### Bug Fixes
+
+* change wording ([8508251](https://github.com/remoodle/remoodle/commit/8508251f5213db6a546dbf3bcf5acaa4728381ae))
+* correct typo ([d29a84c](https://github.com/remoodle/remoodle/commit/d29a84cc0fd9187b6b5e7c1c84a38ca5ae0e27a1))
+* sync classification with route query ([a58bbc0](https://github.com/remoodle/remoodle/commit/a58bbc08230db50369b3773a566c2333a9c53856))
+
+
+### Miscellaneous Chores
+
+* **deps:** add `@vueuse/router` ([2d83147](https://github.com/remoodle/remoodle/commit/2d831472505c0201bbfd5b4ddf865ca867f849fb))
+* **deps:** upgrade `@vueuse/core` ([df4cb8a](https://github.com/remoodle/remoodle/commit/df4cb8a3982fd436e4af5d10fc4d05187455cd6d))
+
 ## [1.9.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.0...remoodle/frontend-v1.9.1) (2025-03-26)
 
 
