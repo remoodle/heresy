@@ -70,7 +70,7 @@ watchEffect(() => {
       class="flex flex-col items-center justify-center text-muted-foreground"
     >
       <span class="text-3xl"> 🌴 </span>
-      <p class="text-base font-medium">You don't any deadlines</p>
+      <p class="text-base font-medium">You don't have any deadlines</p>
     </div>
   </template>
 </template>
