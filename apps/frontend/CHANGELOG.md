@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.3](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.2...remoodle/frontend-v1.9.3) (2025-04-01)
+
+
+### Bug Fixes
+
+* adapt posthog changes ([97d8caa](https://github.com/remoodle/remoodle/commit/97d8caa9311e00231f5998f422da7069eb3297bd))
+
+
+### Miscellaneous Chores
+
+* restructure stuff ([6b0842d](https://github.com/remoodle/remoodle/commit/6b0842d4234005d3ae5f948d2196473d6ab9d442))
+
 ## [1.9.2](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.1...remoodle/frontend-v1.9.2) (2025-03-27)
 
 
