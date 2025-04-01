@@ -23,6 +23,12 @@ export const useUserStore = defineStore("user", () => {
     return !!user.value && !!accessToken.value && !!refreshToken.value;
   });
 
+  const identify = (data: { _id: string; name: string }) => {
+    posthog.identify(data._id, {
+      name: data.name,
+    });
+  };
+
   const login = (
     accessTokenData: string,
     refreshTokenData: string,
@@ -31,6 +37,7 @@ export const useUserStore = defineStore("user", () => {
     accessToken.value = accessTokenData;
     refreshToken.value = refreshTokenData;
     user.value = userData;
+    identify(user.value);
   };
 
   const showTelegramBanner = useStorage(
@@ -73,13 +80,6 @@ export const useUserStore = defineStore("user", () => {
   watchEffect(() => {
     if (data.value) {
       user.value = data.value;
-
-      posthog.identify(user.value._id, {
-        name: user.value.name,
-        username: user.value.username,
-        handle: user.value.handle,
-        health: user.value.health,
-      });
     }
   });
 
@@ -96,6 +96,7 @@ export const useUserStore = defineStore("user", () => {
     authorized,
     login,
     logout,
+    identify,
     showTelegramBanner,
     closeTelegramBanner,
   };

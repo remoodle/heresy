@@ -43,24 +43,27 @@ watch(authorized, async (now, was) => {
   }
 });
 
-onMounted(async () => {
-  const params = useUrlSearchParams("history");
+onMounted(() => {
+  if (authorized.value && userStore.user) {
+    userStore.identify(userStore.user);
+    return;
+  }
 
+  const params = useUrlSearchParams("history");
   const usr = params.usr as string | undefined;
 
-  if (usr) {
-    const data = atob(usr);
+  if (!usr) {
+    return;
+  }
 
-    const resp = JSON.parse(data) as {
-      user: IUser;
-      accessToken: string;
-      refreshToken: string;
-    };
+  const data = atob(usr);
+  const resp = JSON.parse(data) as {
+    user: IUser;
+    accessToken: string;
+    refreshToken: string;
+  };
 
-    if (!resp.user) {
-      return;
-    }
-
+  if (resp.user) {
     userStore.login(resp.accessToken, resp.refreshToken, resp.user);
   }
 });
