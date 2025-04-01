@@ -1,17 +1,13 @@
 <script setup lang="ts">
 import { onMounted, watch, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
-import { useQuery } from "@tanstack/vue-query";
 import type { IUser } from "@remoodle/types";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUrlSearchParams } from "@vueuse/core";
 import { ConfigProvider } from "reka-ui";
-import { useAnalytics } from "@/shared/lib/use-analytics";
-import { useLogout } from "@/shared/lib/use-logout";
 import { useUserStore } from "@/shared/stores/user";
 import { useAppStore } from "@/shared/stores/app";
 import { RouteName } from "@/shared/lib/routes";
-import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const route = useRoute();
@@ -25,42 +21,7 @@ watchEffect(() => {
 });
 
 const userStore = useUserStore();
-const { authorized, user } = storeToRefs(userStore);
-
-const { posthog } = useAnalytics();
-
-const { data, error } = useQuery({
-  queryKey: ["private", "check"],
-  queryFn: async () =>
-    await requestUnwrap((client) =>
-      client.v2.user.check.$get(
-        {},
-        { headers: getAuthHeaders(userStore.accessToken) },
-      ),
-    ),
-  enabled: authorized,
-});
-
-watchEffect(() => {
-  if (data.value) {
-    user.value = data.value;
-
-    posthog.identify(user.value._id, {
-      name: user.value.name,
-      username: user.value.username,
-      handle: user.value.handle,
-      health: user.value.health,
-    });
-  }
-});
-
-const { logout } = useLogout();
-
-watchEffect(() => {
-  if (error.value?.status === 401) {
-    logout();
-  }
-});
+const { authorized } = storeToRefs(userStore);
 
 watch(authorized, async (now, was) => {
   if (was && !now && route.meta.auth === "required") {
