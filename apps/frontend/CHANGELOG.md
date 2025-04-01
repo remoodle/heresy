@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.4](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.3...remoodle/frontend-v1.9.4) (2025-04-01)
+
+
+### Bug Fixes
+
+* identify earlier ([8be1b6f](https://github.com/remoodle/remoodle/commit/8be1b6fa8e4fe9b35b7d3a00a12c36886a62d4df))
+
 ## [1.9.3](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.2...remoodle/frontend-v1.9.3) (2025-04-01)
 
 
