@@ -146,7 +146,7 @@ const AVAILABLE_THRESHOLDS = [
           <TableCell class="font-medium"> 📘 Updated grades </TableCell>
           <TableCell class="text-right">
             <Switch
-              :checked="
+              :model-value="
                 !telegramId
                   ? false
                   : settings.notifications['gradeUpdates::telegram'] === 1
@@ -176,7 +176,7 @@ const AVAILABLE_THRESHOLDS = [
                   <div class="flex items-center space-x-2">
                     <Checkbox
                       :id="threshold"
-                      :checked="
+                      :model-value="
                         telegramId
                           ? settings.deadlineReminders.thresholds.includes(
                               threshold,
@@ -215,7 +215,7 @@ const AVAILABLE_THRESHOLDS = [
           </TableCell>
           <TableCell class="text-right">
             <Switch
-              :checked="
+              :model-value="
                 !telegramId
                   ? false
                   : settings.notifications['deadlineReminders::telegram'] === 1
