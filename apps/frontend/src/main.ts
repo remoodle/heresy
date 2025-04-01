@@ -9,6 +9,7 @@ import {
 
 import App from "./app/App.vue";
 import router from "./app/router";
+import { createPosthog } from "./shared/services/posthog";
 
 const app = createApp(App);
 
@@ -26,5 +27,7 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
 };
 
 app.use(VueQueryPlugin, vueQueryPluginOptions);
+
+createPosthog(app);
 
 app.mount("#app");
