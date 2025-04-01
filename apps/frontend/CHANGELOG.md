@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.5](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.4...remoodle/frontend-v1.9.5) (2025-04-01)
+
+
+### Bug Fixes
+
+* change prop name ([a64b8f7](https://github.com/remoodle/remoodle/commit/a64b8f7fd67e2c14fb5d23bc8f540eb1b59efeb7))
+
 ## [1.9.4](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.3...remoodle/frontend-v1.9.4) (2025-04-01)
 
 
