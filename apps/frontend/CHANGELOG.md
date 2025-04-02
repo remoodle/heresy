@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.6](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.5...remoodle/frontend-v1.9.6) (2025-04-02)
+
+
+### Code Refactoring
+
+* **posthog:** capture pageviews ([8e06889](https://github.com/remoodle/remoodle/commit/8e06889a1ae7eee9bf5d612b9587b9997c0175d7))
+
 ## [1.9.5](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.4...remoodle/frontend-v1.9.5) (2025-04-01)
 
 
