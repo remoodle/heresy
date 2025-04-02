@@ -28,6 +28,6 @@ const vueQueryPluginOptions: VueQueryPluginOptions = {
 
 app.use(VueQueryPlugin, vueQueryPluginOptions);
 
-createPosthog(app);
+createPosthog(app, router);
 
 app.mount("#app");
