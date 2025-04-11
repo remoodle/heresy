@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.7](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.6...remoodle/frontend-v1.9.7) (2025-04-11)
+
+
+### Bug Fixes
+
+* add posthog proxy ([45a7343](https://github.com/remoodle/remoodle/commit/45a7343f42378c1b6c752fd922c49c723491ffac))
+
+
+### Miscellaneous Chores
+
+* remove shit ([0589857](https://github.com/remoodle/remoodle/commit/05898579aa032117182ecfaa5172e0474c251281))
+
 ## [1.9.6](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.5...remoodle/frontend-v1.9.6) (2025-04-02)
 
 
