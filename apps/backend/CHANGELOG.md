@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.5](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.4...remoodle/backend-v2.2.5) (2025-04-20)
+
+
+### Miscellaneous Chores
+
+* add new config ([61aaf1f](https://github.com/remoodle/remoodle/commit/61aaf1f192f56da491c6a59e5132d9414c82db59))
+
 ## [2.2.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.3...remoodle/backend-v2.2.4) (2025-03-20)
 
 
