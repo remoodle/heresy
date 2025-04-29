@@ -105,7 +105,7 @@ export const formatGradeChanges = (data: CourseGradeChanges[]): string => {
   let message = "Updated grades:\n";
 
   for (const diff of data) {
-    message += `\n📘 ${diff.course_name.split(" | ")[0]}:\n`;
+    message += `\n📘 ${diff.course_name}:\n`;
     const gradeChanges = diff.changes;
     for (const change of gradeChanges) {
       const { name, diff, max } = change;
