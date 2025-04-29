@@ -1,5 +1,4 @@
 import type { MoodleGrade } from "@remoodle/types";
-import { config } from "../../config";
 
 export type GradeDiff = [null, number] | [number, number] | [number, null];
 
@@ -106,7 +105,7 @@ export const formatGradeChanges = (data: CourseGradeChanges[]): string => {
   let message = "Updated grades:\n";
 
   for (const diff of data) {
-    message += `\n📘 ${config.telegram.aitu ? diff.course_name.split(" | ")[0] : diff.course_name}:\n`;
+    message += `\n📘 ${diff.course_name.split(" | ")[0]}:\n`;
     const gradeChanges = diff.changes;
     for (const change of gradeChanges) {
       const { name, diff, max } = change;

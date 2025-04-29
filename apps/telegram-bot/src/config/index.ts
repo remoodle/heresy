@@ -1,4 +1,4 @@
-import { cleanEnv, str, bool } from "envalid";
+import { cleanEnv, str } from "envalid";
 import "dotenv/config";
 
 export const env = cleanEnv(process.env, {
@@ -15,8 +15,6 @@ export const env = cleanEnv(process.env, {
   FRONTEND_URL: str({ default: "https://remoodle.app" }),
 
   REDIS_URI: str({ default: "redis://localhost:6379" }),
-
-  AITU: bool({ default: true }),
 });
 
 export const config = {
@@ -28,7 +26,6 @@ export const config = {
     url: env.FRONTEND_URL,
   },
   bot: {
-    aitu: env.AITU,
     token: env.TELEGRAM_BOT_TOKEN,
   },
   redis: {

@@ -176,7 +176,7 @@ async function grades(ctx: Context) {
     gradesKeyboards
       .row()
       .text(
-        `${config.bot.aitu ? grade.shortname.split(" | ")[0] : grade.shortname} ${grade.notingroup ? "❗" : ""}`,
+        `${grade.shortname.split(" | ")[0]} ${grade.notingroup ? "❗" : ""}`,
         `inprogress_course_${grade.id}`,
       );
   });
@@ -240,11 +240,7 @@ async function gradesInProgressCourse(ctx: Context) {
     return;
   }
 
-  let message: string = config.bot.aitu
-    ? `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}`
-    : `${course.fullname}}`;
-
-  message += "\n\n";
+  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
 
   message += `${calculateGrades(grades)}`;
 
@@ -310,7 +306,7 @@ async function gradesPastCourses(ctx: Context) {
     coursesKeyboards
       .row()
       .text(
-        config.bot.aitu ? course.fullname.split(" | ")[0] : course.fullname,
+        course.fullname.split(" | ")[0],
         `past_course_${course.id}_${page}`,
       );
   });
@@ -381,11 +377,7 @@ async function gradesPastCourse(ctx: Context) {
     return;
   }
 
-  let message: string = config.bot.aitu
-    ? `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}`
-    : `${course.fullname}`;
-
-  message += "\n\n";
+  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
 
   message += `${calculateGrades(grades)}`;
 
@@ -613,8 +605,7 @@ async function account(ctx: Context) {
       (process.env.VERSION_TAG || "") +
       "`\nToken health:  `" +
       `${user.health} ${user.health > 0 ? "🟢" : "🔴"}` +
-      "`\n*You are using " +
-      (config.bot.aitu ? "AITU version*" : "NU version*"),
+      "`",
     {
       reply_markup: keyboards.account,
       parse_mode: "Markdown",

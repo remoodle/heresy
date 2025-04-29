@@ -1,4 +1,4 @@
-import { bool, cleanEnv, num, str } from "envalid";
+import { cleanEnv, num, str } from "envalid";
 import "dotenv/config";
 
 export const env = cleanEnv(process.env, {
@@ -38,8 +38,6 @@ export const env = cleanEnv(process.env, {
     default:
       "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFc0ttL2RpNE9RNEtBR0RQZkpsREtDVGh6ZXM2UwpjZzNQN2RJZGp4SDdRbDgwZ0dCWk1hMDF0L2wzVVpRSmxocFVNb2ZjT2EyWjdBQTlyV2twMGVjV2R3PT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0t",
   }),
-
-  AITU: bool({ default: true }),
 });
 
 export const config = {
@@ -73,7 +71,6 @@ export const config = {
   },
   telegram: {
     token: env.TELEGRAM_BOT_TOKEN,
-    aitu: env.AITU,
   },
   notifications: {
     maxDeadlineThresholds: 10,
