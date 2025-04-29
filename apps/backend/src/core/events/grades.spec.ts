@@ -21,7 +21,7 @@ describe("grades notifications", () => {
     expect(formatGradeChanges(diffs)).toMatchInlineSnapshot(`
       "Updated grades:
 
-      📘 Introduction to SRE:
+      📘 Introduction to SRE | Meirmanova Aigul:
         • Final exam documentation submission: <b>N/A → 100</b>
       "
     `);
