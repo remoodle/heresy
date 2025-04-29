@@ -6,6 +6,7 @@ import type {
 import { getTimeLeft } from "@remoodle/utils";
 import { InlineKeyboard, GrammyError, BotError, HttpError } from "grammy";
 import { request, getAuthHeaders } from "../../library/hc";
+import { config } from "../../config";
 
 const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
   return new Date(timestamp)
@@ -52,7 +53,9 @@ const getDeadlineText = (deadline: MoodleEvent) => {
   deadline.timestart *= 1000;
   const timeleft = deadline.timestart - Date.now();
   const isFiring = timeleft / 60 / 60 / 1000 <= 3;
-  const [courseName, _] = deadline.course.shortname.split(" | ");
+  const courseName = config.bot.aitu
+    ? deadline.course.shortname.split(" | ")[0]
+    : deadline.course.fullname;
 
   const date = formatUnixtimestamp(deadline.timestart);
   const timeLeft = `<b>${getTimeLeft(deadline.timestart)}</b>`;
@@ -97,6 +100,10 @@ const getGPA = (total: number) => {
 };
 
 const calculateGrades = (grades: MoodleGrade[]) => {
+  if (!config.bot.aitu) {
+    return "";
+  }
+
   const getGrade = (name: string) =>
     grades.find((grade) => grade.itemname === name)?.graderaw ?? 0;
 

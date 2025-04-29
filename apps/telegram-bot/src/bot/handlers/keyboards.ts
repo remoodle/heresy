@@ -1,4 +1,5 @@
 import { InlineKeyboard } from "grammy";
+import { config } from "../../config";
 
 const keyboards = {
   main: new InlineKeyboard()
@@ -7,7 +8,6 @@ const keyboards = {
     .text("Courses", "grades")
     .row()
     .webApp("Map", "https://aitumap.remoodle.app")
-    // .webApp("Schedule", "https://calendar.remoodle.app")
     .text("Schedule", "schedule_coming_soon")
     .row()
     .text("⚙️", "settings")
@@ -47,5 +47,16 @@ const keyboards = {
     "https://ext.remoodle.app/find-token",
   ),
 };
+
+if (!config.bot.aitu) {
+  keyboards.main = new InlineKeyboard()
+    .text("Deadlines", "deadlines")
+    .row()
+    .text("Courses", "grades")
+    .row()
+    .text("⚙️", "settings")
+    .text("About", "others")
+    .row();
+}
 
 export default keyboards;
