@@ -19,7 +19,7 @@ async function others(ctx: Context) {
       "💬\\ **Community Chat**: @remoodle \n\n" +
       "⭐\\ **Give us a Star**: https://github\\.com/remoodle/remoodle \n\n" +
       "🫰\\ **Donate**: ReMoodle is absolutely free and we depend on your support to keep it running\\! Help us <3 @donateremoodle \n\n" +
-      "💁‍♂️\\ **More**: [Docs](https://ext\\.remoodle\\.app/docs) \\| [Privacy Policy](https://ext\\.remoodle\\.app/privacy\\-policy)",
+      "💁‍♂️\\ **More**: [Docs](https://ext\\.remoodle\\.app/docs) \\| [Privacy Policy](https://ext\\.remoodle\\.app/privacy\\-policy) \\| [Creators](https://remoodle.notion.site/Creators-1e4b62ac705f8034a7dac79161fd97ed)",
     {
       parse_mode: "MarkdownV2",
       reply_markup: keyboards.others,

@@ -8,6 +8,7 @@ const commandsHandler = new Composer<RegistrationContext>();
 commandsHandler.command("start", commands.start);
 commandsHandler.command("deadlines", commands.deadlines);
 commandsHandler.command("ds", commands.deadlines);
+commandsHandler.command("about", commands.about);
 
 const callbacksHandler = new Composer();
 
