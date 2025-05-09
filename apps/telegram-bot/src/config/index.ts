@@ -15,6 +15,11 @@ export const env = cleanEnv(process.env, {
   FRONTEND_URL: str({ default: "https://remoodle.app" }),
 
   REDIS_URI: str({ default: "redis://localhost:6379" }),
+
+  UNI: str({
+    default: "aitu",
+    choices: ["aitu"],
+  }),
 });
 
 export const config = {
@@ -31,4 +36,5 @@ export const config = {
   redis: {
     uri: env.REDIS_URI,
   },
+  uni: env.UNI,
 };

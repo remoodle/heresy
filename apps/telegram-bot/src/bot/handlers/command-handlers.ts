@@ -1,10 +1,11 @@
 import { Context } from "grammy";
 import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
-import { getDeadlineText, getMiniAppUrl } from "../utils";
 import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
+import { uni } from "../universities";
+import { getMiniAppUrl } from "../utils";
 
 async function start(ctx: RegistrationContext) {
   if (!ctx.message || !ctx.message.text || !ctx.from || !ctx.chat) {
@@ -156,16 +157,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  if (!data.length) {
-    await ctx.reply(
-      `You have no active deadlines in the next ${daysLimit} days 🥰`,
-    );
-    return;
-  }
-
-  const text =
-    `Upcoming deadlines${short ? ` [${daysLimit} days]` : ""}:\n\n` +
-    data.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(data, short);
 
   if (ctx.chat.type === "private") {
     await ctx.reply(text, {

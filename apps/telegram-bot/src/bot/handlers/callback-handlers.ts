@@ -2,15 +2,13 @@ import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { request, getAuthHeaders } from "../../library/hc";
 import {
-  getDeadlineText,
-  getGradeText,
-  calculateGrades,
   getNotificationsKeyboard,
   formatUnixtimestamp,
   getMiniAppUrl,
 } from "../utils";
 import keyboards from "./keyboards";
 import { config } from "../../config";
+import { uni } from "../universities";
 
 // Menu buttons
 async function others(ctx: Context) {
@@ -56,15 +54,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  if (!deadlines.length) {
-    await ctx.editMessageText("You have no active deadlines 🥰", {
-      reply_markup: keyboards.deadlines,
-    });
-    return;
-  }
-
-  const text =
-    "Upcoming deadlines:\n\n" + deadlines.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -127,16 +117,7 @@ async function refreshDeadlines(ctx: Context) {
     return;
   }
 
-  if (deadlines.length === 0) {
-    await ctx.editMessageText("You have no active deadlines 🥰", {
-      reply_markup:
-        type === "menu" ? keyboards.deadlines : keyboards.single_deadline,
-    });
-    return;
-  }
-
-  const text =
-    "Upcoming deadlines:\n\n" + deadlines.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -146,7 +127,7 @@ async function refreshDeadlines(ctx: Context) {
 }
 
 // Grades
-async function grades(ctx: Context) {
+async function courses(ctx: Context) {
   if (!ctx.from) {
     return;
   }
@@ -184,7 +165,7 @@ async function grades(ctx: Context) {
   gradesKeyboards
     .row()
     .text("Back ←", "back_to_menu")
-    .text("Past courses", "old_grades_1");
+    .text("Past courses", "old_course_1");
 
   if (grades.length === 0) {
     await ctx.editMessageText("You have no grades 🥰", {
@@ -196,7 +177,7 @@ async function grades(ctx: Context) {
   await ctx.editMessageText("Your courses:", { reply_markup: gradesKeyboards });
 }
 
-async function gradesInProgressCourse(ctx: Context) {
+async function inProgressCourse(ctx: Context) {
   if (!ctx?.from || !ctx?.match) {
     return;
   }
@@ -240,18 +221,12 @@ async function gradesInProgressCourse(ctx: Context) {
     return;
   }
 
-  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
-
-  message += `${calculateGrades(grades)}`;
-
-  grades.forEach((grade) => {
-    message += `${getGradeText(grade)}`;
-  });
+  const message = uni.getGrades(grades, course);
 
   const keyboard = new InlineKeyboard()
     .text("Assignments", `course_assignments_${courseId}`)
     .row()
-    .text("Back ←", "grades");
+    .text("Back ←", "courses");
 
   return await ctx.editMessageText(message, {
     reply_markup: keyboard,
@@ -260,7 +235,7 @@ async function gradesInProgressCourse(ctx: Context) {
 }
 
 // Old courses
-async function gradesPastCourses(ctx: Context) {
+async function listPastCourses(ctx: Context) {
   if (!ctx?.from || !ctx?.match) {
     return;
   }
@@ -283,14 +258,14 @@ async function gradesPastCourses(ctx: Context) {
 
   if (!rmcCourses) {
     await ctx.editMessageText("Past courses are not available.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "grades"),
+      reply_markup: new InlineKeyboard().text("Back ←", "courses"),
     });
     return;
   }
 
   if (rmcCourses.length === 0) {
     await ctx.editMessageText("You have no past courses 🥰", {
-      reply_markup: new InlineKeyboard().text("Back", "grades"),
+      reply_markup: new InlineKeyboard().text("Back", "courses"),
     });
     return;
   }
@@ -314,13 +289,13 @@ async function gradesPastCourses(ctx: Context) {
   coursesKeyboards.row();
 
   if (page > 1) {
-    coursesKeyboards.text("←", `old_grades_${page - 1}`);
+    coursesKeyboards.text("←", `old_course_${page - 1}`);
   }
 
-  coursesKeyboards.text("Back", "grades");
+  coursesKeyboards.text("Back", "courses");
 
   if (page < totalPages) {
-    coursesKeyboards.text("→", `old_grades_${page + 1}`);
+    coursesKeyboards.text("→", `old_course_${page + 1}`);
   }
 
   await ctx.editMessageText(`Your past courses (${page}/${totalPages}):`, {
@@ -328,7 +303,7 @@ async function gradesPastCourses(ctx: Context) {
   });
 }
 
-async function gradesPastCourse(ctx: Context) {
+async function pastCourse(ctx: Context) {
   if (!ctx?.from || !ctx?.match) {
     return;
   }
@@ -367,7 +342,7 @@ async function gradesPastCourse(ctx: Context) {
 
   const keyboard = new InlineKeyboard().text(
     "Back ←",
-    `old_grades_${ctx.match[0].split("_")[3]}`,
+    `old_course_${ctx.match[0].split("_")[3]}`,
   );
 
   if (!grades || !course) {
@@ -377,13 +352,7 @@ async function gradesPastCourse(ctx: Context) {
     return;
   }
 
-  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
-
-  message += `${calculateGrades(grades)}`;
-
-  grades.forEach((grade) => {
-    message += `${getGradeText(grade)}`;
-  });
+  const message = uni.getGrades(grades, course);
 
   return await ctx.editMessageText(message, {
     reply_markup: keyboard,
@@ -605,7 +574,9 @@ async function account(ctx: Context) {
       (process.env.VERSION_TAG || "") +
       "`\nToken health:  `" +
       `${user.health} ${user.health > 0 ? "🟢" : "🔴"}` +
-      "`",
+      "`\n*" +
+      uni.getUniversityName() +
+      "*",
     {
       reply_markup: keyboards.account,
       parse_mode: "Markdown",
@@ -849,15 +820,15 @@ const callbacks = {
     others: others,
     settings: settings,
     deadlines: deadlines,
-    grades: grades,
+    courses: courses,
   },
   deadlines: {
     refresh: refreshDeadlines,
   },
-  grades: {
-    inProgressCourse: gradesInProgressCourse,
-    pastCourses: gradesPastCourses,
-    pastCourse: gradesPastCourse,
+  course: {
+    inProgressCourse: inProgressCourse,
+    pastCourses: listPastCourses,
+    pastCourse: pastCourse,
     assignments: {
       course: courseAssignments,
       assignment: courseAssignmentById,
