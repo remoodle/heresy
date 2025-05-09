@@ -4,7 +4,7 @@ const keyboards = {
   main: new InlineKeyboard()
     .text("Deadlines", "deadlines")
     .row()
-    .text("Courses", "grades")
+    .text("Courses", "courses")
     .row()
     .webApp("Map", "https://aitumap.remoodle.app")
     // .webApp("Schedule", "https://calendar.remoodle.app")

@@ -16,7 +16,7 @@ const callbacksHandler = new Composer();
 callbacksHandler.callbackQuery("others", callbacks.menu.others);
 callbacksHandler.callbackQuery("settings", callbacks.menu.settings);
 callbacksHandler.callbackQuery("deadlines", callbacks.menu.deadlines);
-callbacksHandler.callbackQuery("grades", callbacks.menu.grades);
+callbacksHandler.callbackQuery("courses", callbacks.menu.courses);
 
 // Deadlines buttons
 callbacksHandler.callbackQuery(
@@ -47,24 +47,24 @@ callbacksHandler.callbackQuery(
 // Grades buttons
 callbacksHandler.callbackQuery(
   /inprogress_course_\d+/,
-  callbacks.grades.inProgressCourse,
+  callbacks.course.inProgressCourse,
 );
 
-callbacksHandler.callbackQuery(/old_grades_\d+/, callbacks.grades.pastCourses);
+callbacksHandler.callbackQuery(/old_course_\d+/, callbacks.course.pastCourses);
 callbacksHandler.callbackQuery(
   /past_course_\d+_\d+/,
-  callbacks.grades.pastCourse,
+  callbacks.course.pastCourse,
 );
 
 // Assignments
 callbacksHandler.callbackQuery(
   /course_assignments_\d+/,
-  callbacks.grades.assignments.course,
+  callbacks.course.assignments.course,
 );
 
 callbacksHandler.callbackQuery(
   /assignment_\d+_\d+/,
-  callbacks.grades.assignments.assignment,
+  callbacks.course.assignments.assignment,
 );
 
 // Clear button
