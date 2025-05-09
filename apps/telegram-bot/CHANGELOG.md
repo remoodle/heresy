@@ -1,5 +1,23 @@
 # Changelog
 
+## [2.0.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v1.0.10...remoodle/telegram-bot-v2.0.0) (2025-05-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* add universities support ([#392](https://github.com/remoodle/remoodle/issues/392))
+
+### Features
+
+* add AITU feature flags ([3f5e6df](https://github.com/remoodle/remoodle/commit/3f5e6dfece06f74637135124ad8042457f44ab7e))
+* add creators and about command ([5fe5115](https://github.com/remoodle/remoodle/commit/5fe511572c2d626f2d6863ab1ce425ddea5f1968))
+* add universities support ([#392](https://github.com/remoodle/remoodle/issues/392)) ([526f802](https://github.com/remoodle/remoodle/commit/526f802dd7635c832e882096ba16e25cbeaba475))
+
+
+### Reverts
+
+* "feat: add AITU feature flags" ([aa7525b](https://github.com/remoodle/remoodle/commit/aa7525babf51342a196147c2b6df1e5bfc034c8e))
+
 ## [1.0.10](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v1.0.9...remoodle/telegram-bot-v1.0.10) (2025-03-20)
 
 
