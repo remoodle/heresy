@@ -1,16 +1,10 @@
 import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { request, getAuthHeaders } from "../../library/hc";
-import {
-  getDeadlineText,
-  getGradeText,
-  calculateGrades,
-  getNotificationsKeyboard,
-  formatUnixtimestamp,
-  getMiniAppUrl,
-} from "../utils";
+import { getNotificationsKeyboard, formatUnixtimestamp } from "../utils";
 import keyboards from "./keyboards";
 import { config } from "../../config";
+import uni from "../universities/uni";
 
 // Menu buttons
 async function others(ctx: Context) {
@@ -56,15 +50,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  if (!deadlines.length) {
-    await ctx.editMessageText("You have no active deadlines 🥰", {
-      reply_markup: keyboards.deadlines,
-    });
-    return;
-  }
-
-  const text =
-    "Upcoming deadlines:\n\n" + deadlines.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -94,7 +80,7 @@ async function backToMenu(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(userId, config.frontend.url);
+  const url = await uni.getMiniAppUrl(userId, config.frontend.url);
 
   const keyboard = keyboards.main.clone().webApp("Website", url);
 
@@ -127,16 +113,7 @@ async function refreshDeadlines(ctx: Context) {
     return;
   }
 
-  if (deadlines.length === 0) {
-    await ctx.editMessageText("You have no active deadlines 🥰", {
-      reply_markup:
-        type === "menu" ? keyboards.deadlines : keyboards.single_deadline,
-    });
-    return;
-  }
-
-  const text =
-    "Upcoming deadlines:\n\n" + deadlines.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -240,13 +217,7 @@ async function inProgressCourse(ctx: Context) {
     return;
   }
 
-  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
-
-  message += `${calculateGrades(grades)}`;
-
-  grades.forEach((grade) => {
-    message += `${getGradeText(grade)}`;
-  });
+  const message = uni.getGrades(grades, course);
 
   const keyboard = new InlineKeyboard()
     .text("Assignments", `course_assignments_${courseId}`)
@@ -377,13 +348,7 @@ async function pastCourse(ctx: Context) {
     return;
   }
 
-  let message: string = `${course.fullname.split(" | ")[0]}\nTeacher: ${course.fullname.split(" | ")[1]}\n\n`;
-
-  message += `${calculateGrades(grades)}`;
-
-  grades.forEach((grade) => {
-    message += `${getGradeText(grade)}`;
-  });
+  const message = uni.getGrades(grades, course);
 
   return await ctx.editMessageText(message, {
     reply_markup: keyboard,
@@ -411,7 +376,7 @@ async function notifications(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(
+  const url = await uni.getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",
@@ -495,7 +460,7 @@ async function changeNotifications(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(
+  const url = await uni.getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",
@@ -605,7 +570,9 @@ async function account(ctx: Context) {
       (process.env.VERSION_TAG || "") +
       "`\nToken health:  `" +
       `${user.health} ${user.health > 0 ? "🟢" : "🔴"}` +
-      "`",
+      "`\n*" +
+      uni.getUniversityName() +
+      "*",
     {
       reply_markup: keyboards.account,
       parse_mode: "Markdown",

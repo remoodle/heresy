@@ -1,10 +1,10 @@
 import { Context } from "grammy";
 import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
-import { getDeadlineText, getMiniAppUrl } from "../utils";
 import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
+import uni from "../universities/uni";
 
 async function start(ctx: RegistrationContext) {
   if (!ctx.message || !ctx.message.text || !ctx.from || !ctx.chat) {
@@ -35,7 +35,7 @@ async function start(ctx: RegistrationContext) {
       return;
     }
 
-    const url = await getMiniAppUrl(userId, config.frontend.url);
+    const url = await uni.getMiniAppUrl(userId, config.frontend.url);
 
     const keyboard = keyboards.main.clone().webApp("Website", url);
 
@@ -107,7 +107,7 @@ async function handleRegistration(
   // Registration successful, greet the user
   await ctx.reply(`You have registered successfully!`);
 
-  const url = await getMiniAppUrl(userId, config.frontend.url);
+  const url = await uni.getMiniAppUrl(userId, config.frontend.url);
   const keyboard = keyboards.main.clone().webApp("Website", url);
 
   await ctx.reply(`${data.user.name}`, {
@@ -156,16 +156,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  if (!data.length) {
-    await ctx.reply(
-      `You have no active deadlines in the next ${daysLimit} days 🥰`,
-    );
-    return;
-  }
-
-  const text =
-    `Upcoming deadlines${short ? ` [${daysLimit} days]` : ""}:\n\n` +
-    data.map(getDeadlineText).join("\n");
+  const text = uni.getDeadlines(data, short);
 
   if (ctx.chat.type === "private") {
     await ctx.reply(text, {
