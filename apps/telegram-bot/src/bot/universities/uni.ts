@@ -1,10 +1,10 @@
 import { config } from "../../config";
-import { Aitu } from "./aitu";
+import { AITU } from "./aitu";
 
 const universities = {
-  aitu: new Aitu(),
+  aitu: new AITU(),
 };
 
 const uni = universities[config.uni];
 
-export default uni;
+export { uni };

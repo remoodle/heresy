@@ -1,10 +1,9 @@
 import type { MoodleGrade, MoodleEvent, MoodleCourse } from "@remoodle/types";
-import type { University } from "./university-interface";
-import { getAuthHeaders, request } from "../../library/hc";
+import type { University } from "./university";
 import { formatUnixtimestamp } from "../utils";
 import { getTimeLeft } from "@remoodle/utils";
 
-export class Aitu implements University {
+export class AITU implements University {
   getGrades(grades: MoodleGrade[], course: MoodleCourse): string {
     const getGradeText = (grade: MoodleGrade): string => {
       let text = "";
@@ -61,52 +60,26 @@ export class Aitu implements University {
     );
   }
 
-  getGPA(total: number): string {
-    const grades: { [key: number]: number } = {
-      100: 4.0,
-      95: 4.0,
-      90: 3.67,
-      85: 3.33,
-      80: 3.0,
-      75: 2.67,
-      70: 2.33,
-      65: 2.0,
-      60: 1.67,
-      55: 1.33,
-      50: 1.0,
+  private calculateGrades(grades: MoodleGrade[]): string {
+    const getGPA = (total: number): string => {
+      const grades: { [key: number]: number } = {
+        100: 4.0,
+        95: 4.0,
+        90: 3.67,
+        85: 3.33,
+        80: 3.0,
+        75: 2.67,
+        70: 2.33,
+        65: 2.0,
+        60: 1.67,
+        55: 1.33,
+        50: 1.0,
+      };
+
+      const grade = Math.floor(total / 5) * 5;
+      return grades[grade] ? grades[grade].toFixed(2) : "0.00";
     };
 
-    const grade = Math.floor(total / 5) * 5;
-    return grades[grade] ? grades[grade].toFixed(2) : "0.00";
-  }
-
-  async getMiniAppUrl(
-    userId: number,
-    host: string,
-    route: string = "",
-  ): Promise<string> {
-    const [loginResponse, err] = await request((client) => {
-      return client.v2.auth.login.$post(
-        {
-          json: {},
-        },
-        {
-          headers: getAuthHeaders(userId),
-        },
-      );
-    });
-
-    if (err) {
-      return host + route;
-    }
-
-    const b64 = btoa(JSON.stringify(loginResponse));
-    const url = host + route + "?usr=" + b64;
-
-    return url;
-  }
-
-  private calculateGrades(grades: MoodleGrade[]): string {
     const getGrade = (name: string) =>
       grades.find((grade) => grade.itemname === name)?.graderaw ?? 0;
 
@@ -122,7 +95,7 @@ export class Aitu implements University {
         totalGrade === 0
           ? regFinal * 0.4 + regMid * 0.3 + regEnd * 0.3
           : getGrade("Total");
-      const text = `<b>TOTAL  →  ${total.toFixed(2)}</b>\n<b>GPA  →  ${this.getGPA(total)}</b>\n\n`;
+      const text = `<b>TOTAL  →  ${total.toFixed(2)}</b>\n<b>GPA  →  ${getGPA(total)}</b>\n\n`;
 
       if (total >= 90) {
         return `High scholarship 🎉🎉\n${text}`;

@@ -1,5 +1,6 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { InlineKeyboard, GrammyError, BotError, HttpError } from "grammy";
+import { getAuthHeaders, request } from "../../library/hc";
 
 const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
   return new Date(timestamp)
@@ -13,6 +14,32 @@ const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
       timeZone: "Asia/Almaty",
     })
     .replace("24:00", "00:00");
+};
+
+const getMiniAppUrl = async (
+  userId: number,
+  host: string,
+  route: string = "",
+): Promise<string> => {
+  const [loginResponse, err] = await request((client) => {
+    return client.v2.auth.login.$post(
+      {
+        json: {},
+      },
+      {
+        headers: getAuthHeaders(userId),
+      },
+    );
+  });
+
+  if (err) {
+    return host + route;
+  }
+
+  const b64 = btoa(JSON.stringify(loginResponse));
+  const url = host + route + "?usr=" + b64;
+
+  return url;
 };
 
 const getNotificationsKeyboard = (
@@ -56,4 +83,9 @@ function logWithTimestamp(
   console.error(`[${new Date().toISOString()}] ${message}`, error);
 }
 
-export { getNotificationsKeyboard, formatUnixtimestamp, logWithTimestamp };
+export {
+  getNotificationsKeyboard,
+  formatUnixtimestamp,
+  logWithTimestamp,
+  getMiniAppUrl,
+};
