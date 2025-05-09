@@ -8,7 +8,7 @@ import {
 } from "../utils";
 import keyboards from "./keyboards";
 import { config } from "../../config";
-import { uni } from "../universities/uni";
+import { uni } from "../universities";
 
 // Menu buttons
 async function others(ctx: Context) {

@@ -4,7 +4,7 @@ import { request, getAuthHeaders } from "../../library/hc";
 import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
-import { uni } from "../universities/uni";
+import { uni } from "../universities";
 import { getMiniAppUrl } from "../utils";
 
 async function start(ctx: RegistrationContext) {
