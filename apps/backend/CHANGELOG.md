@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.3.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.5...remoodle/backend-v2.3.0) (2025-05-10)
+
+
+### Features
+
+* add AITU feature flags ([3f5e6df](https://github.com/remoodle/remoodle/commit/3f5e6dfece06f74637135124ad8042457f44ab7e))
+
+
+### Bug Fixes
+
+* remove hacks from api output ([cfa37dc](https://github.com/remoodle/remoodle/commit/cfa37dca8ab06e8d48d3142a6b9c08ac575b8e01))
+* update tests ([f3ac181](https://github.com/remoodle/remoodle/commit/f3ac18164defaca207a8ff65f8e4948faa5aab7c))
+
+
+### Reverts
+
+* "feat: add AITU feature flags" ([aa7525b](https://github.com/remoodle/remoodle/commit/aa7525babf51342a196147c2b6df1e5bfc034c8e))
+
+
+### Miscellaneous Chores
+
+* add `bagon-x2` config ([92d820f](https://github.com/remoodle/remoodle/commit/92d820f085171ab2d449f3f064b618f0e1f5397d))
+
 ## [2.2.5](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.4...remoodle/backend-v2.2.5) (2025-04-20)
 
 
