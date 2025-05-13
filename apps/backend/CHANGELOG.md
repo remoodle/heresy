@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.0...remoodle/backend-v2.3.1) (2025-05-13)
+
+
+### Bug Fixes
+
+* correct tests ([e753dfe](https://github.com/remoodle/remoodle/commit/e753dfe6765465b6285ce47e24c31a4850b68b4f))
+* format timestamp consistently ([2e720c3](https://github.com/remoodle/remoodle/commit/2e720c36d64d0e313939786b10b538653594cb10))
+
 ## [2.3.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.2.5...remoodle/backend-v2.3.0) (2025-05-10)
 
 
