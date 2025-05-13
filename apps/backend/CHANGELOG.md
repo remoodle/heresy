@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.1...remoodle/backend-v2.3.2) (2025-05-13)
+
+
+### Code Refactoring
+
+* split out alert service ([2044dea](https://github.com/remoodle/remoodle/commit/2044dea34e0f64bb25d5e63393c3ce25d09b2ae1))
+
 ## [2.3.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.0...remoodle/backend-v2.3.1) (2025-05-13)
 
 
