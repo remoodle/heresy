@@ -132,7 +132,7 @@ export const trackDeadlineReminders = (
 
 export const formatDeadlineReminders = (
   data: CourseDeadlineReminders[],
-  formatter = (timestart: number) => getTimeLeft(timestart * 1000),
+  formatter = (timestart: number) => getTimeLeft(timestart),
 ): string => {
   let message = "🔔 Upcoming deadlines 🔔\n\n";
 
@@ -140,7 +140,9 @@ export const formatDeadlineReminders = (
     message += `🗓 ${diff.course_name}\n`;
 
     for (const { event_name, event_timestart } of diff.reminders) {
-      const formattedDate = new Date(event_timestart).toLocaleString("en-US", {
+      const timestamp = event_timestart * 1000;
+
+      const formattedDate = new Date(timestamp).toLocaleString("en-US", {
         weekday: "short",
         month: "short",
         day: "numeric",
@@ -150,7 +152,7 @@ export const formatDeadlineReminders = (
         hour12: false,
         timeZone: "Asia/Almaty",
       });
-      message += `  • ${event_name}: <b>${formatter(event_timestart)}</b>, ${formattedDate}\n`;
+      message += `  • ${event_name}: <b>${formatter(timestamp)}</b>, ${formattedDate}\n`;
     }
     message += "\n";
   }
