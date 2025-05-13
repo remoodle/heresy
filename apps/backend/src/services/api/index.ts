@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { prometheus } from "@hono/prometheus";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
@@ -6,11 +7,7 @@ import { pinoLogger } from "hono-pino-logger";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
 import { applyBullBoard } from "../../library/bull-board";
-import {
-  registerMetrics,
-  printMetrics,
-  initUserCounter,
-} from "./middleware/metrics";
+import { registry, initMetrics } from "./helpers/metrics";
 import { versionHandler } from "./middleware/version";
 import { v2 } from "./router/v2";
 
@@ -19,6 +16,8 @@ const api = new Hono();
 api.use("*", pinoLogger(logger.api), prettyJSON());
 api.use("*", versionHandler);
 api.use("*", cors());
+
+const { printMetrics, registerMetrics } = prometheus({ registry });
 
 api.use("*", registerMetrics);
 api.get("/metrics", printMetrics);
@@ -36,7 +35,7 @@ const run = () => {
     `Starting server on http://${config.http.host}:${config.http.port}`,
   );
 
-  initUserCounter();
+  initMetrics();
 
   serve({
     hostname: config.http.host,

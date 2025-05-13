@@ -1,8 +1,8 @@
 import { Gauge, Registry } from "prom-client";
-import { prometheus } from "@hono/prometheus";
 import { db } from "../../../library/db";
 
 const registry = new Registry();
+
 const userGauge = new Gauge({
   name: "user_counter",
   help: "Number of users",
@@ -11,9 +11,19 @@ const userGauge = new Gauge({
 
 async function initUserCounter() {
   const userCount = await db.user.countDocuments();
-  userGauge.inc(userCount);
+  userGauge.set(userCount);
 }
 
-const { printMetrics, registerMetrics } = prometheus({ registry });
+export async function increaseUserCounter() {
+  userGauge.inc();
+}
 
-export { userGauge, initUserCounter, printMetrics, registerMetrics };
+export async function decreaseUserCounter() {
+  userGauge.dec();
+}
+
+export async function initMetrics() {
+  await initUserCounter();
+}
+
+export { registry };

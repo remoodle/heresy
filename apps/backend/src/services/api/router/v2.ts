@@ -16,7 +16,6 @@ import { config, env } from "../../../config";
 import { db } from "../../../library/db";
 import { deleteUser } from "../../../core/wrapper";
 import { QueueName, JobName } from "../../../core/queues";
-import { requestAlertWorker } from "../../../library/hc";
 import { Moodle } from "../../../library/moodle";
 import {
   hashPassword,
@@ -25,10 +24,11 @@ import {
 } from "../helpers/crypto";
 import { zValidator } from "../helpers/zv";
 import { issueTokens } from "../helpers/jwt";
+import { increaseUserCounter, decreaseUserCounter } from "../helpers/metrics";
 import { defaultRules, rateLimiter } from "../middleware/ratelimit";
 import { authMiddleware } from "../middleware/auth";
 import { errorHandler } from "../middleware/error";
-import { userGauge } from "../middleware/metrics";
+import { createAlert } from "../helpers/alerts";
 
 const authRoutes = new Hono<{
   Variables: {
@@ -149,16 +149,12 @@ const authRoutes = new Hono<{
             });
           }
 
-          userGauge.inc();
+          increaseUserCounter();
 
-          await requestAlertWorker((client) =>
-            client.new.$post({
-              json: {
-                topic: env.isProduction ? "users2" : "dev",
-                message: `New ${telegramId ? "Telegram" : "Regular"} user \n<b>${student.fullname}</b> \n<b>${student.username}</b>`,
-              },
-            }),
-          );
+          await createAlert({
+            event: "user.sync",
+            data: { userId, telegramId, student },
+          });
         } catch (error: any) {
           throw new HTTPException(500, {
             message: "Failed to create user" + error,
@@ -731,7 +727,7 @@ const userRoutes = new Hono<{
       });
     }
 
-    userGauge.dec();
+    decreaseUserCounter();
 
     return ctx.json({ ok: true });
   })
