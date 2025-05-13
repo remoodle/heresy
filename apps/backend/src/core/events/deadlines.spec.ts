@@ -107,13 +107,13 @@ describe("deadlines notifications", () => {
           {
             event_id: 1,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740000,
+            event_timestart: 1726426740,
             threshold: "12 hours",
           },
           {
             event_id: 2,
             event_name: "Assignment 2 is due",
-            event_timestart: 1726426740000,
+            event_timestart: 1726426740,
             threshold: "12 hours",
           },
         ],
@@ -125,7 +125,7 @@ describe("deadlines notifications", () => {
           {
             event_id: 1,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740000,
+            event_timestart: 1726426740,
             threshold: "12 hours",
           },
         ],
