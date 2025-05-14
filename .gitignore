@@ -1,5 +1,7 @@
 .DS_Store
+
 .turbo
+
 node_modules
 
 .dev.vars
@@ -7,3 +9,5 @@ node_modules
 
 .env
 *.local
+
+*.log
