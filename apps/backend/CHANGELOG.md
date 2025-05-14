@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.3...remoodle/backend-v2.3.4) (2025-05-14)
+
+
+### Miscellaneous Chores
+
+* bump node version ([7dc15c1](https://github.com/remoodle/remoodle/commit/7dc15c129027a7c76f96c7c003d77c27565c14ea))
+
 ## [2.3.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.2...remoodle/backend-v2.3.3) (2025-05-14)
 
 
