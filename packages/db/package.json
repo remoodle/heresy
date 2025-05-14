@@ -20,7 +20,7 @@
     "@remoodle/prettier-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^20.11.17",
+    "@types/node": "^22.15.18",
     "@types/uuid": "^10.0.0",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",

@@ -41,7 +41,7 @@
     "@remoodle/types": "workspace:*",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/jsonwebtoken": "^9.0.6",
-    "@types/node": "^20.11.17",
+    "@types/node": "^22.15.18",
     "eslint": "^8.57.0",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.3.3",
