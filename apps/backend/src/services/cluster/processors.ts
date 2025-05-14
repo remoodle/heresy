@@ -4,6 +4,7 @@ import { Telegram, getValues, partition, objectEntries } from "@remoodle/utils";
 import { config } from "../../config";
 import { db } from "../../library/db";
 import { logger } from "../../library/logger";
+import { getActiveUsers } from "../../core/wrapper";
 import {
   type CourseGradeChanges,
   formatGradeChanges,
@@ -30,7 +31,7 @@ export const processors: Record<QueueName, Processor> = {
   [QueueName.EVENTS_SYNC]: {
     jobName: JobName.SCHEDULE_EVENTS,
     process: async () => {
-      const users = await getUsers();
+      const users = await getActiveUsers();
 
       logger.cluster.info(`Updating events for ${users.length} users`);
 
@@ -76,7 +77,7 @@ export const processors: Record<QueueName, Processor> = {
   [QueueName.COURSES_SYNC]: {
     jobName: JobName.SCHEDULE_COURSES,
     process: async () => {
-      const users = await getUsers();
+      const users = await getActiveUsers();
 
       logger.cluster.info(`Updating courses for ${users.length} users`);
 
@@ -113,7 +114,7 @@ export const processors: Record<QueueName, Processor> = {
   [QueueName.GRADES_SYNC]: {
     jobName: JobName.SCHEDULE_GRADES,
     process: async (job) => {
-      const users = await getUsers();
+      const users = await getActiveUsers();
 
       const { classification = "inprogress", trackDiff = true } = job.data;
 
@@ -450,7 +451,19 @@ export const processors: Record<QueueName, Processor> = {
         throw new Error(`User ${userId} has no telegramId`);
       }
 
-      const response = await sendTelegramMessage(user.telegramId, message);
+      const telegram = new Telegram(config.telegram.token, user.telegramId);
+
+      const response = await telegram.notify(message, {
+        parseMode: "HTML",
+        replyMarkup: [
+          [
+            {
+              text: "Clear",
+              callback_data: "remove_message",
+            },
+          ],
+        ],
+      });
 
       if (response.ok) {
         logger.cluster.info(
@@ -481,27 +494,3 @@ export const findJobQueueProcessor = (jobName: JobName) => {
 
   return data;
 };
-
-const getUsers = async (options: Record<string, any> = {}) => {
-  const users = await db.user
-    .find({ moodleId: { $exists: true }, health: { $gt: 0 }, ...options })
-    .lean();
-
-  return users.map((user) => ({ userId: user._id, health: user.health }));
-};
-
-async function sendTelegramMessage(chatId: number, message: string) {
-  const telegram = new Telegram(config.telegram.token, chatId);
-
-  return await telegram.notify(message, {
-    parseMode: "HTML",
-    replyMarkup: [
-      [
-        {
-          text: "Clear",
-          callback_data: "remove_message",
-        },
-      ],
-    ],
-  });
-}

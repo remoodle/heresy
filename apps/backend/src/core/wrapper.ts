@@ -6,3 +6,11 @@ export const deleteUser = async (userId: string) => {
   await db.grade.deleteMany({ userId });
   await db.event.deleteMany({ userId });
 };
+
+export const getActiveUsers = async () => {
+  const users = await db.user
+    .find({ moodleId: { $exists: true }, health: { $gt: 0 } })
+    .lean();
+
+  return users.map((user) => ({ userId: user._id, health: user.health }));
+};
