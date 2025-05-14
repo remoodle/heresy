@@ -36,7 +36,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@remoodle/alert-worker": "workspace:*",
     "@remoodle/eslint-config": "workspace:*",
     "@remoodle/prettier-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
