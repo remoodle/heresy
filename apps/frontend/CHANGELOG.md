@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.9](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.8...remoodle/frontend-v1.9.9) (2025-05-14)
+
+
+### Code Refactoring
+
+* split app store ([2808f51](https://github.com/remoodle/remoodle/commit/2808f519d285522151ed7cb13458b481ecbf854f))
+
 ## [1.9.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.7...remoodle/frontend-v1.9.8) (2025-05-14)
 
 
