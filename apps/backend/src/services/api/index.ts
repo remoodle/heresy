@@ -32,7 +32,7 @@ const routes = api.route("/v2", v2);
 
 const run = () => {
   logger.api.info(
-    `Starting server on http://${config.http.host}:${config.http.port}`,
+    `starting server on http://${config.http.host}:${config.http.port}`,
   );
 
   initMetrics();

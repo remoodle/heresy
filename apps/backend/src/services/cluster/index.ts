@@ -47,20 +47,21 @@ const spawnWorkers = async (tasks: Tasks) => {
 };
 
 const run = async () => {
+  logger.cluster.info("starting cluster...");
+
   const tasks = await loadConfig();
 
-  logger.cluster.info("Starting cluster...");
-
   if (config.cluster.scheduler.enabled && config.cluster.queues.prune) {
-    logger.cluster.info("Obliterating queues...");
+    logger.cluster.info("obliterating queues...");
     await obliterateQueues();
   }
 
   if (config.cluster.scheduler.enabled) {
-    logger.cluster.info("Upserting schedulers...");
+    logger.cluster.info("upserting schedulers...");
     await upsertSchedulers(tasks);
   }
 
+  logger.cluster.info("spawning workers...");
   await spawnWorkers(tasks);
 };
 
@@ -76,7 +77,7 @@ export const closeWorkers = async () => {
 };
 
 const gracefulShutdown = async (signal: string) => {
-  logger.cluster.info(`Received ${signal}, closing server...`);
+  logger.cluster.info(`received ${signal}, closing server...`);
   await closeQueues();
   await closeWorkers();
   process.exit(0);

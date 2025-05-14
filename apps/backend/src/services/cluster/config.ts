@@ -15,7 +15,7 @@ export type Tasks = Task[];
 export const loadConfig = async () => {
   const { configPath } = config.cluster.tasks;
 
-  logger.cluster.info(`Loading config from ${configPath}`);
+  logger.cluster.info(`loading config from ${configPath}`);
   const configFile = await readFile(__dirname + configPath, "utf8");
 
   return JSON.parse(configFile) as Tasks;

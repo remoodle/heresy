@@ -33,7 +33,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async () => {
       const users = await getActiveUsers();
 
-      logger.cluster.info(`Updating events for ${users.length} users`);
+      logger.cluster.info(`scheduling events sync for ${users.length} users`);
 
       const jobs = users.map((payload) => ({
         name: JobName.UPDATE_EVENTS,
@@ -60,11 +60,11 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      logger.cluster.info(`Updating events for ${userId}`);
+      logger.cluster.info({ userId }, `syncing events`);
 
       await syncEvents(userId);
 
-      logger.cluster.info(`Scheduling reminders for ${userId}`);
+      logger.cluster.info({ userId }, `scheduling reminders`);
 
       const reminderJob = await queues[QueueName.REMINDERS].add(
         QueueName.REMINDERS,
@@ -79,7 +79,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async () => {
       const users = await getActiveUsers();
 
-      logger.cluster.info(`Updating courses for ${users.length} users`);
+      logger.cluster.info(`scheduling courses sync for ${users.length} users`);
 
       const jobs = users.map((payload) => ({
         name: JobName.UPDATE_COURSES,
@@ -106,7 +106,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      logger.cluster.info(`Updating courses for ${userId}`);
+      logger.cluster.info({ userId }, `syncing courses`);
 
       await syncCourses(userId);
     },
@@ -119,7 +119,11 @@ export const processors: Record<QueueName, Processor> = {
       const { classification = "inprogress", trackDiff = true } = job.data;
 
       logger.cluster.info(
-        `Updating ${classification} grades for ${users.length} users, trackDiff: ${trackDiff}`,
+        {
+          classification,
+          trackDiff,
+        },
+        `scheduling grades sync for ${users.length} users`,
       );
 
       const courses = await db.course
@@ -202,7 +206,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const { lifo } = job.opts;
 
-      logger.cluster.info(`Updating grades for ${userId}`);
+      logger.cluster.info({ userId }, `syncing grades`);
 
       const courses = await db.course
         .find({
@@ -274,6 +278,15 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId, courseId, courseName, trackDiff } = job.data;
 
+      logger.cluster.info(
+        {
+          userId,
+          courseId,
+          trackDiff,
+        },
+        `syncing course grades`,
+      );
+
       const result = await syncCourseGrades(userId, courseId, trackDiff);
 
       if (!result) {
@@ -293,9 +306,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId, courseIds } = job.data;
 
-      logger.cluster.info(
-        `Combining grades for ${userId}, courses ${courseIds}`,
-      );
+      logger.cluster.info({ userId, courseIds }, `combining grades`);
 
       const childrenValues = await job.getChildrenValues<
         CourseGradeChanges | undefined
@@ -351,7 +362,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      logger.cluster.info(`Checking reminders for ${userId}`);
+      logger.cluster.info({ userId }, `checking reminders`);
 
       const user = await db.user.findOne({ _id: userId });
 
@@ -439,7 +450,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId, message } = job.data;
 
-      logger.cluster.info(`Sending telegram message for ${userId}`);
+      logger.cluster.info({ userId }, `sending telegram message`);
 
       const user = await db.user.findOne({ _id: userId });
 
@@ -467,16 +478,23 @@ export const processors: Record<QueueName, Processor> = {
 
       if (response.ok) {
         logger.cluster.info(
-          message,
-          `Sent notification to ${user.name} (${user.moodleId})`,
+          {
+            moodleId: user.moodleId,
+            name: user.name,
+            message,
+          },
+          `sent telegram message`,
         );
       } else {
         logger.cluster.error(
           {
+            moodleId: user.moodleId,
+            name: user.name,
+            message,
             status: response.status,
             statusText: response.statusText,
           },
-          `Failed to send notification to ${user.name} (${user.moodleId})`,
+          `failed to send notification`,
         );
       }
     },
