@@ -1,5 +1,7 @@
 # ReMoodle
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/remoodle/remoodle)
+
 Enhancing Moodle experience with care
 
 ## Development
