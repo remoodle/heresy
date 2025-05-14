@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.7...remoodle/frontend-v1.9.8) (2025-05-14)
+
+
+### Miscellaneous Chores
+
+* bump node version ([7dc15c1](https://github.com/remoodle/remoodle/commit/7dc15c129027a7c76f96c7c003d77c27565c14ea))
+
 ## [1.9.7](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.6...remoodle/frontend-v1.9.7) (2025-04-11)
 
 
