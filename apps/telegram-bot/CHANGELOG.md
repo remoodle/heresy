@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.0...remoodle/telegram-bot-v2.0.1) (2025-05-14)
+
+
+### Miscellaneous Chores
+
+* bump node version ([7dc15c1](https://github.com/remoodle/remoodle/commit/7dc15c129027a7c76f96c7c003d77c27565c14ea))
+
 ## [2.0.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v1.0.10...remoodle/telegram-bot-v2.0.0) (2025-05-09)
 
 
