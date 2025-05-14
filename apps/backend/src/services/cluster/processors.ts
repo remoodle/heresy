@@ -1,6 +1,6 @@
 import { FlowProducer } from "bullmq";
 import type { FlowChildJob, FlowJob, Job } from "bullmq";
-import { Telegram, getValues, partition } from "@remoodle/utils";
+import { Telegram, getValues, partition, objectEntries } from "@remoodle/utils";
 import { config } from "../../config";
 import { db } from "../../library/db";
 import { logger } from "../../library/logger";
@@ -16,15 +16,20 @@ import {
 import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
 
-export type ClusterJob = {
-  queueName: QueueName;
-  run(job: Job): Promise<any>;
+export type Processor = {
+  /*
+   * Could become JobName | JobName[] in future to support Named Processors
+   * https://docs.bullmq.io/patterns/named-processor
+   * https://docs.nestjs.com/techniques/queues
+   */
+  jobName: JobName;
+  process(job: Job): Promise<any>;
 };
 
-export const jobs: Record<JobName, ClusterJob> = {
-  [JobName.SCHEDULE_EVENTS]: {
-    queueName: QueueName.EVENTS_SYNC,
-    run: async () => {
+export const processors: Record<QueueName, Processor> = {
+  [QueueName.EVENTS_SYNC]: {
+    jobName: JobName.SCHEDULE_EVENTS,
+    process: async () => {
       const users = await getUsers();
 
       logger.cluster.info(`Updating events for ${users.length} users`);
@@ -49,9 +54,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return bulk.length;
     },
   },
-  [JobName.UPDATE_EVENTS]: {
-    queueName: QueueName.EVENTS,
-    run: async (job) => {
+  [QueueName.EVENTS]: {
+    jobName: JobName.UPDATE_EVENTS,
+    process: async (job) => {
       const { userId } = job.data;
 
       logger.cluster.info(`Updating events for ${userId}`);
@@ -68,9 +73,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return reminderJob;
     },
   },
-  [JobName.SCHEDULE_COURSES]: {
-    queueName: QueueName.COURSES_SYNC,
-    run: async () => {
+  [QueueName.COURSES_SYNC]: {
+    jobName: JobName.SCHEDULE_COURSES,
+    process: async () => {
       const users = await getUsers();
 
       logger.cluster.info(`Updating courses for ${users.length} users`);
@@ -95,9 +100,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return bulk.length;
     },
   },
-  [JobName.UPDATE_COURSES]: {
-    queueName: QueueName.COURSES,
-    run: async (job) => {
+  [QueueName.COURSES]: {
+    jobName: JobName.UPDATE_COURSES,
+    process: async (job) => {
       const { userId } = job.data;
 
       logger.cluster.info(`Updating courses for ${userId}`);
@@ -105,9 +110,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       await syncCourses(userId);
     },
   },
-  [JobName.SCHEDULE_GRADES]: {
-    queueName: QueueName.GRADES_SYNC,
-    run: async (job) => {
+  [QueueName.GRADES_SYNC]: {
+    jobName: JobName.SCHEDULE_GRADES,
+    process: async (job) => {
       const users = await getUsers();
 
       const { classification = "inprogress", trackDiff = true } = job.data;
@@ -189,9 +194,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return trees.length;
     },
   },
-  [JobName.UPDATE_GRADES]: {
-    queueName: QueueName.GRADES_FLOW,
-    run: async (job) => {
+  [QueueName.GRADES_FLOW]: {
+    jobName: JobName.UPDATE_GRADES,
+    process: async (job) => {
       const { userId, classification, trackDiff } = job.data;
 
       const { lifo } = job.opts;
@@ -263,9 +268,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return tree.children?.length;
     },
   },
-  [JobName.UPDATE_COURSE_GRADES]: {
-    queueName: QueueName.GRADES_FLOW_UPDATE,
-    run: async (job) => {
+  [QueueName.GRADES_FLOW_UPDATE]: {
+    jobName: JobName.UPDATE_COURSE_GRADES,
+    process: async (job) => {
       const { userId, courseId, courseName, trackDiff } = job.data;
 
       const result = await syncCourseGrades(userId, courseId, trackDiff);
@@ -282,9 +287,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       );
     },
   },
-  [JobName.COMBINE_GRADES]: {
-    queueName: QueueName.GRADES_FLOW_COMBINE,
-    run: async (job) => {
+  [QueueName.GRADES_FLOW_COMBINE]: {
+    jobName: JobName.COMBINE_GRADES,
+    process: async (job) => {
       const { userId, courseIds } = job.data;
 
       logger.cluster.info(
@@ -340,9 +345,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return gradeChanges;
     },
   },
-  [JobName.CHECK_REMINDERS]: {
-    queueName: QueueName.REMINDERS,
-    run: async (job) => {
+  [QueueName.REMINDERS]: {
+    jobName: JobName.CHECK_REMINDERS,
+    process: async (job) => {
       const { userId } = job.data;
 
       logger.cluster.info(`Checking reminders for ${userId}`);
@@ -428,9 +433,9 @@ export const jobs: Record<JobName, ClusterJob> = {
       return deadlineReminders;
     },
   },
-  [JobName.SEND_TELEGRAM_MESSAGE]: {
-    queueName: QueueName.TELEGRAM,
-    run: async (job) => {
+  [QueueName.TELEGRAM]: {
+    jobName: JobName.SEND_TELEGRAM_MESSAGE,
+    process: async (job) => {
       const { userId, message } = job.data;
 
       logger.cluster.info(`Sending telegram message for ${userId}`);
@@ -463,6 +468,18 @@ export const jobs: Record<JobName, ClusterJob> = {
       }
     },
   },
+};
+
+export const findJobQueueProcessor = (jobName: JobName) => {
+  const data = objectEntries(processors).find(
+    ([, processor]) => processor.jobName === jobName,
+  );
+
+  if (!data) {
+    throw new Error(`Processor for ${jobName} not found`);
+  }
+
+  return data;
 };
 
 const getUsers = async (options: Record<string, any> = {}) => {

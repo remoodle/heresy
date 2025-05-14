@@ -1,0 +1,20 @@
+import { readFile } from "node:fs/promises";
+import type { RepeatOptions, WorkerOptions } from "bullmq";
+import { logger } from "../../library/logger";
+import { JobName } from "../../core/queues";
+import { config } from "../../config";
+
+type Task = {
+  name: JobName;
+  repeat?: Omit<RepeatOptions, "key">;
+  opts?: WorkerOptions;
+};
+
+export const loadConfig = async () => {
+  const { configPath } = config.cluster.tasks;
+
+  logger.cluster.info(`Loading config from ${configPath}`);
+  const configFile = await readFile(__dirname + configPath, "utf8");
+
+  return JSON.parse(configFile) as Task[];
+};

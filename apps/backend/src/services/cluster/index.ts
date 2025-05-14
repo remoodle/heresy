@@ -11,7 +11,8 @@ import {
 import { config } from "../../config";
 import { logger } from "../../library/logger";
 import { db } from "../../library/db";
-import { jobs } from "./jobs";
+import { findJobQueueProcessor } from "./processors";
+import { loadConfig } from "./config";
 
 const workers: Worker[] = [];
 
@@ -21,30 +22,13 @@ const defaultWorkerOptions: WorkerOptions = {
   removeOnFail: { age: 3600 * 3 }, // keep up to 3 hours
 };
 
-const loadConfig = async () => {
-  const { configPath } = config.cluster.tasks;
-
-  logger.cluster.info(`Loading config from ${configPath}`);
-  const configFile = await readFile(__dirname + configPath, "utf8");
-
-  return JSON.parse(configFile) as {
-    name: JobName;
-    repeat?: Omit<RepeatOptions, "key">;
-    opts?: WorkerOptions;
-  }[];
-};
-
 const upsertWorkers = async () => {
   const tasks = await loadConfig();
 
   for (const task of tasks) {
-    const clusterJob = jobs[task.name];
+    const [queueName, { process }] = findJobQueueProcessor(task.name);
 
-    if (!clusterJob) {
-      throw new Error(`Job ${task.name} not found`);
-    }
-
-    const worker = new Worker(clusterJob.queueName, clusterJob.run, {
+    const worker = new Worker(queueName, process, {
       ...defaultWorkerOptions,
       ...task.opts,
     });
@@ -60,33 +44,34 @@ const upsertSchedulers = async (date?: Date | "manual" | "init") => {
 
   const tasks = await loadConfig();
 
-  for (const task of tasks.filter((task) => task.repeat)) {
-    const clusterJob = jobs[task.name];
+  const repeatableTasks = tasks.filter((task) => task.repeat);
 
-    if (!clusterJob) {
-      throw new Error(`Repeatable Job ${task.name} not found`);
-    }
+  for (const task of repeatableTasks) {
+    const [queueName, _] = findJobQueueProcessor(task.name);
 
-    const queue = queues[clusterJob.queueName];
+    const queue = queues[queueName];
 
     const scheduledJobs = await queue.getJobs(["delayed", "active"]);
 
-    if (!scheduledJobs.length) {
-      logger.cluster.info(
-        `Scheduling ${task.name} at ${JSON.stringify(task.repeat)}`,
-      );
-
-      await queue.upsertJobScheduler(task.name, task.repeat!, {
-        data: {
-          date,
-        },
-        opts: {
-          backoff: 3,
-          attempts: 6,
-          removeOnFail: false,
-        },
-      });
+    if (scheduledJobs.length) {
+      logger.cluster.info(`Job ${task.name} already scheduled`);
+      return;
     }
+
+    logger.cluster.info(
+      `Scheduling ${task.name} at ${JSON.stringify(task.repeat)}`,
+    );
+
+    await queue.upsertJobScheduler(task.name, task.repeat!, {
+      data: {
+        date,
+      },
+      opts: {
+        backoff: 3,
+        attempts: 6,
+        removeOnFail: false,
+      },
+    });
   }
 };
 
