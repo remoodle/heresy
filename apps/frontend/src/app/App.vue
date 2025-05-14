@@ -6,19 +6,11 @@ import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUrlSearchParams } from "@vueuse/core";
 import { ConfigProvider } from "reka-ui";
 import { useUserStore } from "@/shared/stores/user";
-import { useAppStore } from "@/shared/stores/app";
 import { RouteName } from "@/shared/lib/routes";
 import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const route = useRoute();
 const router = useRouter();
-
-const appStore = useAppStore();
-const { theme } = storeToRefs(appStore);
-
-watchEffect(() => {
-  document.documentElement.setAttribute("data-theme", theme.value);
-});
 
 const userStore = useUserStore();
 const { authorized } = storeToRefs(userStore);

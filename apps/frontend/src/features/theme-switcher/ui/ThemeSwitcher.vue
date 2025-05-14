@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { useAppStore } from "@/shared/stores/app";
+import { useSettingsStore } from "@/shared/stores/settings";
 import { Icon } from "@/shared/ui/icon";
 import { Button } from "@/shared/ui/button";
 
-const appStore = useAppStore();
+const settingsStore = useSettingsStore();
 
 const toggleTheme = () => {
-  appStore.toggleTheme();
+  settingsStore.toggleTheme();
 };
 </script>
 
 <template>
-  <slot :toggle-theme="toggleTheme" :theme="appStore.theme">
+  <slot :toggle-theme="toggleTheme" :theme="settingsStore.theme">
     <Button variant="secondary" size="icon" @click="toggleTheme">
       <Icon
         class="h-6 w-6"
-        :name="appStore.theme === 'light' ? 'sun' : 'moon'"
+        :name="settingsStore.theme === 'light' ? 'sun' : 'moon'"
       />
     </Button>
   </slot>

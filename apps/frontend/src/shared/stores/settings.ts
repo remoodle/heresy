@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 import { useColorMode } from "@vueuse/core";
 import { getStorageKey } from "@/shared/lib/helpers";
 
-export const useAppStore = defineStore("app", () => {
+export const useSettingsStore = defineStore("settings", () => {
   const { store: storedTheme, system: systemTheme } = useColorMode({
     modes: {
       light: "light",
