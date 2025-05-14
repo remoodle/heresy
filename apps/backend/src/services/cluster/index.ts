@@ -1,18 +1,29 @@
-import { readFile } from "node:fs/promises";
-import type { RepeatOptions, WorkerOptions } from "bullmq";
-import cron from "node-cron";
+import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
-import {
-  queues,
-  obliterateQueues,
-  closeQueues,
-  JobName,
-} from "../../core/queues";
+import { queues, obliterateQueues, closeQueues } from "../../core/queues";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
 import { db } from "../../library/db";
 import { findJobQueueProcessor } from "./processors";
-import { loadConfig } from "./config";
+import { loadConfig, type Tasks } from "./config";
+
+const upsertSchedulers = async (tasks: Tasks) => {
+  const repeatableTasks = tasks.filter((task) => task.repeat);
+
+  for (const task of repeatableTasks) {
+    const [queueName, _] = findJobQueueProcessor(task.name);
+
+    const queue = queues[queueName];
+
+    await queue.upsertJobScheduler(task.name, task.repeat!, {
+      opts: {
+        backoff: 3,
+        attempts: 6,
+        removeOnFail: false,
+      },
+    });
+  }
+};
 
 const workers: Worker[] = [];
 
@@ -22,9 +33,7 @@ const defaultWorkerOptions: WorkerOptions = {
   removeOnFail: { age: 3600 * 3 }, // keep up to 3 hours
 };
 
-const upsertWorkers = async () => {
-  const tasks = await loadConfig();
-
+const spawnWorkers = async (tasks: Tasks) => {
   for (const task of tasks) {
     const [queueName, { process }] = findJobQueueProcessor(task.name);
 
@@ -37,64 +46,27 @@ const upsertWorkers = async () => {
   }
 };
 
-const upsertSchedulers = async (date?: Date | "manual" | "init") => {
-  if (!config.cluster.scheduler.enabled) {
-    return;
-  }
-
+const run = async () => {
   const tasks = await loadConfig();
 
-  const repeatableTasks = tasks.filter((task) => task.repeat);
+  logger.cluster.info("Starting cluster...");
 
-  for (const task of repeatableTasks) {
-    const [queueName, _] = findJobQueueProcessor(task.name);
-
-    const queue = queues[queueName];
-
-    const scheduledJobs = await queue.getJobs(["delayed", "active"]);
-
-    if (scheduledJobs.length) {
-      logger.cluster.info(`Job ${task.name} already scheduled`);
-      return;
-    }
-
-    logger.cluster.info(
-      `Scheduling ${task.name} at ${JSON.stringify(task.repeat)}`,
-    );
-
-    await queue.upsertJobScheduler(task.name, task.repeat!, {
-      data: {
-        date,
-      },
-      opts: {
-        backoff: 3,
-        attempts: 6,
-        removeOnFail: false,
-      },
-    });
-  }
-};
-
-const run = async () => {
-  if (config.cluster.queues.prune) {
+  if (config.cluster.scheduler.enabled && config.cluster.queues.prune) {
     logger.cluster.info("Obliterating queues...");
     await obliterateQueues();
   }
 
-  logger.cluster.info("Starting cluster...");
+  if (config.cluster.scheduler.enabled) {
+    logger.cluster.info("Upserting schedulers...");
+    await upsertSchedulers(tasks);
+  }
 
-  await upsertWorkers();
-
-  await upsertSchedulers();
+  await spawnWorkers(tasks);
 };
 
 run().catch((e) => {
   logger.cluster.error(e);
   process.exit(1);
-});
-
-cron.schedule("*/5 * * * *", async (date) => {
-  await upsertSchedulers(date);
 });
 
 export const closeWorkers = async () => {
