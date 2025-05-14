@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.3.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.2...remoodle/backend-v2.3.3) (2025-05-14)
+
+
+### Miscellaneous Chores
+
+* remove leftovers ([1570ecf](https://github.com/remoodle/remoodle/commit/1570ecf1710b15493869202a79972452d53e5be2))
+
+
+### Code Refactoring
+
+* **cluster:** introduce processor pattern ([4cd3289](https://github.com/remoodle/remoodle/commit/4cd3289ce402331afb4d8919421db630835fe901))
+* **cluster:** split utils ([d961570](https://github.com/remoodle/remoodle/commit/d9615702db084970cd04bbbcbcc0805952e473c0))
+* improve logger ([3d35901](https://github.com/remoodle/remoodle/commit/3d3590199655643170ec49b7e280190a9d07ace3))
+* remove legacy failover mechanism ([6d45013](https://github.com/remoodle/remoodle/commit/6d4501361fb24cd697af986ce35a89f1d993a09a))
+
 ## [2.3.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.1...remoodle/backend-v2.3.2) (2025-05-13)
 
 
