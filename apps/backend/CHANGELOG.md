@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.7](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.6...remoodle/backend-v2.3.7) (2025-05-16)
+
+
+### Bug Fixes
+
+* typo ([eeaa20a](https://github.com/remoodle/remoodle/commit/eeaa20a6473aa1de89ccb26d94e85a5a84625ab0))
+
 ## [2.3.6](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.5...remoodle/backend-v2.3.6) (2025-05-16)
 
 
