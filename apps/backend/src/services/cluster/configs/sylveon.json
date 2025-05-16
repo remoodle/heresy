@@ -20,19 +20,19 @@
   {
     "name": "courses::update",
     "opts": {
-      "concurrency": 5
+      "concurrency": 10
     }
   },
   {
     "name": "events::update",
     "opts": {
-      "concurrency": 5
+      "concurrency": 10
     }
   },
   {
     "name": "grades::update-by-course",
     "opts": {
-      "concurrency": 5
+      "concurrency": 10
     }
   },
   {
