@@ -140,9 +140,7 @@ export const processors: Record<QueueName, Processor> = {
         .find({
           deleted: false,
           notingroup: { $ne: true },
-          userId: {
-            $in: users.filter(({ userId }) => userId),
-          },
+          userId: { $in: users.map((user) => user.userId) },
           ...(classification && { classification }),
         })
         .lean();
