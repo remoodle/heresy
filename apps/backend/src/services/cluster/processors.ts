@@ -33,7 +33,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [userId] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await getActiveUsers();
 
       logger.cluster.info(`scheduling events sync for ${users.length} users`);
 
@@ -81,7 +81,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [userId] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await getActiveUsers();
 
       logger.cluster.info(`scheduling courses sync for ${users.length} users`);
 
@@ -126,7 +126,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const { lifo } = job.opts;
 
-      const users = userId ? [userId] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await getActiveUsers();
 
       logger.cluster.info(
         {
@@ -141,7 +141,7 @@ export const processors: Record<QueueName, Processor> = {
           deleted: false,
           notingroup: { $ne: true },
           userId: {
-            $in: users.filter((u) => u.health > 0).map((u) => u.userId),
+            $in: users.filter(({ userId }) => userId),
           },
           ...(classification && { classification }),
         })

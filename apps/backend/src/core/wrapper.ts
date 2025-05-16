@@ -12,5 +12,5 @@ export const getActiveUsers = async () => {
     .find({ moodleId: { $exists: true }, health: { $gt: 0 } })
     .lean();
 
-  return users.map((user) => ({ userId: user._id, health: user.health }));
+  return users.map((user) => ({ userId: user._id }));
 };
