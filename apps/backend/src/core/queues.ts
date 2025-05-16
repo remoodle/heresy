@@ -10,7 +10,6 @@ export enum JobName {
   UPDATE_EVENTS = "events::update",
 
   SCHEDULE_GRADES = "grades::schedule-sync",
-  UPDATE_GRADES = "grades::update-user",
   UPDATE_COURSE_GRADES = "grades::update-by-course",
   COMBINE_GRADES = "grades::combine-diffs",
 
@@ -27,7 +26,6 @@ export enum QueueName {
   COURSES = "courses update",
 
   GRADES_SYNC = "grades sync",
-  GRADES_FLOW = "grades flow",
   GRADES_FLOW_COMBINE = "grades combine",
   GRADES_FLOW_UPDATE = "grades update",
 

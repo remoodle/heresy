@@ -30,8 +30,10 @@ export type Processor = {
 export const processors: Record<QueueName, Processor> = {
   [QueueName.EVENTS_SYNC]: {
     jobName: JobName.SCHEDULE_EVENTS,
-    process: async () => {
-      const users = await getActiveUsers();
+    process: async (job) => {
+      const { userId } = job.data;
+
+      const users = userId ? [userId] : await getActiveUsers();
 
       logger.cluster.info(`scheduling events sync for ${users.length} users`);
 
@@ -76,8 +78,10 @@ export const processors: Record<QueueName, Processor> = {
   },
   [QueueName.COURSES_SYNC]: {
     jobName: JobName.SCHEDULE_COURSES,
-    process: async () => {
-      const users = await getActiveUsers();
+    process: async (job) => {
+      const { userId } = job.data;
+
+      const users = userId ? [userId] : await getActiveUsers();
 
       logger.cluster.info(`scheduling courses sync for ${users.length} users`);
 
@@ -114,9 +118,15 @@ export const processors: Record<QueueName, Processor> = {
   [QueueName.GRADES_SYNC]: {
     jobName: JobName.SCHEDULE_GRADES,
     process: async (job) => {
-      const users = await getActiveUsers();
+      const {
+        userId,
+        classification = "inprogress",
+        trackDiff = true,
+      } = job.data;
 
-      const { classification = "inprogress", trackDiff = true } = job.data;
+      const { lifo } = job.opts;
+
+      const users = userId ? [userId] : await getActiveUsers();
 
       logger.cluster.info(
         {
@@ -164,6 +174,7 @@ export const processors: Record<QueueName, Processor> = {
               data,
               queueName: QueueName.GRADES_FLOW_UPDATE,
               opts: {
+                lifo,
                 attempts: 4,
                 backoff: {
                   type: "exponential",
@@ -186,6 +197,7 @@ export const processors: Record<QueueName, Processor> = {
             },
             children,
             opts: {
+              lifo,
               deduplication: {
                 id: `${userId}::${courseIds.join("-")}`,
               },
@@ -197,80 +209,6 @@ export const processors: Record<QueueName, Processor> = {
       const trees = await flow.addBulk(flows);
 
       return trees.length;
-    },
-  },
-  [QueueName.GRADES_FLOW]: {
-    jobName: JobName.UPDATE_GRADES,
-    process: async (job) => {
-      const { userId, classification, trackDiff } = job.data;
-
-      const { lifo } = job.opts;
-
-      logger.cluster.info({ userId }, `syncing grades`);
-
-      const courses = await db.course
-        .find({
-          userId,
-          deleted: false,
-          notingroup: { $ne: true },
-          ...(classification && { classification }),
-        })
-        .lean();
-
-      if (!courses.length) {
-        return;
-      }
-
-      const courseIds = courses.map((course) => course.data.id);
-
-      const flow = new FlowProducer({
-        connection: db.redisConnection,
-      });
-
-      const children: FlowChildJob[] = courses.map((course) => {
-        const data = {
-          userId,
-          courseId: course.data.id,
-          courseName: course.data.fullname,
-          trackDiff,
-        };
-
-        return {
-          name: JobName.UPDATE_COURSE_GRADES,
-          queueName: QueueName.GRADES_FLOW_UPDATE,
-          data,
-          opts: {
-            lifo,
-            attempts: 4,
-            backoff: {
-              type: "exponential",
-              delay: 2000,
-            },
-            deduplication: {
-              id: `${userId}::${course.data.id}`,
-            },
-            ignoreDependencyOnFailure: true,
-          },
-        };
-      });
-
-      const tree = await flow.add({
-        name: JobName.COMBINE_GRADES,
-        queueName: QueueName.GRADES_FLOW_COMBINE,
-        data: {
-          userId,
-          courseIds,
-        },
-        children,
-        opts: {
-          lifo,
-          deduplication: {
-            id: `${userId}::${courseIds.join("-")}`,
-          },
-        },
-      });
-
-      return tree.children?.length;
     },
   },
   [QueueName.GRADES_FLOW_UPDATE]: {
