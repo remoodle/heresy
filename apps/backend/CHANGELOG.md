@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.6](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.5...remoodle/backend-v2.3.6) (2025-05-16)
+
+
+### Bug Fixes
+
+* handle prioritization properly ([0b3261f](https://github.com/remoodle/remoodle/commit/0b3261fcedcf1b6b1d224b54ac37108bf1c19ecc))
+
 ## [2.3.5](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.4...remoodle/backend-v2.3.5) (2025-05-16)
 
 
