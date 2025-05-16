@@ -3,19 +3,19 @@ import { getValues } from "@remoodle/utils";
 import { db } from "../library/db";
 
 export enum JobName {
-  SCHEDULE_COURSES = "courses::schedule-sync",
-  UPDATE_COURSES = "courses::update",
+  COURSES_SCHEDULE_SYNC = "courses::schedule-sync",
+  COURSES_UPDATE = "courses::update",
 
-  SCHEDULE_EVENTS = "events::schedule-sync",
-  UPDATE_EVENTS = "events::update",
+  EVENTS_SCHEDULE_SYNC = "events::schedule-sync",
+  EVENTS_UPDATE = "events::update",
 
-  SCHEDULE_GRADES = "grades::schedule-sync",
-  UPDATE_COURSE_GRADES = "grades::update-by-course",
-  COMBINE_GRADES = "grades::combine-diffs",
+  GRADES_SCHEDULE_SYNC = "grades::schedule-sync",
+  GRADES_UPDATE_COURSE = "grades::update-by-course",
+  GRADES_COMBINE_DIFFS = "grades::combine-diffs",
 
-  CHECK_REMINDERS = "reminders::check",
+  REMINDERS_CHECK = "reminders::check",
 
-  SEND_TELEGRAM_MESSAGE = "telegram::send-message",
+  TELEGRAM_SEND_MESSAGE = "telegram::send-message",
 }
 
 export enum QueueName {
@@ -26,10 +26,10 @@ export enum QueueName {
   COURSES = "courses update",
 
   GRADES_SYNC = "grades sync",
-  GRADES_FLOW_COMBINE = "grades combine",
   GRADES_FLOW_UPDATE = "grades update",
+  GRADES_FLOW_COMBINE = "grades combine",
 
-  REMINDERS = "reminders check",
+  REMINDERS = "reminders",
 
   TELEGRAM = "telegram",
 }

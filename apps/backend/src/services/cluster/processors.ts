@@ -29,7 +29,7 @@ export type Processor = {
 
 export const processors: Record<QueueName, Processor> = {
   [QueueName.EVENTS_SYNC]: {
-    jobName: JobName.SCHEDULE_EVENTS,
+    jobName: JobName.EVENTS_SCHEDULE_SYNC,
     process: async (job) => {
       const { userId } = job.data;
 
@@ -38,7 +38,7 @@ export const processors: Record<QueueName, Processor> = {
       logger.cluster.info(`scheduling events sync for ${users.length} users`);
 
       const jobs = users.map((payload) => ({
-        name: JobName.UPDATE_EVENTS,
+        name: JobName.EVENTS_UPDATE,
         data: { userId: payload.userId },
         opts: {
           deduplication: {
@@ -58,7 +58,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.EVENTS]: {
-    jobName: JobName.UPDATE_EVENTS,
+    jobName: JobName.EVENTS_UPDATE,
     process: async (job) => {
       const { userId } = job.data;
 
@@ -77,7 +77,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.COURSES_SYNC]: {
-    jobName: JobName.SCHEDULE_COURSES,
+    jobName: JobName.COURSES_SCHEDULE_SYNC,
     process: async (job) => {
       const { userId } = job.data;
 
@@ -86,7 +86,7 @@ export const processors: Record<QueueName, Processor> = {
       logger.cluster.info(`scheduling courses sync for ${users.length} users`);
 
       const jobs = users.map((payload) => ({
-        name: JobName.UPDATE_COURSES,
+        name: JobName.COURSES_UPDATE,
         data: { userId: payload.userId },
         opts: {
           deduplication: {
@@ -106,7 +106,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.COURSES]: {
-    jobName: JobName.UPDATE_COURSES,
+    jobName: JobName.COURSES_UPDATE,
     process: async (job) => {
       const { userId } = job.data;
 
@@ -116,7 +116,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.GRADES_SYNC]: {
-    jobName: JobName.SCHEDULE_GRADES,
+    jobName: JobName.GRADES_SCHEDULE_SYNC,
     process: async (job) => {
       const {
         userId,
@@ -170,7 +170,7 @@ export const processors: Record<QueueName, Processor> = {
             };
 
             return {
-              name: JobName.UPDATE_COURSE_GRADES,
+              name: JobName.GRADES_UPDATE_COURSE,
               data,
               queueName: QueueName.GRADES_FLOW_UPDATE,
               opts: {
@@ -189,7 +189,7 @@ export const processors: Record<QueueName, Processor> = {
           });
 
           return {
-            name: JobName.COMBINE_GRADES,
+            name: JobName.GRADES_COMBINE_DIFFS,
             queueName: QueueName.GRADES_FLOW_COMBINE,
             data: {
               userId,
@@ -212,7 +212,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.GRADES_FLOW_UPDATE]: {
-    jobName: JobName.UPDATE_COURSE_GRADES,
+    jobName: JobName.GRADES_UPDATE_COURSE,
     process: async (job) => {
       const { userId, courseId, courseName, trackDiff } = job.data;
 
@@ -240,7 +240,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.GRADES_FLOW_COMBINE]: {
-    jobName: JobName.COMBINE_GRADES,
+    jobName: JobName.GRADES_COMBINE_DIFFS,
     process: async (job) => {
       const { userId, courseIds } = job.data;
 
@@ -296,7 +296,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.REMINDERS]: {
-    jobName: JobName.CHECK_REMINDERS,
+    jobName: JobName.REMINDERS_CHECK,
     process: async (job) => {
       const { userId } = job.data;
 
@@ -384,7 +384,7 @@ export const processors: Record<QueueName, Processor> = {
     },
   },
   [QueueName.TELEGRAM]: {
-    jobName: JobName.SEND_TELEGRAM_MESSAGE,
+    jobName: JobName.TELEGRAM_SEND_MESSAGE,
     process: async (job) => {
       const { userId, message } = job.data;
 
