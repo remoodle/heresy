@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.3.5](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.4...remoodle/backend-v2.3.5) (2025-05-16)
+
+
+### Bug Fixes
+
+* bump production concurrency ([75d7f09](https://github.com/remoodle/remoodle/commit/75d7f0985bac225241fb0d1d5af250588e8fafa7))
+* **cluster:** update configs ([2e10960](https://github.com/remoodle/remoodle/commit/2e109602bb07d87798947c05a139233aae41da0d))
+
+
+### Code Refactoring
+
+* simplify registration priority ([fd46907](https://github.com/remoodle/remoodle/commit/fd46907cc1ec63533f9900f3acfa174d5e205e62))
+* update job enums ([8e9359d](https://github.com/remoodle/remoodle/commit/8e9359d44832acb26d42035da31b87d17290d0da))
+
 ## [2.3.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.3...remoodle/backend-v2.3.4) (2025-05-14)
 
 
