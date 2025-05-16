@@ -20,17 +20,11 @@
   {
     "name": "courses::update",
     "opts": {
-      "concurrency": 5
+      "concurrency": 1
     }
   },
   {
     "name": "events::update",
-    "opts": {
-      "concurrency": 5
-    }
-  },
-  {
-    "name": "grades::update-user",
     "opts": {
       "concurrency": 1
     }
@@ -38,25 +32,25 @@
   {
     "name": "grades::update-by-course",
     "opts": {
-      "concurrency": 50
+      "concurrency": 1
     }
   },
   {
     "name": "grades::combine-diffs",
     "opts": {
-      "concurrency": 100
+      "concurrency": 1
     }
   },
   {
     "name": "reminders::check",
     "opts": {
-      "concurrency": 10
+      "concurrency": 1
     }
   },
   {
     "name": "telegram::send-message",
     "opts": {
-      "concurrency": 2,
+      "concurrency": 1,
       "limiter": {
         "max": 30,
         "duration": 1000
