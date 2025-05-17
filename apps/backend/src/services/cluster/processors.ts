@@ -35,26 +35,39 @@ export const processors: Record<QueueName, Processor> = {
 
       const users = userId ? [{ userId }] : await getActiveUsers();
 
-      logger.cluster.info(`scheduling events sync for ${users.length} users`);
+      logger.cluster.info(
+        { userId },
+        `scheduling events sync for ${users.length} users`,
+      );
 
-      const jobs = users.map((payload) => ({
-        name: JobName.EVENTS_UPDATE,
-        data: { userId: payload.userId },
-        opts: {
-          deduplication: {
-            id: payload.userId,
+      const flowProducer = new FlowProducer();
+
+      const flows = users.map((user) => ({
+        name: JobName.REMINDERS_CHECK,
+        queueName: QueueName.REMINDERS,
+        data: { userId: user.userId },
+        children: [
+          {
+            queueName: QueueName.EVENTS,
+            name: JobName.EVENTS_UPDATE,
+            data: { userId: user.userId },
+            opts: {
+              deduplication: {
+                id: user.userId,
+              },
+              attempts: 3,
+              backoff: {
+                type: "exponential",
+                delay: 1000,
+              },
+            },
           },
-          attempts: 3,
-          backoff: {
-            type: "exponential",
-            delay: 1000,
-          },
-        },
+        ],
       }));
 
-      const bulk = await queues[QueueName.EVENTS].addBulk(jobs);
+      const trees = await flowProducer.addBulk(flows);
 
-      return bulk.length;
+      return trees.length;
     },
   },
   [QueueName.EVENTS]: {
@@ -65,15 +78,6 @@ export const processors: Record<QueueName, Processor> = {
       logger.cluster.info({ userId }, `syncing events`);
 
       await syncEvents(userId);
-
-      logger.cluster.info({ userId }, `scheduling reminders`);
-
-      const reminderJob = await queues[QueueName.REMINDERS].add(
-        QueueName.REMINDERS,
-        { userId },
-      );
-
-      return reminderJob;
     },
   },
   [QueueName.COURSES_SYNC]: {
@@ -130,6 +134,7 @@ export const processors: Record<QueueName, Processor> = {
 
       logger.cluster.info(
         {
+          userId,
           classification,
           trackDiff,
         },
@@ -147,7 +152,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const grouppedCourses = partition(courses, (course) => course.userId);
 
-      const flow = new FlowProducer({
+      const flowProducer = new FlowProducer({
         connection: db.redisConnection,
       });
 
@@ -204,7 +209,7 @@ export const processors: Record<QueueName, Processor> = {
         })
         .filter(Boolean);
 
-      const trees = await flow.addBulk(flows);
+      const trees = await flowProducer.addBulk(flows);
 
       return trees.length;
     },
