@@ -1,13 +1,12 @@
 import { serve } from "@hono/node-server";
-import { prometheus } from "@hono/prometheus";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { prettyJSON } from "hono/pretty-json";
 import { pinoLogger } from "hono-pino-logger";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
-import { applyBullBoard } from "../../library/bull-board";
-import { registry, initMetrics } from "./helpers/metrics";
+import { applyPrometheus } from "./middleware/prometheus";
+import { applyBullBoard } from "./middleware/bull-board";
 import { versionHandler } from "./middleware/version";
 import { v2 } from "./router/v2";
 
@@ -17,16 +16,13 @@ api.use("*", pinoLogger(logger.api), prettyJSON());
 api.use("*", versionHandler);
 api.use("*", cors());
 
-const { printMetrics, registerMetrics } = prometheus({ registry });
-
-api.use("*", registerMetrics);
-api.get("/metrics", printMetrics);
-
-applyBullBoard(api);
-
 api.get("/health", async (ctx) => {
   return ctx.json({ status: "ok" });
 });
+
+applyPrometheus(api);
+
+applyBullBoard(api);
 
 const routes = api.route("/v2", v2);
 
@@ -34,8 +30,6 @@ const run = () => {
   logger.api.info(
     `starting server on http://${config.http.host}:${config.http.port}`,
   );
-
-  initMetrics();
 
   serve({
     hostname: config.http.host,

@@ -12,7 +12,7 @@ import type {
   MoodleGrade,
 } from "@remoodle/types";
 
-import { config, env } from "../../../config";
+import { config } from "../../../config";
 import { db } from "../../../library/db";
 import { deleteUser } from "../../../core/wrapper";
 import { QueueName, JobName } from "../../../core/queues";
@@ -25,11 +25,11 @@ import {
 } from "../helpers/crypto";
 import { zValidator } from "../helpers/zv";
 import { issueTokens } from "../helpers/jwt";
+import { createAlert } from "../helpers/alerts";
 import { increaseUserCounter, decreaseUserCounter } from "../helpers/metrics";
 import { defaultRules, rateLimiter } from "../middleware/ratelimit";
 import { authMiddleware } from "../middleware/auth";
 import { errorHandler } from "../middleware/error";
-import { createAlert } from "../helpers/alerts";
 
 const authRoutes = new Hono<{
   Variables: {

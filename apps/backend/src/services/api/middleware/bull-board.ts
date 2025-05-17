@@ -4,8 +4,8 @@ import { createBullBoard } from "@bull-board/api";
 import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
 import { HonoAdapter } from "@bull-board/hono";
 import { serveStatic } from "@hono/node-server/serve-static";
-import { queueValues } from "../core/queues";
-import { config } from "../config";
+import { queueValues } from "../../../core/queues";
+import { config } from "../../../config";
 
 const BASE_PATH = "/admin/queues";
 
@@ -18,6 +18,7 @@ export const applyBullBoard = (app: Hono): void => {
   });
 
   serverAdapter.setBasePath(BASE_PATH);
+
   app
     .use(
       BASE_PATH,
