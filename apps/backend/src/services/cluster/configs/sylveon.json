@@ -2,19 +2,19 @@
   {
     "name": "courses::schedule-sync",
     "repeat": {
-      "pattern": "0 */60 * * * *"
+      "pattern": "0 0 0 */1 * *"
     }
   },
   {
     "name": "grades::schedule-sync",
     "repeat": {
-      "every": 600000
+      "every": 1800000
     }
   },
   {
     "name": "events::schedule-sync",
     "repeat": {
-      "pattern": "0 */10 * * * *"
+      "pattern": "0 */30 * * * *"
     }
   },
   {
