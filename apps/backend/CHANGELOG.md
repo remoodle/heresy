@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.9](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.8...remoodle/backend-v2.3.9) (2025-05-17)
+
+
+### Bug Fixes
+
+* handle alerts properly ([a9c4279](https://github.com/remoodle/remoodle/commit/a9c42791f28ffeae3452a15b0515cfdb210aee47))
+
 ## [2.3.8](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.7...remoodle/backend-v2.3.8) (2025-05-17)
 
 
