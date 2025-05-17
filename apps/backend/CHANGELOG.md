@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.14](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.13...remoodle/backend-v2.3.14) (2025-05-17)
+
+
+### Bug Fixes
+
+* pass redis connection to flow producer ([95e03f4](https://github.com/remoodle/remoodle/commit/95e03f45fcb231ae28e745d8da9c696e5e4d8b40))
+
 ## [2.3.13](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.12...remoodle/backend-v2.3.13) (2025-05-17)
 
 
