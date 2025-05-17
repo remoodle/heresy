@@ -36,7 +36,9 @@ export const processors: Record<QueueName, Processor> = {
         `scheduling events sync for ${users.length} users`,
       );
 
-      const flowProducer = new FlowProducer();
+      const flowProducer = new FlowProducer({
+        connection: db.redisConnection,
+      });
 
       const flows = users.map((user) => ({
         name: JobName.REMINDERS_CHECK,
