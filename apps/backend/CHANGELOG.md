@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.11](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.10...remoodle/backend-v2.3.11) (2025-05-17)
+
+
+### Code Refactoring
+
+* move events to cluster ([9d61070](https://github.com/remoodle/remoodle/commit/9d610705a79ad24ec1c534b82e09224993d2740a))
+* restructure api ([4ad4e04](https://github.com/remoodle/remoodle/commit/4ad4e045300f58242b6eead895fc2160bd133863))
+
 ## [2.3.10](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.9...remoodle/backend-v2.3.10) (2025-05-17)
 
 
