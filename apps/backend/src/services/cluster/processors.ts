@@ -7,11 +7,7 @@ import { logger } from "../../library/logger";
 import { getActiveUsers } from "../../core/wrapper";
 import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
-import {
-  type CourseGradeChanges,
-  formatGradeChanges,
-  trackCourseGradeChanges,
-} from "./events/grades";
+import { formatGradeChanges, trackCourseGradeChanges } from "./events/grades";
 import {
   formatDeadlineReminders,
   trackDeadlineReminders,
@@ -249,14 +245,13 @@ export const processors: Record<QueueName, Processor> = {
 
       logger.cluster.info({ userId, courseIds }, `combining grades`);
 
-      const childrenValues = await job.getChildrenValues<
-        CourseGradeChanges | undefined
-      >();
+      const childrenValues = await job.getChildrenValues<Awaited<
+        ReturnType<typeof trackCourseGradeChanges>
+      > | null>();
 
-      const gradeChanges: CourseGradeChanges[] = getValues(childrenValues)
+      const gradeChanges = getValues(childrenValues)
         .filter(Boolean)
-        .filter((course) => !!course?.changes.length)
-        .map((value) => value) as CourseGradeChanges[];
+        .filter((course) => !!course.changes.length);
 
       if (!gradeChanges.length) {
         return "no grade changes";
