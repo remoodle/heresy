@@ -17,6 +17,7 @@ import { db } from "../../../library/db";
 import { deleteUser } from "../../../core/wrapper";
 import { QueueName, JobName } from "../../../core/queues";
 import { Moodle } from "../../../library/moodle";
+import { logger } from "../../../library/logger";
 import {
   hashPassword,
   verifyPassword,
@@ -143,12 +144,16 @@ const authRoutes = new Hono<{
             });
           }
 
-          increaseUserCounter();
+          try {
+            increaseUserCounter();
 
-          await createAlert({
-            event: "user.sync",
-            data: { userId, telegramId, student },
-          });
+            await createAlert({
+              event: "user.sync",
+              data: { userId, telegramId, student },
+            });
+          } catch (error: any) {
+            logger.api.error(error);
+          }
         } catch (error: any) {
           throw new HTTPException(500, {
             message: "Failed to create user" + error,

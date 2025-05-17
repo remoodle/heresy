@@ -101,7 +101,9 @@ async function handleRegistration(
   );
   if (error) {
     // If the token is invalid, ask for the token again
-    await ctx.reply("Your token is invalid. Please try again.");
+    await ctx.reply(
+      `Your token is invalid. Please try again. Error: ${error.message}`,
+    );
     return;
   }
 
