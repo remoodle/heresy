@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.8](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.7...remoodle/backend-v2.3.8) (2025-05-17)
+
+
+### Bug Fixes
+
+* add error logs ([41451ce](https://github.com/remoodle/remoodle/commit/41451cef9906cc9f91d75655dbeb56c3ecd98de6))
+
 ## [2.3.7](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.6...remoodle/backend-v2.3.7) (2025-05-16)
 
 
