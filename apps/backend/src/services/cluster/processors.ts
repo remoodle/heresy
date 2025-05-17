@@ -306,11 +306,9 @@ export const processors: Record<QueueName, Processor> = {
         throw new Error(`User ${user} not found `);
       }
 
-      const rawEvents = await db.event.find({ userId });
-
-      const events = rawEvents.sort(
-        (a, b) => a.data.timestart - b.data.timestart,
-      );
+      const events = await db.event
+        .find({ userId })
+        .sort({ "data.timestart": 1 });
 
       if (!events.length) {
         return "no events";
@@ -325,9 +323,7 @@ export const processors: Record<QueueName, Processor> = {
         return "no deadline reminders";
       }
 
-      const reminders = deadlineReminders.flatMap(
-        (deadlineReminder) => deadlineReminder.reminders,
-      );
+      const reminders = deadlineReminders.flatMap((course) => course.reminders);
 
       for (const { event_id, threshold } of reminders) {
         const event = events.find(({ data }) => data.id === event_id);
@@ -345,10 +341,6 @@ export const processors: Record<QueueName, Processor> = {
           { $set: { reminders: updatedReminders } },
           { upsert: true },
         );
-      }
-
-      if (!deadlineReminders.length) {
-        return "no deadline reminders";
       }
 
       if (
