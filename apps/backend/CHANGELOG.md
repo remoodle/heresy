@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.3.12](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.11...remoodle/backend-v2.3.12) (2025-05-17)
+
+
+### Code Refactoring
+
+* remove useless checks ([1c50c31](https://github.com/remoodle/remoodle/commit/1c50c31ceeeef708cb0381d22940fb9b9622516a))
+* schedule reminders check in a flow ([33f2b68](https://github.com/remoodle/remoodle/commit/33f2b68b531ce87a1bb0049cd35c3114ca514b29))
+
 ## [2.3.11](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.10...remoodle/backend-v2.3.11) (2025-05-17)
 
 
