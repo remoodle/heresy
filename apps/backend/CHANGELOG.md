@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.10](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.9...remoodle/backend-v2.3.10) (2025-05-17)
+
+
+### Bug Fixes
+
+* update config ([23af034](https://github.com/remoodle/remoodle/commit/23af0342ea22b7e0a3b5041af2afb8c83e3cf7fa))
+
 ## [2.3.9](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.8...remoodle/backend-v2.3.9) (2025-05-17)
 
 
