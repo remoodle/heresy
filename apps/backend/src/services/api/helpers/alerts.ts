@@ -20,8 +20,6 @@ export const createAlert = async (data: any) => {
     if (!response.ok) {
       throw new Error(response.statusText);
     }
-
-    return response.json();
   } catch (error) {
     console.error(error);
   }
