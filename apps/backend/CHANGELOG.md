@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.3.13](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.12...remoodle/backend-v2.3.13) (2025-05-17)
+
+
+### Bug Fixes
+
+* change errors keep age ([720dd20](https://github.com/remoodle/remoodle/commit/720dd205cf262d3a349186338041fc2c075073a8))
+
+
+### Miscellaneous Chores
+
+* remove type safety hacks ([09da386](https://github.com/remoodle/remoodle/commit/09da3868dd7f4b2db5ecadce598bce7bfe5ffcf1))
+
 ## [2.3.12](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.11...remoodle/backend-v2.3.12) (2025-05-17)
 
 
