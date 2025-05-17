@@ -5,17 +5,17 @@ import { config } from "../../config";
 import { db } from "../../library/db";
 import { logger } from "../../library/logger";
 import { getActiveUsers } from "../../core/wrapper";
+import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
+import { queues, QueueName, JobName } from "../../core/queues";
 import {
   type CourseGradeChanges,
   formatGradeChanges,
   trackCourseGradeChanges,
-} from "../../core/events/grades";
+} from "./events/grades";
 import {
   formatDeadlineReminders,
   trackDeadlineReminders,
-} from "../../core/events/deadlines";
-import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
-import { queues, QueueName, JobName } from "../../core/queues";
+} from "./events/deadlines";
 
 export type Processor = {
   /*
