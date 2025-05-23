@@ -10,14 +10,11 @@ import {
 import { Avatar } from "@/shared/ui/avatar";
 import { Logo } from "@/shared/ui/logo";
 import { useUserStore } from "@/shared/stores/user";
-import { useLogout } from "@/shared/lib/use-logout";
 import { RouteName } from "@/shared/lib/routes";
 
 const route = useRoute();
 
 const userStore = useUserStore();
-
-const { logout } = useLogout();
 </script>
 
 <template>
@@ -47,7 +44,9 @@ const { logout } = useLogout();
             <RouterLink :to="{ name: RouteName.Courses }">
               <DropdownMenuItem> Courses </DropdownMenuItem>
             </RouterLink>
-            <DropdownMenuItem @click="logout()"> Logout </DropdownMenuItem>
+            <DropdownMenuItem @click="userStore.logout()">
+              Logout
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
