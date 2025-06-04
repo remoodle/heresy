@@ -120,7 +120,7 @@ const authRoutes = new Hono<{
             await flowProducer.add({
               name: JobName.GRADES_SCHEDULE_SYNC,
               queueName: QueueName.GRADES_SYNC,
-              data: { userId, trackDiff: false },
+              data: { userId, trackDiff: false, classification: null },
               opts: { lifo: true },
               children: [
                 {
