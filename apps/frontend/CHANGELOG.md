@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.9.10](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.9...remoodle/frontend-v1.9.10) (2025-06-04)
+
+
+### Bug Fixes
+
+* include tailwind plugin ([52b55fa](https://github.com/remoodle/remoodle/commit/52b55fae96e8f2349f7ed5c0afd16e3b2475b250))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump frontend packages ([ad8e1a1](https://github.com/remoodle/remoodle/commit/ad8e1a10ab4a9decfc5f9e81b9590e70e89b4b07))
+* **deps:** install @tailwindcss/vite as dev ([4b09d00](https://github.com/remoodle/remoodle/commit/4b09d0044e4908b7ef0d48a50549f18b21188e1a))
+* use own nvmrc for each project ([f580070](https://github.com/remoodle/remoodle/commit/f580070692df720e16ce1c3029bf705c03c477f9))
+
+
+### Code Refactoring
+
+* migrate on tailwind v4 ([b7ea169](https://github.com/remoodle/remoodle/commit/b7ea1695ae9c0d8388e257fadb40539c3e368c70))
+* remove useless composable ([14c0e32](https://github.com/remoodle/remoodle/commit/14c0e32137b3c5e9392f3ec21e921eb8a6eae688))
+
 ## [1.9.9](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.8...remoodle/frontend-v1.9.9) (2025-05-14)
 
 
