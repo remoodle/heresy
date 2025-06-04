@@ -125,7 +125,7 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
 <template>
   <div>
     <h1 class="text-xl font-medium">Profile</h1>
-    <p class="text-sm text-muted-foreground">Account information</p>
+    <p class="text-muted-foreground text-sm">Account information</p>
   </div>
   <Separator />
   <form @submit.prevent="updateHandle()">

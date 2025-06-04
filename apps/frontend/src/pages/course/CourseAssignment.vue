@@ -64,7 +64,7 @@ const grade = computed(() => {
       </template>
     </div>
 
-    <Text class="prose prose-sm my-1 text-foreground" :msg="assignment.intro" />
+    <Text class="prose prose-sm text-foreground my-1" :msg="assignment.intro" />
 
     <ul v-if="assignment.introattachments.length" class="flex flex-col gap-4">
       <li

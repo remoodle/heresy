@@ -19,7 +19,7 @@ const userStore = useUserStore();
 
 <template>
   <header
-    class="top-0 z-[20] flex h-16 w-full flex-none justify-center bg-background shadow-sm"
+    class="bg-background top-0 z-20 flex h-16 w-full flex-none justify-center shadow-sm"
     :class="{ sticky: !route.meta.unstickyHeader }"
   >
     <div class="container flex h-full w-full items-center justify-between">
@@ -28,7 +28,7 @@ const userStore = useUserStore();
           <Logo class="h-12 w-12 flex-none" />
         </Link>
       </div>
-      <div class="flex-shrink-1 hidden h-full w-full justify-center lg:flex">
+      <div class="hidden h-full w-full flex-shrink-1 justify-center lg:flex">
         <!-- <MagicSearch /> -->
         <!--  -->
       </div>

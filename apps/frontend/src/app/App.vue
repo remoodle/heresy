@@ -63,7 +63,7 @@ onMounted(() => {
 
 <template>
   <ConfigProvider>
-    <div class="flex h-[100svh] flex-col">
+    <div class="flex h-svh flex-col">
       <RouterView />
     </div>
     <Toaster />

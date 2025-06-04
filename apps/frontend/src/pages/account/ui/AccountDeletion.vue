@@ -45,7 +45,7 @@ const { mutate: deleteAccount, isPending: deletingAccount } = useMutation({
     <summary>
       <span> Manage your data </span>
     </summary>
-    <p class="my-1 text-muted-foreground">
+    <p class="text-muted-foreground my-1">
       This will delete your user account, all data and everything else that goes
       with it.
     </p>

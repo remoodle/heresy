@@ -117,7 +117,7 @@ const {
     </template>
     <RoundedSection dense>
       <div
-        class="flex flex-col space-y-4 lg:flex-row lg:space-x-12 lg:space-y-0"
+        class="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-12"
       >
         <aside class="mt-6 h-32 rounded-2xl border p-2 lg:h-fit lg:w-1/5">
           <ScrollArea class="h-full">
@@ -134,7 +134,7 @@ const {
                     name: RouteName.Assignment,
                     params: { courseId, assignmentId: item.cmid },
                   }"
-                  class="rounded-xl px-3 py-2 text-sm font-medium hover:bg-muted"
+                  class="hover:bg-muted rounded-xl px-3 py-2 text-sm font-medium"
                   :class="
                     cn(
                       'w-full justify-start text-left',

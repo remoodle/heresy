@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
@@ -26,6 +27,6 @@ export default defineConfig((config) => {
     define: {
       __BUILD_INFO__: JSON.stringify(buildInfo),
     },
-    plugins: [vue(), vueDevTools(), validateEnv()],
+    plugins: [vue(), vueDevTools(), validateEnv(), tailwindcss()],
   };
 });

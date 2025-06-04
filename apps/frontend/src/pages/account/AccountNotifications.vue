@@ -127,7 +127,7 @@ const AVAILABLE_THRESHOLDS = [
 <template>
   <div>
     <h1 class="text-xl font-medium">Notifications</h1>
-    <p class="text-sm text-muted-foreground">
+    <p class="text-muted-foreground text-sm">
       Configure how you receive notifications
     </p>
   </div>
@@ -204,7 +204,7 @@ const AVAILABLE_THRESHOLDS = [
                     />
                     <label
                       :for="threshold"
-                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      class="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     >
                       {{ threshold }}
                     </label>
@@ -236,7 +236,7 @@ const AVAILABLE_THRESHOLDS = [
 
   <div class="max-w-sm">
     <div>
-      <div class="mb-2 text-muted-foreground">
+      <div class="text-muted-foreground mb-2">
         Telegram ID: <strong>{{ telegramId || "not connected" }}</strong>
       </div>
       <Dialog v-model:open="showOtpModal">

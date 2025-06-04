@@ -51,7 +51,7 @@ watchEffect(() => {
     <div v-if="deadlines.length" class="flex flex-col gap-6">
       <div v-for="[date, list] in objectEntries(deadlines)" :key="date">
         <div class="mb-2 flex justify-between">
-          <span class="text-sm font-medium text-muted-foreground">
+          <span class="text-muted-foreground text-sm font-medium">
             <span v-if="formatDate(Date.now(), 'fullDate') === date"> 🔥 </span>
             {{ date }}
           </span>
@@ -67,7 +67,7 @@ watchEffect(() => {
     </div>
     <div
       v-else
-      class="flex flex-col items-center justify-center text-muted-foreground"
+      class="text-muted-foreground flex flex-col items-center justify-center"
     >
       <span class="text-3xl"> 🌴 </span>
       <p class="text-base font-medium">You don't have any deadlines</p>

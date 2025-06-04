@@ -31,7 +31,7 @@ withDefaults(
     />
     <span
       v-if="indicator"
-      class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full border-2 border-primary"
+      class="border-primary absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2"
       :class="indicatorStyles"
     ></span>
   </div>

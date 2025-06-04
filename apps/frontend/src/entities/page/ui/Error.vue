@@ -21,7 +21,7 @@ const emit = defineEmits(["retry"]);
     <Icon name="error" class="h-9 w-9 flex-none" />
     <div class="flex flex-col gap-2">
       <div v-if="!compact" class="flex flex-col">
-        <span class="text-lg font-bold leading-6"> An error occurred </span>
+        <span class="text-lg leading-6 font-bold"> An error occurred </span>
         <p class="text-base-content/80 text-sm">
           Try again or
           <Link :to="TELEGRAM_CHAT_URL" underline hover> contact us </Link>

@@ -63,7 +63,7 @@ defineProps<{
         {{ splitCourseName(deadline.course.fullname).name }}
       </Link>
     </div>
-    <span class="flex-shrink-0 text-sm">
+    <span class="shrink-0 text-sm">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>

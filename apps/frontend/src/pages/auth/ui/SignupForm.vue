@@ -68,7 +68,7 @@ const { mutate: submit, isPending } = useMutation({
               required
             />
             <Link
-              class="text-sm text-muted-foreground"
+              class="text-muted-foreground text-sm"
               :to="EXTERNAL.how_to_find_token"
               hover
             >

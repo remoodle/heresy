@@ -33,16 +33,16 @@ const attendance = computed(() => {
       params: { courseId: course.id },
       query: { courseName: course.fullname },
     }"
-    class="flex items-center justify-between gap-x-2 rounded-lg bg-secondary px-4 py-4 text-left transition-all hover:bg-secondary"
+    class="bg-secondary hover:bg-secondary flex items-center justify-between gap-x-2 rounded-lg px-4 py-4 text-left transition-all"
   >
     <div class="flex flex-col">
-      <div v-show="showCategory" class="text-xs text-muted-foreground">
+      <div v-show="showCategory" class="text-muted-foreground text-xs">
         {{ course.coursecategory }}
       </div>
       <span class="text-lg font-medium">
         {{ splitted.name }}
       </span>
-      <div class="text-sm text-muted-foreground">
+      <div class="text-muted-foreground text-sm">
         {{ splitted.teacher }}
       </div>
     </div>

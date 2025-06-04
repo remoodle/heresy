@@ -11,7 +11,10 @@
   },
   "aliases": {
     "components": "@/shared",
-    "utils": "@/shared/ui/utils"
+    "composables": "@/composables",
+    "utils": "@/shared/ui/utils",
+    "ui": "@/shared/ui",
+    "lib": "@/shared/lib"
   },
   "iconLibrary": "lucide"
 }

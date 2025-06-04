@@ -58,12 +58,12 @@ defineProps<{
     <Text
       v-if="module.description?.length"
       :msg="module.description"
-      class="prose prose-sm my-0.5 border-l-4 pl-2 text-foreground"
+      class="prose prose-sm text-foreground my-0.5 border-l-4 pl-2"
     />
     <template v-if="module.contents && module.contents.length">
       <ul class="flex flex-col gap-2">
         <template v-for="item in module.contents" :key="item.timecreated">
-          <span class="break-all text-sm text-muted-foreground">
+          <span class="text-muted-foreground text-sm break-all">
             <template v-if="item.type === 'url'">
               {{ item.fileurl }}
             </template>

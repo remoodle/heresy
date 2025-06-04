@@ -55,7 +55,7 @@ const route = useRoute();
 
       <p
         v-if="features.enableTokenAuth"
-        class="px-8 text-center text-sm text-muted-foreground"
+        class="text-muted-foreground px-8 text-center text-sm"
       >
         {{
           route.name === RouteName.Login
@@ -76,7 +76,7 @@ const route = useRoute();
         </Link>
       </p>
       <template v-if="route.name !== RouteName.Login">
-        <p class="text-center text-sm text-muted-foreground">
+        <p class="text-muted-foreground text-center text-sm">
           By continuing, you agree to our
           <br />
           <Link :to="{ name: RouteName.Terms }" underline hover

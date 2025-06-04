@@ -25,7 +25,7 @@ const sidebarNavItems: Item[] = [
 </script>
 
 <template>
-  <nav class="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
+  <nav class="flex space-x-2 lg:flex-col lg:space-y-1 lg:space-x-0">
     <Link
       v-for="item in sidebarNavItems"
       :key="item.title"

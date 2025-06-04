@@ -59,7 +59,7 @@ const buildInfo = getBuildInfo() ?? {
               >
                 <Icon class="h-6 w-6" name="telegram" />
               </Button>
-              <span class="text-xs text-muted-foreground"> chat </span>
+              <span class="text-muted-foreground text-xs"> chat </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -71,7 +71,7 @@ const buildInfo = getBuildInfo() ?? {
               >
                 <Icon class="h-6 w-6" name="telegram" />
               </Button>
-              <span class="text-xs text-muted-foreground"> bot </span>
+              <span class="text-muted-foreground text-xs"> bot </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -83,7 +83,7 @@ const buildInfo = getBuildInfo() ?? {
               >
                 <Icon class="h-6 w-6" name="telegram" />
               </Button>
-              <span class="text-xs text-muted-foreground"> donate </span>
+              <span class="text-muted-foreground text-xs"> donate </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -95,17 +95,17 @@ const buildInfo = getBuildInfo() ?? {
               >
                 <Icon class="h-6 w-6" name="github" />
               </Button>
-              <span class="text-xs text-muted-foreground"> ⭐ </span>
+              <span class="text-muted-foreground text-xs"> ⭐ </span>
             </div>
           </div>
 
           <div class="flex flex-col items-center justify-center gap-0.5">
             <ThemeSwitcher class="flex-none" />
-            <span class="text-xs text-muted-foreground"> theme </span>
+            <span class="text-muted-foreground text-xs"> theme </span>
           </div>
         </div>
 
-        <span class="text-xs text-muted-foreground">
+        <span class="text-muted-foreground text-xs">
           <ClientVersion :version="buildInfo.version" />
           {{ MODE }}
         </span>

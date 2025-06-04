@@ -26,7 +26,7 @@ const delegatedProps = computed(() => {
     <TableCell
       :class="
         cn(
-          'whitespace-nowrap p-4 align-middle text-sm text-foreground',
+          'text-foreground p-4 align-middle text-sm whitespace-nowrap',
           props.class,
         )
       "
