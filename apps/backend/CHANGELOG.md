@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.15](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.14...remoodle/backend-v2.3.15) (2025-06-04)
+
+
+### Bug Fixes
+
+* fetch all grades on registration ([1ed1676](https://github.com/remoodle/remoodle/commit/1ed16761c85807606872df9a671943ec12de1a89))
+
 ## [2.3.14](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.13...remoodle/backend-v2.3.14) (2025-05-17)
 
 
