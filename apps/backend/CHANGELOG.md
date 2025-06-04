@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.16](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.15...remoodle/backend-v2.3.16) (2025-06-04)
+
+
+### Miscellaneous Chores
+
+* use own nvmrc for each project ([f580070](https://github.com/remoodle/remoodle/commit/f580070692df720e16ce1c3029bf705c03c477f9))
+
 ## [2.3.15](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.14...remoodle/backend-v2.3.15) (2025-06-04)
 
 
