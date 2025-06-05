@@ -21,7 +21,7 @@ const getMiniAppUrl = async (
   userId: number,
   host: string,
   route: string = "",
-): Promise<URL> => {
+): Promise<string> => {
   const [loginResponse, err] = await request((client) => {
     return client.v2.auth.login.$post(
       {
@@ -36,7 +36,7 @@ const getMiniAppUrl = async (
   const webUrl = new URL(host + route);
 
   if (err) {
-    return webUrl;
+    return webUrl.toString();
   }
 
   const b64 = btoa(JSON.stringify(loginResponse));
@@ -44,7 +44,7 @@ const getMiniAppUrl = async (
   webUrl.searchParams.set("usr", b64);
   webUrl.searchParams.set("api_url", config.backend.url);
 
-  return webUrl;
+  return webUrl.toString();
 };
 
 const getNotificationsKeyboard = (

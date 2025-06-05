@@ -38,7 +38,7 @@ async function start(ctx: RegistrationContext) {
 
     const url = await getMiniAppUrl(userId, config.frontend.url);
 
-    const keyboard = keyboards.main.clone().webApp("Website", url.toString());
+    const keyboard = keyboards.main.clone().webApp("Website", url);
 
     await ctx.reply(`${user.name}`, {
       reply_markup: keyboard,
@@ -111,7 +111,7 @@ async function handleRegistration(
   await ctx.reply(`You have registered successfully!`);
 
   const url = await getMiniAppUrl(userId, config.frontend.url);
-  const keyboard = keyboards.main.clone().webApp("Website", url.toString());
+  const keyboard = keyboards.main.clone().webApp("Website", url);
 
   await ctx.reply(`${data.user.name}`, {
     reply_markup: keyboard,

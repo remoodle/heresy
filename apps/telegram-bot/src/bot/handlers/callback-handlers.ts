@@ -88,7 +88,7 @@ async function backToMenu(ctx: Context) {
 
   const url = await getMiniAppUrl(userId, config.frontend.url);
 
-  const keyboard = keyboards.main.clone().webApp("Website", url.toString());
+  const keyboard = keyboards.main.clone().webApp("Website", url);
 
   await ctx.editMessageText(`${user.name}`, {
     reply_markup: keyboard,
@@ -389,10 +389,7 @@ async function notifications(ctx: Context) {
   );
 
   await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(
-      data.settings.notifications,
-      url.toString(),
-    ),
+    reply_markup: getNotificationsKeyboard(data.settings.notifications, url),
   });
 }
 
@@ -476,10 +473,7 @@ async function changeNotifications(ctx: Context) {
   );
 
   await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(
-      data.settings.notifications,
-      url.toString(),
-    ),
+    reply_markup: getNotificationsKeyboard(data.settings.notifications, url),
   });
 }
 
