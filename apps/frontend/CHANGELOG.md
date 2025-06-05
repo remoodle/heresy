@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.11](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.10...remoodle/frontend-v1.9.11) (2025-06-05)
+
+
+### Miscellaneous Chores
+
+* **deps:** remove tailwindcss-animate ([cca6a86](https://github.com/remoodle/remoodle/commit/cca6a861bcf5f611831a951eb440b1ac64a11ba4))
+
 ## [1.9.10](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.9...remoodle/frontend-v1.9.10) (2025-06-04)
 
 
