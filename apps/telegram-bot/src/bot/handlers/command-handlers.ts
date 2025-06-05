@@ -3,6 +3,7 @@ import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
 import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
+import { getMiniAppUrl } from "../utils";
 import { config } from "../../config";
 import { uni } from "../universities";
 
