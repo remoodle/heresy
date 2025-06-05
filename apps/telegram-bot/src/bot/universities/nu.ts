@@ -29,7 +29,15 @@ export class NU implements University {
     return message;
   }
 
-  getDeadlines(deadlines: MoodleEvent[]): string {
+  getDeadlines(deadlines: MoodleEvent[], short: boolean = false): string {
+    if (!deadlines.length) {
+      return (
+        "You have no upcoming deadlines" +
+        (short ? " in the next 2 days" : "") +
+        " 🥰"
+      );
+    }
+
     const getDeadlineText = (deadline: MoodleEvent): string => {
       let text = "";
       deadline.timestart *= 1000;
