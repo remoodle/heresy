@@ -1,7 +1,5 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { InlineKeyboard, GrammyError, BotError, HttpError } from "grammy";
-import { getAuthHeaders, request } from "../../library/hc";
-import { config } from "../../config";
 
 const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
   return new Date(timestamp)
@@ -15,36 +13,6 @@ const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
       timeZone: "Asia/Almaty",
     })
     .replace("24:00", "00:00");
-};
-
-const getMiniAppUrl = async (
-  userId: number,
-  host: string,
-  route: string = "",
-): Promise<URL> => {
-  const [loginResponse, err] = await request((client) => {
-    return client.v2.auth.login.$post(
-      {
-        json: {},
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
-    );
-  });
-
-  const webUrl = new URL(host + route);
-
-  if (err) {
-    return webUrl;
-  }
-
-  const b64 = btoa(JSON.stringify(loginResponse));
-
-  webUrl.searchParams.set("usr", b64);
-  webUrl.searchParams.set("api_url", config.backend.url);
-
-  return webUrl;
 };
 
 const getNotificationsKeyboard = (
@@ -88,9 +56,4 @@ function logWithTimestamp(
   console.error(`[${new Date().toISOString()}] ${message}`, error);
 }
 
-export {
-  getNotificationsKeyboard,
-  formatUnixtimestamp,
-  logWithTimestamp,
-  getMiniAppUrl,
-};
+export { getNotificationsKeyboard, formatUnixtimestamp, logWithTimestamp };

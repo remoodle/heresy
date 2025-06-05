@@ -1,11 +1,7 @@
 import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { request, getAuthHeaders } from "../../library/hc";
-import {
-  getNotificationsKeyboard,
-  formatUnixtimestamp,
-  getMiniAppUrl,
-} from "../utils";
+import { getNotificationsKeyboard, formatUnixtimestamp } from "../utils";
 import keyboards from "./keyboards";
 import { config } from "../../config";
 import { uni } from "../universities";
@@ -39,7 +35,7 @@ async function deadlines(ctx: Context) {
 
   const userId = ctx.from.id;
 
-  const [deadlines, _] = await request((client) =>
+  const [deadlines, error] = await request((client) =>
     client.v2.deadlines.$get(
       {
         query: {},
@@ -49,6 +45,8 @@ async function deadlines(ctx: Context) {
       },
     ),
   );
+
+  console.log(error);
 
   if (!deadlines) {
     return;
@@ -84,9 +82,9 @@ async function backToMenu(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(userId, config.frontend.url);
+  const url = await uni.getMiniAppUrl(userId, config.frontend.url);
 
-  const keyboard = keyboards.main.clone().webApp("Website", url);
+  const keyboard = keyboards.main.clone().webApp("Website", url.toString());
 
   await ctx.editMessageText(`${user.name}`, {
     reply_markup: keyboard,
@@ -380,14 +378,17 @@ async function notifications(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(
+  const url = await uni.getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",
   );
 
   await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(data.settings.notifications, url),
+    reply_markup: getNotificationsKeyboard(
+      data.settings.notifications,
+      url.toString(),
+    ),
   });
 }
 
@@ -464,14 +465,17 @@ async function changeNotifications(ctx: Context) {
     return;
   }
 
-  const url = await getMiniAppUrl(
+  const url = await uni.getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",
   );
 
   await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(data.settings.notifications, url),
+    reply_markup: getNotificationsKeyboard(
+      data.settings.notifications,
+      url.toString(),
+    ),
   });
 }
 

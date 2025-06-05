@@ -5,7 +5,6 @@ import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
 import { uni } from "../universities";
-import { getMiniAppUrl } from "../utils";
 
 async function start(ctx: RegistrationContext) {
   if (!ctx.message || !ctx.message.text || !ctx.from || !ctx.chat) {
@@ -36,9 +35,9 @@ async function start(ctx: RegistrationContext) {
       return;
     }
 
-    const url = await getMiniAppUrl(userId, config.frontend.url);
+    const url = await uni.getMiniAppUrl(userId, config.frontend.url);
 
-    const keyboard = keyboards.main.clone().webApp("Website", url);
+    const keyboard = keyboards.main.clone().webApp("Website", url.toString());
 
     await ctx.reply(`${user.name}`, {
       reply_markup: keyboard,
@@ -110,8 +109,8 @@ async function handleRegistration(
   // Registration successful, greet the user
   await ctx.reply(`You have registered successfully!`);
 
-  const url = await getMiniAppUrl(userId, config.frontend.url);
-  const keyboard = keyboards.main.clone().webApp("Website", url);
+  const url = await uni.getMiniAppUrl(userId, config.frontend.url);
+  const keyboard = keyboards.main.clone().webApp("Website", url.toString());
 
   await ctx.reply(`${data.user.name}`, {
     reply_markup: keyboard,

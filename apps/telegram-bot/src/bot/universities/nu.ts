@@ -3,6 +3,7 @@ import type { University } from "./university";
 import { getAuthHeaders, request } from "../../library/hc";
 import { formatUnixtimestamp } from "../utils";
 import { getTimeLeft } from "@remoodle/utils";
+import { config } from "../../config";
 
 export class NU implements University {
   getGrades(grades: MoodleGrade[], course: MoodleCourse): string {
@@ -70,11 +71,11 @@ export class NU implements University {
     return grades[grade] ? grades[grade].toFixed(2) : "0.00";
   }
 
-  async getMiniAppUrl(
+  getMiniAppUrl = async (
     userId: number,
     host: string,
     route: string = "",
-  ): Promise<string> {
+  ): Promise<URL> => {
     const [loginResponse, err] = await request((client) => {
       return client.v2.auth.login.$post(
         {
@@ -86,15 +87,19 @@ export class NU implements University {
       );
     });
 
+    const webUrl = new URL(host + route);
+
     if (err) {
-      return host + route;
+      return webUrl;
     }
 
     const b64 = btoa(JSON.stringify(loginResponse));
-    const url = host + route + "?usr=" + b64;
 
-    return url;
-  }
+    webUrl.searchParams.set("usr", b64);
+    webUrl.searchParams.set("api_url", config.backend.url);
+
+    return webUrl;
+  };
 
   getUniversityName(): string {
     return "Nazarbayev University";
