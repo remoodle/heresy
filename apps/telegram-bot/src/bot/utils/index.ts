@@ -1,6 +1,7 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { InlineKeyboard, GrammyError, BotError, HttpError } from "grammy";
 import { getAuthHeaders, request } from "../../library/hc";
+import { config } from "../../config";
 
 const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
   return new Date(timestamp)
@@ -20,7 +21,7 @@ const getMiniAppUrl = async (
   userId: number,
   host: string,
   route: string = "",
-): Promise<string> => {
+): Promise<URL> => {
   const [loginResponse, err] = await request((client) => {
     return client.v2.auth.login.$post(
       {
@@ -32,14 +33,18 @@ const getMiniAppUrl = async (
     );
   });
 
+  const webUrl = new URL(host + route);
+
   if (err) {
-    return host + route;
+    return webUrl;
   }
 
   const b64 = btoa(JSON.stringify(loginResponse));
-  const url = host + route + "?usr=" + b64;
 
-  return url;
+  webUrl.searchParams.set("usr", b64);
+  webUrl.searchParams.set("api_url", config.backend.url);
+
+  return webUrl;
 };
 
 const getNotificationsKeyboard = (

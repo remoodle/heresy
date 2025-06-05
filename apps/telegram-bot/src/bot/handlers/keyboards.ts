@@ -1,4 +1,5 @@
 import { InlineKeyboard } from "grammy";
+import { config } from "../../config";
 
 const keyboards = {
   main: new InlineKeyboard()
@@ -47,5 +48,16 @@ const keyboards = {
     "https://ext.remoodle.app/find-token",
   ),
 };
+
+if (config.uni === "nu") {
+  keyboards.main = new InlineKeyboard()
+    .text("Deadlines", "deadlines")
+    .row()
+    .text("Courses", "courses")
+    .row()
+    .text("⚙️", "settings")
+    .text("About", "others")
+    .row();
+}
 
 export default keyboards;

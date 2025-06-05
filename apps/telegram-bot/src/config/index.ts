@@ -18,7 +18,7 @@ export const env = cleanEnv(process.env, {
 
   UNI: str({
     default: "aitu",
-    choices: ["aitu"],
+    choices: ["aitu", "nu"],
   }),
 });
 
