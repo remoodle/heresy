@@ -1,9 +1,7 @@
 import type { MoodleGrade, MoodleEvent, MoodleCourse } from "@remoodle/types";
 import type { University } from "./university";
-import { getAuthHeaders, request } from "../../library/hc";
 import { formatUnixtimestamp } from "../utils";
 import { getTimeLeft } from "@remoodle/utils";
-import { config } from "../../config";
 
 export class NU implements University {
   getGrades(grades: MoodleGrade[], course: MoodleCourse): string {
@@ -59,55 +57,6 @@ export class NU implements University {
       "Upcoming deadlines:\n\n" + deadlines.map(getDeadlineText).join("\n")
     );
   }
-
-  getGPA(total: number): string {
-    const grades: { [key: number]: number } = {
-      100: 4.0,
-      95: 4.0,
-      90: 3.67,
-      85: 3.33,
-      80: 3.0,
-      75: 2.67,
-      70: 2.33,
-      65: 2.0,
-      60: 1.67,
-      55: 1.33,
-      50: 1.0,
-    };
-
-    const grade = Math.floor(total / 5) * 5;
-    return grades[grade] ? grades[grade].toFixed(2) : "0.00";
-  }
-
-  getMiniAppUrl = async (
-    userId: number,
-    host: string,
-    route: string = "",
-  ): Promise<URL> => {
-    const [loginResponse, err] = await request((client) => {
-      return client.v2.auth.login.$post(
-        {
-          json: {},
-        },
-        {
-          headers: getAuthHeaders(userId),
-        },
-      );
-    });
-
-    const webUrl = new URL(host + route);
-
-    if (err) {
-      return webUrl;
-    }
-
-    const b64 = btoa(JSON.stringify(loginResponse));
-
-    webUrl.searchParams.set("usr", b64);
-    webUrl.searchParams.set("api_url", config.backend.url);
-
-    return webUrl;
-  };
 
   getUniversityName(): string {
     return "Nazarbayev University";

@@ -1,7 +1,11 @@
 import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { request, getAuthHeaders } from "../../library/hc";
-import { getNotificationsKeyboard, formatUnixtimestamp } from "../utils";
+import {
+  getNotificationsKeyboard,
+  formatUnixtimestamp,
+  getMiniAppUrl,
+} from "../utils";
 import keyboards from "./keyboards";
 import { config } from "../../config";
 import { uni } from "../universities";
@@ -82,7 +86,7 @@ async function backToMenu(ctx: Context) {
     return;
   }
 
-  const url = await uni.getMiniAppUrl(userId, config.frontend.url);
+  const url = await getMiniAppUrl(userId, config.frontend.url);
 
   const keyboard = keyboards.main.clone().webApp("Website", url.toString());
 
@@ -378,7 +382,7 @@ async function notifications(ctx: Context) {
     return;
   }
 
-  const url = await uni.getMiniAppUrl(
+  const url = await getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",
@@ -465,7 +469,7 @@ async function changeNotifications(ctx: Context) {
     return;
   }
 
-  const url = await uni.getMiniAppUrl(
+  const url = await getMiniAppUrl(
     userId,
     config.frontend.url,
     "/account/notifications",

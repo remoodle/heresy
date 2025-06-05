@@ -2,8 +2,6 @@ import type { MoodleGrade, MoodleEvent, MoodleCourse } from "@remoodle/types";
 import type { University } from "./university";
 import { formatUnixtimestamp } from "../utils";
 import { getTimeLeft } from "@remoodle/utils";
-import { getAuthHeaders, request } from "../../library/hc";
-import { config } from "../../config";
 
 export class AITU implements University {
   getGrades(grades: MoodleGrade[], course: MoodleCourse): string {
@@ -130,34 +128,4 @@ export class AITU implements University {
   getUniversityName(): string {
     return "Astana IT University";
   }
-
-  getMiniAppUrl = async (
-    userId: number,
-    host: string,
-    route: string = "",
-  ): Promise<URL> => {
-    const [loginResponse, err] = await request((client) => {
-      return client.v2.auth.login.$post(
-        {
-          json: {},
-        },
-        {
-          headers: getAuthHeaders(userId),
-        },
-      );
-    });
-
-    const webUrl = new URL(host + route);
-
-    if (err) {
-      return webUrl;
-    }
-
-    const b64 = btoa(JSON.stringify(loginResponse));
-
-    webUrl.searchParams.set("usr", b64);
-    webUrl.searchParams.set("api_url", config.backend.url);
-
-    return webUrl;
-  };
 }

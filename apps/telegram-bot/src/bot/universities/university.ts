@@ -5,5 +5,4 @@ export interface University {
   getGrades(grades: MoodleGrade[], course: MoodleCourse): string;
   getDeadlines(deadlines: MoodleEvent[], short: boolean): string;
   getUniversityName(): string;
-  getMiniAppUrl(userId: number, host: string, route: string): Promise<URL>;
 }
