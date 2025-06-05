@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.3](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.2...remoodle/telegram-bot-v2.0.3) (2025-06-05)
+
+
+### Miscellaneous Chores
+
+* open calendar for bot ([07ce97e](https://github.com/remoodle/remoodle/commit/07ce97eda77d742850fa05ceb453a7263061c117))
+* use own nvmrc for each project ([f580070](https://github.com/remoodle/remoodle/commit/f580070692df720e16ce1c3029bf705c03c477f9))
+
 ## [2.0.2](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.1...remoodle/telegram-bot-v2.0.2) (2025-05-17)
 
 
