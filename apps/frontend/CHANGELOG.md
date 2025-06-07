@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.14](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.13...remoodle/frontend-v1.9.14) (2025-06-07)
+
+
+### Build System
+
+* **deps:** bump reka-ui from 2.3.0 to 2.3.1 ([#426](https://github.com/remoodle/remoodle/issues/426)) ([00182ef](https://github.com/remoodle/remoodle/commit/00182efa48b9860a307c564acd2521605d51230a))
+
 ## [1.9.13](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.12...remoodle/frontend-v1.9.13) (2025-06-07)
 
 
