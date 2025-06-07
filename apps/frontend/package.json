@@ -15,8 +15,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@remoodle/utils": "workspace:*",
     "@radix-icons/vue": "^1.0.0",
+    "@remoodle/utils": "workspace:*",
     "@tanstack/vue-query": "^5.80.6",
     "@vueuse/core": "^13.3.0",
     "@vueuse/router": "^13.3.0",
@@ -40,11 +40,11 @@
     "zod": "^3.25.56"
   },
   "devDependencies": {
+    "@iconify/vue": "^5.0.0",
+    "@julr/vite-plugin-validate-env": "^2.1.0",
     "@remoodle/backend": "workspace:*",
     "@remoodle/eslint-config": "workspace:^",
     "@remoodle/types": "workspace:*",
-    "@iconify/vue": "^5.0.0",
-    "@julr/vite-plugin-validate-env": "^2.1.0",
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.8",
     "@tsconfig/node22": "^22.0.2",
@@ -58,7 +58,6 @@
     "eslint-plugin-vue": "^10.2.0",
     "npm-run-all2": "^8.0.4",
     "oxlint": "^0.18.0",
-    "prettier-plugin-tailwindcss": "^0.6.12",
     "stale-dep": "^0.8.2",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",

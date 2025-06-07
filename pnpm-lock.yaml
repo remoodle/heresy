@@ -241,9 +241,6 @@ importers:
       oxlint:
         specifier: ^0.18.0
         version: 0.18.0
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.12
-        version: 0.6.12(prettier@3.5.3)
       stale-dep:
         specifier: ^0.8.2
         version: 0.8.2

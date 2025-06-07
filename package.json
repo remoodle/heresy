@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,md,vue}\"",
     "test": "TZ=UTC turbo test",
     "type-check": "turbo type-check",
     "build": "turbo build"
