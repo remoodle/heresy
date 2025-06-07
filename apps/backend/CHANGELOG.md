@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.19](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.18...remoodle/backend-v2.3.19) (2025-06-07)
+
+
+### Bug Fixes
+
+* update path loading ([9250d1b](https://github.com/remoodle/remoodle/commit/9250d1bc923cef81527c4962c6d03663f7801186))
+
 ## [2.3.18](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.17...remoodle/backend-v2.3.18) (2025-06-07)
 
 
