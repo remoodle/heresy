@@ -40,9 +40,8 @@ watchEffect(() => {
 
   courses.value = partition(data.value, ({ coursecategory }) => coursecategory);
 
-  if (courseCategories.value.length) {
-    !toggledCourseCategories.value.length &&
-      toggledCourseCategories.value.push(...courseCategories.value);
+  if (courseCategories.value.length && !toggledCourseCategories.value.length) {
+    toggledCourseCategories.value.push(...courseCategories.value);
   }
 });
 </script>

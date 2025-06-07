@@ -51,6 +51,7 @@ const handleJwtAuth = (ctx: Context, token: string) => {
 
     ctx.set("userId", payload.userId);
   } catch (error) {
+    console.error(error);
     throw new HTTPException(401, { message: "Invalid token" });
   }
 };

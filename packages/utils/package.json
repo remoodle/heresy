@@ -1,27 +1,25 @@
 {
   "name": "@remoodle/utils",
   "version": "1.0.0",
+  "type": "module",
   "main": "src/index.ts",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "type-check": "tsc --noEmit",
-    "lint": "eslint . && prettier --check src/",
-    "fix": "eslint . --fix && prettier --write src/"
+    "lint": "eslint src/"
   },
   "dependencies": {
-    "dayjs": "^1.11.10",
-    "hono": "^4.5.5"
+    "dayjs": "^1.11.13",
+    "hono": "^4.7.11"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
-    "@remoodle/prettier-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^22.15.18",
-    "eslint": "^8.57.0",
-    "prettier": "^3.3.3",
-    "typescript": "~5.4.3"
+    "@types/node": "^22.15.30",
+    "eslint": "^9.28.0",
+    "typescript": "~5.8.3"
   }
 }

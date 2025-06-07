@@ -20,7 +20,7 @@ export const trackCourseDiff = (
 ): GradeChange[] => {
   const oldGradesMap = new Map(oldGrades.map((item) => [item.id, item]));
 
-  let gradeChanges: GradeChange[] = [];
+  const gradeChanges: GradeChange[] = [];
 
   for (const newGrade of newGrades) {
     if (!newGrade.itemname.trim()) {

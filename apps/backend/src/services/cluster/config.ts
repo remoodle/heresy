@@ -1,3 +1,5 @@
+import path from "path";
+import { fileURLToPath } from "url";
 import { readFile } from "node:fs/promises";
 import type { RepeatOptions, WorkerOptions } from "bullmq";
 import { logger } from "../../library/logger";
@@ -11,6 +13,9 @@ type Task = {
 };
 
 export type Tasks = Task[];
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const loadConfig = async () => {
   const { configPath } = config.cluster.tasks;

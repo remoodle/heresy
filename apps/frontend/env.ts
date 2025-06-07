@@ -2,7 +2,7 @@ import { defineConfig } from "@julr/vite-plugin-validate-env";
 import { z } from "zod";
 
 export default defineConfig({
-  validator: "zod",
+  validator: "standard",
   schema: {
     VITE_SERVER_URL: z
       .string()

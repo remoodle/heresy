@@ -26,6 +26,7 @@ export function getURLHost(url: string) {
   try {
     return new URL(url).host;
   } catch (e) {
+    console.log(e);
     return url;
   }
 }

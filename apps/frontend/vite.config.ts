@@ -3,10 +3,8 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueDevTools from "vite-plugin-vue-devtools";
-import { ValidateEnv as validateEnv } from "@julr/vite-plugin-validate-env";
+import { ValidateEnv } from "@julr/vite-plugin-validate-env";
 import packageJson from "./package.json";
-
-const resolve = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 export default defineConfig((config) => {
   const { mode } = config;
@@ -19,14 +17,19 @@ export default defineConfig((config) => {
   };
 
   return {
+    plugins: [
+      vue(),
+      vueDevTools(),
+      tailwindcss(),
+      ValidateEnv({ configFile: "env" }),
+    ],
     resolve: {
       alias: {
-        "@": resolve("./src"),
+        "@": fileURLToPath(new URL("./src", import.meta.url)),
       },
     },
     define: {
       __BUILD_INFO__: JSON.stringify(buildInfo),
     },
-    plugins: [vue(), vueDevTools(), validateEnv(), tailwindcss()],
   };
 });

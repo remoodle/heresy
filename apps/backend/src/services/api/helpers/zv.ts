@@ -10,7 +10,7 @@ export const zValidator = <
   target: Target,
   schema: T,
 ) =>
-  zv(target, schema, (result, c) => {
+  zv(target, schema, (result, _c) => {
     if (!result.success) {
       throw new HTTPException(400, {
         message: result.error.errors.map((e) => e.message).join(", "),

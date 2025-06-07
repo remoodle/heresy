@@ -286,7 +286,7 @@ const authRoutes = new Hono<{
         });
       }
 
-      let user: IUser | null = await db.user.findOne({
+      const user: IUser | null = await db.user.findOne({
         telegramId: telegramData.id,
       });
 

@@ -45,7 +45,7 @@ onMounted(() => {
     script.setAttribute("data-radius", props.radius);
   }
 
-  // @ts-ignore
+  // @ts-expect-error global object
   window.onTelegramAuth = onTelegramAuth;
 
   if (telegram.value) {

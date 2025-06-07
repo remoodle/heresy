@@ -4,7 +4,7 @@ import { config } from "../../../config";
 const getToken = (payload: object, expiresIn: string) => {
   return jwt.sign(payload, config.jwt.privateKey, {
     algorithm: config.jwt.algorithm as Algorithm,
-    expiresIn: expiresIn,
+    expiresIn: expiresIn as any,
   });
 };
 
