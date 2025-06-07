@@ -26,8 +26,6 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=@remoodle/backend
 
-EXPOSE 9000
-
 RUN export TZ="Asia/Karachi" \
     && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone
@@ -35,4 +33,4 @@ RUN export TZ="Asia/Karachi" \
 ARG VERSION_TAG
 ENV VERSION_TAG=$VERSION_TAG
 
-CMD node ./apps/backend/dist/services/$SERVICE_NAME/index.js
+CMD node ./apps/backend/dist/services/$SERVICE_NAME/index.cjs
