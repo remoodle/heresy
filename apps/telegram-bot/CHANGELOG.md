@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.6](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.5...remoodle/telegram-bot-v2.0.6) (2025-06-07)
+
+
+### Code Refactoring
+
+* fix basic eslint warnings ([cc4dec0](https://github.com/remoodle/remoodle/commit/cc4dec0e72a53b535fba0e2b2c1caf8867161ab0))
+
 ## [2.0.5](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.4...remoodle/telegram-bot-v2.0.5) (2025-06-07)
 
 
