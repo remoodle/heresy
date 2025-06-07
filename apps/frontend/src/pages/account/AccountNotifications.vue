@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { ref, reactive, toRef, watch, onMounted, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import { useMutation } from "@tanstack/vue-query";
 import type { UserSettings } from "@remoodle/types";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Label } from "@/shared/ui/label";
 import { Switch } from "@/shared/ui/switch";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Separator } from "@/shared/ui/separator";
@@ -13,16 +12,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/shared/ui/dialog";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,

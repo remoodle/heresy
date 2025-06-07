@@ -22,7 +22,7 @@ const courseCategories = computed(() => Object.keys(courses.value || {}));
 
 const classification = ref<MoodleCourseClassification>("inprogress");
 
-const { isFetching, isError, data, error, refetch } = useQuery({
+const { isFetching, data, error, refetch } = useQuery({
   queryKey: ["private", "courses.overall", classification],
   queryFn: async () =>
     await requestUnwrap((client) =>

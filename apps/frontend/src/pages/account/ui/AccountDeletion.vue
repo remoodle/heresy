@@ -20,7 +20,7 @@ const userStore = useUserStore();
 
 const { toast } = useToast();
 
-const { mutate: deleteAccount, isPending: deletingAccount } = useMutation({
+const { mutate: deleteAccount } = useMutation({
   mutationFn: async () =>
     requestUnwrap((client) =>
       client.v2.bye.$delete({}, { headers: getAuthHeaders() }),

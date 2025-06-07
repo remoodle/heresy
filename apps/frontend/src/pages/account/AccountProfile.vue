@@ -10,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose,
 } from "@/shared/ui/dialog";
 import { Input } from "@/shared/ui/input";
 import { Button } from "@/shared/ui/button";
@@ -63,7 +62,7 @@ const { mutate: updateHandle, isPending: updatingHandle } = useMutation({
         { headers: getAuthHeaders() },
       ),
     ),
-  onSuccess: (data) => {
+  onSuccess: () => {
     initialHandle.value = handle.value;
 
     if (userStore.user) {
@@ -104,7 +103,7 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
         { headers: getAuthHeaders() },
       ),
     ),
-  onSuccess: (data) => {
+  onSuccess: () => {
     resetPasswordFields();
 
     showPasswordDialog.value = false;

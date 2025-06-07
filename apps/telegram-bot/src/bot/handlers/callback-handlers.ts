@@ -243,41 +243,35 @@ async function listPastCourses(ctx: Context) {
   const page = parseInt(ctx.match[0]?.split("_")[2]);
   const userId = ctx.from.id;
 
-  let [rmcCourses, _] = await request((client) =>
+  const [cources, _] = await request((client) =>
     client.v2.courses.$get(
-      {
-        query: {
-          status: "past",
-        },
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
+      { query: { status: "past" } },
+      { headers: getAuthHeaders(userId) },
     ),
   );
 
-  if (!rmcCourses) {
+  if (!cources) {
     await ctx.editMessageText("Past courses are not available.", {
       reply_markup: new InlineKeyboard().text("Back ←", "courses"),
     });
     return;
   }
 
-  if (rmcCourses.length === 0) {
+  if (cources.length === 0) {
     await ctx.editMessageText("You have no past courses 🥰", {
       reply_markup: new InlineKeyboard().text("Back", "courses"),
     });
     return;
   }
 
-  const totalPages = Math.ceil(rmcCourses.length / 10);
+  const totalPages = Math.ceil(cources.length / 10);
   const startIndex = (page - 1) * 10;
   const endIndex = startIndex + 10;
-  let courses = rmcCourses.slice(startIndex, endIndex);
+  const slicedCourses = cources.slice(startIndex, endIndex);
 
   const coursesKeyboards = new InlineKeyboard();
 
-  courses.forEach((course) => {
+  slicedCourses.forEach((course) => {
     coursesKeyboards
       .row()
       .text(

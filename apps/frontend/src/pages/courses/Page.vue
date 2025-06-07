@@ -11,7 +11,7 @@ import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 
 const classification = useRouteQuery<MoodleCourseClassification>("c", "past");
 
-const { isPending, isError, data, error, refetch } = useQuery({
+const { isPending, data, error, refetch } = useQuery({
   queryKey: ["private", "courses", classification],
   queryFn: async () =>
     await requestUnwrap((client) =>

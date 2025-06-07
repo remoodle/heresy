@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useRoute } from "vue-router";
 import { useUserStore } from "@/shared/stores/user";
 import { RoundedSection, PageWrapper } from "@/entities/page";
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
-import { useToast } from "@/shared/ui/toast";
 import { Avatar } from "@/shared/ui/avatar";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { RouteName } from "@/shared/lib/routes";
@@ -17,15 +15,7 @@ const userStore = useUserStore();
 
 const route = useRoute();
 
-const { toast } = useToast();
-
-const {
-  isPending,
-  isError,
-  data: account,
-  error,
-  refetch,
-} = useQuery({
+const { isPending, data: account } = useQuery({
   queryKey: ["private", "account"],
   queryFn: async () =>
     await requestUnwrap((client) =>

@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { watchEffect } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useQuery } from "@tanstack/vue-query";
 import { useUserStore } from "@/shared/stores/user";
 
 const userStore = useUserStore();
 
-const router = useRouter();
 const route = useRoute();
 
 const filepath = route.query.filepath as string;
-const from = route.query.from as string;
 
 const getCleanFilepath = () => {
   const url = new URL(filepath);

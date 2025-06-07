@@ -74,7 +74,7 @@ export const createHC = <A extends Hono<any, any, any>>(
           ? (data as APIErrorResponse).error.message
           : (data as string);
 
-      // @ts-ignore
+      // @ts-expect-error - TODO: fix this
       throw new HTTPException(response.status, { message });
     }
 

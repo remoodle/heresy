@@ -31,7 +31,7 @@ onMounted(async () => {
 
 const userStore = useUserStore();
 
-const { isPending: loading, data: course } = useQuery<Course>({
+const { data: course, isPending: pendingCourse } = useQuery<Course>({
   queryKey: ["private", "course", courseId],
   queryFn: async () =>
     await requestUnwrap((client) =>
@@ -62,11 +62,7 @@ watchEffect(() => {
   }
 });
 
-const {
-  isPending: loadingAssignments,
-  data: assignments,
-  error: assignmentsError,
-} = useQuery({
+const { data: assignments, isPending: pendingAssignments } = useQuery({
   queryKey: ["private", "course-assignments", courseId],
   queryFn: async () =>
     await requestUnwrap((client) =>
@@ -79,11 +75,7 @@ const {
     ),
 });
 
-const {
-  isPending: loadingGrades,
-  data: grades,
-  error: gradesError,
-} = useQuery({
+const { data: grades } = useQuery({
   queryKey: ["private", "course-grades", courseId],
   queryFn: async () =>
     await requestUnwrap((client) =>
@@ -101,7 +93,7 @@ const {
   <PageWrapper sticky-header>
     <template #title>
       <h1>
-        <template v-if="!courseName && loading && !isDefined(course)">
+        <template v-if="!courseName && pendingCourse && !isDefined(course)">
           Loading...
         </template>
         <template v-else>
@@ -122,7 +114,7 @@ const {
         <aside class="mt-6 h-32 rounded-2xl border p-2 lg:h-fit lg:w-1/5">
           <ScrollArea class="h-full">
             <nav class="flex flex-wrap lg:flex-col">
-              <template v-if="loadingAssignments">
+              <template v-if="pendingAssignments">
                 <Skeleton v-for="i in 4" :key="i" class="my-1 h-9 w-full" />
               </template>
               <template v-else-if="assignments?.length">

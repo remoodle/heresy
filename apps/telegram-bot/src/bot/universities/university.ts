@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import type { MoodleCourse, MoodleEvent, MoodleGrade } from "@remoodle/types";
 
 export interface University {

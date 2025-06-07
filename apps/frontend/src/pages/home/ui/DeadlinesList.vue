@@ -18,7 +18,7 @@ const deadlines = ref<{
   [date: string]: MoodleEvent[] | undefined;
 }>();
 
-const { isFetching, isError, data, error, refetch } = useQuery({
+const { isFetching, data, error, refetch } = useQuery({
   queryKey: ["private", "deadlines"],
   queryFn: async () =>
     await requestUnwrap((client) =>

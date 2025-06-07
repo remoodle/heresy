@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, watch, watchEffect } from "vue";
+import { onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import type { IUser } from "@remoodle/types";
 import { RouterView, useRoute, useRouter } from "vue-router";
