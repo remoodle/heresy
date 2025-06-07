@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.12](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.11...remoodle/frontend-v1.9.12) (2025-06-07)
+
+
+### Miscellaneous Chores
+
+* upgrade tooling & packages ([8f519e9](https://github.com/remoodle/remoodle/commit/8f519e9031e9b2b21eaeccce5d23d36fe9e10b29))
+
 ## [1.9.11](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.10...remoodle/frontend-v1.9.11) (2025-06-05)
 
 
