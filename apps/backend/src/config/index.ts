@@ -23,7 +23,7 @@ export const env = cleanEnv(process.env, {
 
   CLUSTER_QUEUES_PRUNE: str({ default: "0" }),
   CLUSTER_SCHEDULER_ENABLED: str({ default: "0" }),
-  CLUSTER_TASKS_CONFIG_PATH: str({ default: "/configs/example.json" }),
+  CLUSTER_TASKS_CONFIG_PATH: str({ default: "./configs/example.json" }),
 
   ALERT_WORKER_URL: str({ default: "http://localhost:8787" }),
   ALERT_WORKER_SECRET: str({ default: "UpqqN" }),
