@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.5](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.4...remoodle/telegram-bot-v2.0.5) (2025-06-07)
+
+
+### Build System
+
+* update tooling ([5861885](https://github.com/remoodle/remoodle/commit/5861885a37b23eb40c67d0347981998d2321bd13))
+
 ## [2.0.4](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.3...remoodle/telegram-bot-v2.0.4) (2025-06-07)
 
 
