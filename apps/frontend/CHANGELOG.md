@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.9.13](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.12...remoodle/frontend-v1.9.13) (2025-06-07)
+
+
+### Miscellaneous Chores
+
+* **deps:** keep single prettier-plugin-tailwindcss ([a6c6075](https://github.com/remoodle/remoodle/commit/a6c6075ea84668163cd7f0e03e6c2457e59abbeb))
+
+
+### Code Refactoring
+
+* fix basic eslint warnings ([cc4dec0](https://github.com/remoodle/remoodle/commit/cc4dec0e72a53b535fba0e2b2c1caf8867161ab0))
+
 ## [1.9.12](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.11...remoodle/frontend-v1.9.12) (2025-06-07)
 
 
