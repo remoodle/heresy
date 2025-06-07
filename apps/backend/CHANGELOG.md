@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.17](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.16...remoodle/backend-v2.3.17) (2025-06-07)
+
+
+### Miscellaneous Chores
+
+* upgrade tooling & packages ([8f519e9](https://github.com/remoodle/remoodle/commit/8f519e9031e9b2b21eaeccce5d23d36fe9e10b29))
+
 ## [2.3.16](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.15...remoodle/backend-v2.3.16) (2025-06-04)
 
 
