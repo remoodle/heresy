@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.16](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.15...remoodle/frontend-v1.9.16) (2025-06-11)
+
+
+### Bug Fixes
+
+* format classes ([e1c4ab0](https://github.com/remoodle/remoodle/commit/e1c4ab08537b09318ad007c07861cc28bf9a222a))
+
 ## [1.9.15](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.14...remoodle/frontend-v1.9.15) (2025-06-11)
 
 
