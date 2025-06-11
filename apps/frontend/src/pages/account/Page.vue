@@ -39,7 +39,7 @@ const { isPending, data: account } = useQuery({
     </template>
     <RoundedSection>
       <div
-        class="flex flex-col space-y-8 space-x-2 lg:flex-row lg:space-y-0 lg:space-x-12"
+        class="flex flex-col space-x-2 space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0"
       >
         <aside class="lg:w-1/5">
           <AccountSidebar />

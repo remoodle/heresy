@@ -5,5 +5,7 @@
   "jsxSingleQuote": false,
   "semi": true,
   "trailingComma": "all",
-  "tabWidth": 2
+  "tabWidth": 2,
+  "tailwindStylesheet": "./apps/frontend/src/shared/assets/base.css",
+  "plugins": ["prettier-plugin-tailwindcss"]
 }

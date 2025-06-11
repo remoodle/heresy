@@ -63,7 +63,7 @@ defineProps<{
     <template v-if="module.contents && module.contents.length">
       <ul class="flex flex-col gap-2">
         <template v-for="item in module.contents" :key="item.timecreated">
-          <span class="text-muted-foreground text-sm break-all">
+          <span class="text-muted-foreground break-all text-sm">
             <template v-if="item.type === 'url'">
               {{ item.fileurl }}
             </template>

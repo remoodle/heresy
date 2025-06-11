@@ -50,7 +50,7 @@ const elBanner = ref();
               </Link>
               <h1
                 data-testid="page-title"
-                class="text-2xl font-medium break-all md:text-3xl"
+                class="break-all text-2xl font-medium md:text-3xl"
               >
                 <slot name="title"></slot>
               </h1>
@@ -65,7 +65,7 @@ const elBanner = ref();
       class="container mb-6"
       :class="{
         hidden: elHeaderContainer?.childElementCount === 0,
-        'sticky top-0 z-2': stickyHeader,
+        'z-2 sticky top-0': stickyHeader,
       }"
     >
       <div v-if="$slots.header" class="flex flex-col gap-6 lg:flex-row">

@@ -28,7 +28,7 @@ const userStore = useUserStore();
           <Logo class="h-12 w-12 flex-none" />
         </Link>
       </div>
-      <div class="hidden h-full w-full flex-shrink-1 justify-center lg:flex">
+      <div class="flex-shrink-1 hidden h-full w-full justify-center lg:flex">
         <!-- <MagicSearch /> -->
         <!--  -->
       </div>

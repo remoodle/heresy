@@ -34,7 +34,7 @@ defineExpose({ elList });
     <div
       v-bind="$attrs"
       ref="elList"
-      class="[&>*]:before:bg-primary flex h-14 w-full flex-row gap-x-3 *:relative *:flex *:h-full *:shrink-0 *:items-center *:gap-1 *:px-2 *:no-underline *:before:absolute *:before:top-[95%] *:before:left-0 *:before:z-0 *:before:hidden *:before:h-1 *:before:w-full *:before:content-['']"
+      class="[&>*]:before:bg-primary flex h-14 w-full flex-row gap-x-3 *:relative *:flex *:h-full *:shrink-0 *:items-center *:gap-1 *:px-2 *:no-underline *:before:absolute *:before:left-0 *:before:top-[95%] *:before:z-0 *:before:hidden *:before:h-1 *:before:w-full *:before:content-['']"
       :class="[
         bordered && 'border-b',
         [rounded ? '*:before:rounded' : '*:before:rounded-t-full'],

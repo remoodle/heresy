@@ -56,7 +56,7 @@ const moduleSorter = (
       :href="`#${content.id}`"
       :aria-label="`Permalink to ${content.name}`"
       tabindex="-1"
-      class="group text-primary text-2xl"
+      class="text-primary group text-2xl"
     >
       {{ content.name }}
     </a>

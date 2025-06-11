@@ -109,7 +109,7 @@ const { data: grades } = useQuery({
     </template>
     <RoundedSection dense>
       <div
-        class="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-12"
+        class="flex flex-col space-y-4 lg:flex-row lg:space-x-12 lg:space-y-0"
       >
         <aside class="mt-6 h-32 rounded-2xl border p-2 lg:h-fit lg:w-1/5">
           <ScrollArea class="h-full">

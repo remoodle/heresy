@@ -14,7 +14,7 @@ const userStore = useUserStore();
       !userStore.user?.telegramId &&
       userStore.showTelegramBanner
     "
-    class="top-0 z-50 mb-2 w-full bg-linear-to-r from-[#2AABEE] to-[#229ED9] p-3 text-center text-sm font-medium text-white md:text-base"
+    class="bg-linear-to-r top-0 z-50 mb-2 w-full from-[#2AABEE] to-[#229ED9] p-3 text-center text-sm font-medium text-white md:text-base"
   >
     <div class="flex items-center justify-center gap-4">
       <p>

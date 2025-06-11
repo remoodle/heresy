@@ -8,7 +8,7 @@ import { NotificationsBanner } from "@/widgets/notifications-banner";
   <NotificationsBanner />
   <Header />
   <div class="bg-secondary">
-    <div class="mt-12 mb-10 flex-wrap justify-between sm:flex">
+    <div class="mb-10 mt-12 flex-wrap justify-between sm:flex">
       <main class="flex w-full flex-col">
         <RouterView v-slot="{ Component }">
           <Component :is="Component" />
