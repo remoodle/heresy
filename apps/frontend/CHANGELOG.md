@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.15](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.14...remoodle/frontend-v1.9.15) (2025-06-11)
+
+
+### Bug Fixes
+
+* treat buttons as in tw 3 ([18ac6a6](https://github.com/remoodle/remoodle/commit/18ac6a6d7bc775f4f2710b81d2b39effa5d2a6f5))
+
 ## [1.9.14](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.13...remoodle/frontend-v1.9.14) (2025-06-07)
 
 
