@@ -36,3 +36,20 @@ export const getTimeLeft = (date: number) => {
 
   return timeComponents.join(", ");
 };
+
+export const formatTimestamp = (
+  timestamp: number,
+  options?: Intl.DateTimeFormatOptions,
+) => {
+  return new Date(timestamp)
+    .toLocaleString("en-US", {
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "Asia/Almaty",
+      ...options,
+    })
+    .replace("24:00", "00:00");
+};

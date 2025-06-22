@@ -1,14 +1,11 @@
 import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
+import { formatTimestamp } from "@remoodle/utils";
 import { request, getAuthHeaders } from "../../library/hc";
-import {
-  getNotificationsKeyboard,
-  formatUnixtimestamp,
-  getMiniAppUrl,
-} from "../utils";
+import { getNotificationsKeyboard, getMiniAppUrl } from "../utils";
 import keyboards from "./keyboards";
+import { uni } from "../../university";
 import { config } from "../../config";
-import { uni } from "../universities";
 
 // Menu buttons
 async function others(ctx: Context) {
@@ -54,7 +51,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  const text = uni.getDeadlines(deadlines);
+  const text = uni.getDeadlinesMessage(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -117,7 +114,7 @@ async function refreshDeadlines(ctx: Context) {
     return;
   }
 
-  const text = uni.getDeadlines(deadlines);
+  const text = uni.getDeadlinesMessage(deadlines);
 
   await ctx.editMessageText(text, {
     parse_mode: "HTML",
@@ -221,7 +218,7 @@ async function inProgressCourse(ctx: Context) {
     return;
   }
 
-  const message = uni.getGrades(grades, course);
+  const message = uni.getGradesMessage(grades, course);
 
   const keyboard = new InlineKeyboard()
     .text("Assignments", `course_assignments_${courseId}`)
@@ -346,7 +343,7 @@ async function pastCourse(ctx: Context) {
     return;
   }
 
-  const message = uni.getGrades(grades, course);
+  const message = uni.getGradesMessage(grades, course);
 
   return await ctx.editMessageText(message, {
     reply_markup: keyboard,
@@ -569,7 +566,7 @@ async function account(ctx: Context) {
       "`\nToken health:  `" +
       `${user.health} ${user.health > 0 ? "🟢" : "🔴"}` +
       "`\n*" +
-      uni.getUniversityName() +
+      uni.name +
       "*",
     {
       reply_markup: keyboards.account,
@@ -774,13 +771,11 @@ async function courseAssignmentById(ctx: Context) {
   text += `*${course.fullname}*\n\n`;
 
   if (assignment.duedate && assignment.allowsubmissionsfromdate) {
-    text += `*Opened:* ${formatUnixtimestamp(assignment.allowsubmissionsfromdate * 1000, true)}\n`;
-    text += `*Due:* ${formatUnixtimestamp(assignment.duedate * 1000, true)}\n`;
+    text += `*Opened:* ${formatTimestamp(assignment.allowsubmissionsfromdate * 1000, { year: "numeric" })}\n`;
+    text += `*Due:* ${formatTimestamp(assignment.duedate * 1000, { year: "numeric" })};\n`;
   }
 
-  console.log(assignmentId);
   const grade = grades.find((g) => g.iteminstance === assignmentId);
-  console.log(grade);
 
   if (grade) {
     text += `*Grade:* ${grade.gradeformatted}%\n`;

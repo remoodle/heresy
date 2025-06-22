@@ -2,20 +2,6 @@ import type { NotificationSettings } from "@remoodle/types";
 import { InlineKeyboard, GrammyError, BotError, HttpError } from "grammy";
 import { getAuthHeaders, request } from "../../library/hc";
 
-const formatUnixtimestamp = (timestamp: number, showYear: boolean = false) => {
-  return new Date(timestamp)
-    .toLocaleString("en-US", {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      year: showYear ? "numeric" : undefined,
-      hour12: false,
-      timeZone: "Asia/Almaty",
-    })
-    .replace("24:00", "00:00");
-};
-
 const getMiniAppUrl = async (
   userId: number,
   host: string,
@@ -83,9 +69,4 @@ function logWithTimestamp(
   console.error(`[${new Date().toISOString()}] ${message}`, error);
 }
 
-export {
-  getNotificationsKeyboard,
-  formatUnixtimestamp,
-  logWithTimestamp,
-  getMiniAppUrl,
-};
+export { getNotificationsKeyboard, logWithTimestamp, getMiniAppUrl };
