@@ -133,15 +133,17 @@ async function deadlines(ctx: Context) {
 
   const userId = ctx.from?.id;
 
-  const short = ctx.message.text.startsWith("/ds");
+  const isShort = ctx.message.text.startsWith("/ds");
 
-  const daysLimit = short ? "2" : "21";
+  const daysLimit = isShort
+    ? uni.deadlinesDaysLimit.short
+    : uni.deadlinesDaysLimit.default;
 
   const [data, error] = await request((client) =>
     client.v2.deadlines.$get(
       {
         query: {
-          daysLimit,
+          daysLimit: daysLimit.toString(),
         },
       },
       {
@@ -159,11 +161,11 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  const text = uni.getDeadlinesMessage(data, short);
+  const text = uni.getDeadlinesMessage(data, isShort ? daysLimit : false);
 
   if (ctx.chat.type === "private") {
     await ctx.reply(text, {
-      reply_markup: short ? undefined : keyboards.single_deadline,
+      reply_markup: isShort ? undefined : keyboards.single_deadline,
       parse_mode: "HTML",
     });
   } else {

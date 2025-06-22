@@ -34,11 +34,11 @@ export const formatDeadlineItem = (
 
 export const formatDeadlinesList = (
   deadlines: MoodleEvent[],
-  short: boolean = false,
+  short: false | number,
   options: DeadlineFormatOptions = {},
 ): string => {
   if (!deadlines.length) {
-    return `You have no upcoming deadlines${short ? " in the next 2 days" : ""} 🥰`;
+    return `You have no upcoming deadlines${short !== false ? ` in the next ${short} days` : ""} 🥰`;
   }
 
   const deadlineItems = deadlines.map((deadline) =>

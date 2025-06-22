@@ -95,6 +95,11 @@ const calculateTotalGrades = (grades: MoodleGrade[]): GradeBlock[] => {
 export const aitu: UniversityConfig = {
   name: "Astana IT University",
 
+  deadlinesDaysLimit: {
+    default: 21,
+    short: 2,
+  },
+
   getGradesMessage: (grades: MoodleGrade[], course: MoodleCourse): string => {
     const blocks: GradeBlock[] = [];
 
@@ -119,7 +124,7 @@ export const aitu: UniversityConfig = {
 
   getDeadlinesMessage: (
     deadlines: MoodleEvent[],
-    short: boolean = false,
+    short: false | number = false,
   ): string => {
     return formatDeadlinesList(deadlines, short, {
       getCourseName: (event) => {

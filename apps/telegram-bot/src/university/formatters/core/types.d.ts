@@ -2,8 +2,15 @@ import type { MoodleGrade, MoodleEvent, MoodleCourse } from "@remoodle/types";
 
 export type UniversityConfig = {
   name: string;
+  deadlinesDaysLimit: {
+    default: number;
+    short: number;
+  };
   getGradesMessage: (grades: MoodleGrade[], course: MoodleCourse) => string;
-  getDeadlinesMessage: (deadlines: MoodleEvent[], short?: boolean) => string;
+  getDeadlinesMessage: (
+    deadlines: MoodleEvent[],
+    short?: false | number,
+  ) => string;
 };
 
 export type GradeBlock = {
