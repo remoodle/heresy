@@ -4,7 +4,7 @@ import { request, getAuthHeaders } from "../../library/hc";
 import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
-import { uni } from "../universities";
+import { uni } from "../../university";
 import { getMiniAppUrl } from "../utils";
 
 async function start(ctx: RegistrationContext) {
@@ -159,7 +159,7 @@ async function deadlines(ctx: Context) {
     return;
   }
 
-  const text = uni.getDeadlines(data, short);
+  const text = uni.getDeadlinesMessage(data, short);
 
   if (ctx.chat.type === "private") {
     await ctx.reply(text, {
