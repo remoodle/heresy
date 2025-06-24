@@ -97,24 +97,6 @@ export function getRelativeTime(date: TDate): string {
   return dayjs(date).fromNow();
 }
 
-export function splitCourseName(title?: string) {
-  if (!title) {
-    return { name: "", teacher: "" };
-  }
-
-  const [name, teacher] = title.split(" | ");
-
-  if (!name || !teacher) {
-    return { name: title, teacher: "" };
-  }
-
-  return { name, teacher };
-}
-
-export function formatAssignmentName(title: string) {
-  return title.replace("is due", "").trim();
-}
-
 export const vFocus = {
   mounted: (el: HTMLInputElement) => el.focus(),
 };

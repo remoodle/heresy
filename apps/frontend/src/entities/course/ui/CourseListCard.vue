@@ -2,7 +2,6 @@
 import { computed } from "vue";
 import type { ExtendedCourse } from "@remoodle/types";
 import { RouteName } from "@/shared/lib/routes";
-import { splitCourseName } from "@/shared/lib/helpers";
 import {
   Tooltip,
   TooltipContent,
@@ -16,10 +15,6 @@ const props = defineProps<{
   course: ExtendedCourse;
   showCategory: boolean;
 }>();
-
-const splitted = computed(() => {
-  return splitCourseName(props.course.fullname);
-});
 
 const attendance = computed(() => {
   return props.course.grades?.find((g) => g.itemmodule === "attendance");
@@ -40,11 +35,8 @@ const attendance = computed(() => {
         {{ course.coursecategory }}
       </div>
       <span class="text-lg font-medium">
-        {{ splitted.name }}
+        {{ course.fullname }}
       </span>
-      <div class="text-muted-foreground text-sm">
-        {{ splitted.teacher }}
-      </div>
     </div>
     <div v-if="course.grades" class="flex flex-none gap-1">
       <TooltipProvider v-if="typeof attendance?.graderaw === 'number'">

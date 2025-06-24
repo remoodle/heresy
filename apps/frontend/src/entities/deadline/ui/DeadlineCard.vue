@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import type { MoodleEvent } from "@remoodle/types";
 import { RouteName } from "@/shared/lib/routes";
-import {
-  splitCourseName,
-  formatAssignmentName,
-  formatDate,
-  fromUnix,
-  getRelativeTime,
-} from "@/shared/lib/helpers";
+import { formatDate, fromUnix, getRelativeTime } from "@/shared/lib/helpers";
 import {
   Tooltip,
   TooltipContent,
@@ -47,7 +41,7 @@ defineProps<{
         hover
         class="truncate"
       >
-        {{ formatAssignmentName(deadline.name) }}
+        {{ deadline.name }}
       </component>
       <Link
         :to="{
@@ -60,7 +54,7 @@ defineProps<{
         hover
         class="truncate text-sm"
       >
-        {{ splitCourseName(deadline.course.fullname).name }}
+        {{ deadline.course.shortname }}
       </Link>
     </div>
     <span class="shrink-0 text-sm">
