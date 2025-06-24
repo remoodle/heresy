@@ -9,7 +9,7 @@ export function parseCourseFullname(fullname: string) {
 
   return {
     courseName: parts[0],
-    teacher: parts[1] ?? undefined,
+    teacher: parts[parts.length - 1] ?? undefined,
   };
 }
 
