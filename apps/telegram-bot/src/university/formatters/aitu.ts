@@ -1,10 +1,19 @@
 import type { MoodleGrade, MoodleCourse, MoodleEvent } from "@remoodle/types";
-import type { UniversityConfig, GradeBlock } from "./core/types";
+import type { UniversityConfig, GradeBlock, CourseItem } from "./core/types";
 import { formatGradeItem, createSeparator, renderBlocks } from "./core/grades";
 import { formatDeadlinesList } from "./core/deadlines";
+import { formatCoursesList } from "./core/courses";
+
+export function parseCourseFullname(fullname: string) {
+  const parts = fullname.split(" | ");
+  return {
+    courseName: parts[0],
+    teacher: parts[1] ?? undefined,
+  };
+}
 
 const formatCourseHeader = (course: MoodleCourse): string => {
-  const [courseName, teacher] = course.fullname.split(" | ");
+  const { courseName, teacher } = parseCourseFullname(course.fullname);
   return `${courseName}\nTeacher: ${teacher}\n\n`;
 };
 
@@ -100,6 +109,14 @@ export const aitu: UniversityConfig = {
     short: 2,
   },
 
+  getCoursesMessage: (courses: MoodleCourse[]): CourseItem[] => {
+    return formatCoursesList(courses, {
+      getCourseName: (course) => {
+        return `${parseCourseFullname(course.shortname).courseName} ${course.notingroup ? "❗" : ""}`;
+      },
+    });
+  },
+
   getGradesMessage: (grades: MoodleGrade[], course: MoodleCourse): string => {
     const blocks: GradeBlock[] = [];
 
@@ -128,7 +145,7 @@ export const aitu: UniversityConfig = {
   ): string => {
     return formatDeadlinesList(deadlines, short, {
       getCourseName: (event) => {
-        const [courseName] = event.course.shortname.split(" | ");
+        const { courseName } = parseCourseFullname(event.course.shortname);
         return courseName;
       },
       getDeadlineName: (event) => {

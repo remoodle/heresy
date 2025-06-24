@@ -1,6 +1,7 @@
 import type { UniversityConfig } from "./core/types";
 import { formatGradeItem, renderBlocks } from "./core/grades";
 import { formatDeadlinesList } from "./core/deadlines";
+import { formatCoursesList } from "./core/courses";
 
 export const dummy: UniversityConfig = {
   name: "Dummy University",
@@ -8,6 +9,14 @@ export const dummy: UniversityConfig = {
   deadlinesDaysLimit: {
     default: 21,
     short: 2,
+  },
+
+  getCoursesMessage: (courses) => {
+    return formatCoursesList(courses, {
+      getCourseName: (course) => {
+        return course.fullname;
+      },
+    });
   },
 
   getGradesMessage: (grades, course) => {

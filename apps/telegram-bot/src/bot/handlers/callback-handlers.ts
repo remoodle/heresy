@@ -123,7 +123,6 @@ async function refreshDeadlines(ctx: Context) {
   });
 }
 
-// Grades
 async function courses(ctx: Context) {
   if (!ctx.from) {
     return;
@@ -131,7 +130,7 @@ async function courses(ctx: Context) {
 
   const userId = ctx.from.id;
 
-  const [grades, _] = await request((client) =>
+  const [courses, _] = await request((client) =>
     client.v2.courses.$get(
       {
         query: {
@@ -144,34 +143,33 @@ async function courses(ctx: Context) {
     ),
   );
 
-  if (!grades) {
+  if (!courses) {
     return;
   }
 
-  const gradesKeyboards = new InlineKeyboard();
+  const coursesKeyboards = new InlineKeyboard();
 
-  grades.forEach((grade) => {
-    gradesKeyboards
-      .row()
-      .text(
-        `${grade.shortname.split(" | ")[0]} ${grade.notingroup ? "❗" : ""}`,
-        `inprogress_course_${grade.id}`,
-      );
+  const courseItems = uni.getCoursesMessage(courses);
+
+  courseItems.forEach((course) => {
+    coursesKeyboards.row().text(course.name, `inprogress_course_${course.id}`);
   });
 
-  gradesKeyboards
+  coursesKeyboards
     .row()
     .text("Back ←", "back_to_menu")
     .text("Past courses", "old_course_1");
 
-  if (grades.length === 0) {
-    await ctx.editMessageText("You have no grades 🥰", {
-      reply_markup: gradesKeyboards,
+  if (!courses.length) {
+    await ctx.editMessageText("You have no courses 🥰", {
+      reply_markup: coursesKeyboards,
     });
     return;
   }
 
-  await ctx.editMessageText("Your courses:", { reply_markup: gradesKeyboards });
+  await ctx.editMessageText("Your courses:", {
+    reply_markup: coursesKeyboards,
+  });
 }
 
 async function inProgressCourse(ctx: Context) {
@@ -240,41 +238,40 @@ async function listPastCourses(ctx: Context) {
   const page = parseInt(ctx.match[0]?.split("_")[2]);
   const userId = ctx.from.id;
 
-  const [cources, _] = await request((client) =>
+  const [courses, _] = await request((client) =>
     client.v2.courses.$get(
       { query: { status: "past" } },
       { headers: getAuthHeaders(userId) },
     ),
   );
 
-  if (!cources) {
+  if (!courses) {
     await ctx.editMessageText("Past courses are not available.", {
       reply_markup: new InlineKeyboard().text("Back ←", "courses"),
     });
     return;
   }
 
-  if (cources.length === 0) {
+  if (!courses.length) {
     await ctx.editMessageText("You have no past courses 🥰", {
       reply_markup: new InlineKeyboard().text("Back", "courses"),
     });
     return;
   }
 
-  const totalPages = Math.ceil(cources.length / 10);
+  const courseItems = uni.getCoursesMessage(courses);
+
+  const totalPages = Math.ceil(courseItems.length / 10);
   const startIndex = (page - 1) * 10;
   const endIndex = startIndex + 10;
-  const slicedCourses = cources.slice(startIndex, endIndex);
+  const slicedCourses = courseItems.slice(startIndex, endIndex);
 
   const coursesKeyboards = new InlineKeyboard();
 
   slicedCourses.forEach((course) => {
     coursesKeyboards
       .row()
-      .text(
-        course.fullname.split(" | ")[0],
-        `past_course_${course.id}_${page}`,
-      );
+      .text(course.name, `past_course_${course.id}_${page}`);
   });
 
   coursesKeyboards.row();

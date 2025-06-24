@@ -11,10 +11,16 @@ export type UniversityConfig = {
     deadlines: MoodleEvent[],
     short?: false | number,
   ) => string;
+  getCoursesMessage: (courses: MoodleCourse[]) => CourseItem[];
 };
 
 export type GradeBlock = {
   type: "header" | "calculation" | "grade" | "separator";
   content: string;
   priority?: number;
+};
+
+export type CourseItem = {
+  id: number;
+  name: string;
 };
