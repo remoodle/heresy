@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.17](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.16...remoodle/frontend-v1.9.17) (2025-06-24)
+
+
+### Code Refactoring
+
+* remove aitu hacks from frontend ([8392606](https://github.com/remoodle/remoodle/commit/839260687c96548985e1303769ffadbf1f93d075))
+
 ## [1.9.16](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.15...remoodle/frontend-v1.9.16) (2025-06-11)
 
 
