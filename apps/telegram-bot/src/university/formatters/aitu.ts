@@ -5,11 +5,18 @@ import { formatDeadlinesList } from "./core/deadlines";
 import { formatCoursesList } from "./core/courses";
 
 export function parseCourseFullname(fullname: string) {
-  const parts = fullname.split(" | ");
+  const lastPipeIndex = fullname.lastIndexOf("|");
+
+  if (lastPipeIndex === -1) {
+    return {
+      courseName: fullname.trim(),
+      teacher: null,
+    };
+  }
 
   return {
-    courseName: parts[0],
-    teacher: parts[parts.length - 1] ?? undefined,
+    courseName: fullname.substring(0, lastPipeIndex).trim(),
+    teacher: fullname.substring(lastPipeIndex + 1).trim(),
   };
 }
 
