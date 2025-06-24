@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.0.7](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.6...remoodle/telegram-bot-v2.0.7) (2025-06-24)
+
+
+### Bug Fixes
+
+* proper teacher parsing ([4408684](https://github.com/remoodle/remoodle/commit/4408684c8c5c45c8808585023ffb416f7a9a7901))
+
+
+### Code Refactoring
+
+* create better uni formatter core ([#430](https://github.com/remoodle/remoodle/issues/430)) ([8f0a8f1](https://github.com/remoodle/remoodle/commit/8f0a8f1f9c46eac1e0fe66fb1a2c1e0c560159dd))
+* unify course name formatting ([958e2a6](https://github.com/remoodle/remoodle/commit/958e2a6f32028beafc34ea0cd168ac948d0c0b29))
+* unify formatting ([5c3de9f](https://github.com/remoodle/remoodle/commit/5c3de9f4636eab42a284346ed164f79c443c8302))
+
 ## [2.0.6](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.5...remoodle/telegram-bot-v2.0.6) (2025-06-07)
 
 
