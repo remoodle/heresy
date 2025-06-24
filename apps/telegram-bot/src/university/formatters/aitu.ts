@@ -6,6 +6,7 @@ import { formatCoursesList } from "./core/courses";
 
 export function parseCourseFullname(fullname: string) {
   const parts = fullname.split(" | ");
+
   return {
     courseName: parts[0],
     teacher: parts[1] ?? undefined,
@@ -14,6 +15,7 @@ export function parseCourseFullname(fullname: string) {
 
 const formatCourseHeader = (course: MoodleCourse): string => {
   const { courseName, teacher } = parseCourseFullname(course.fullname);
+
   return `${courseName}\nTeacher: ${teacher}\n\n`;
 };
 
@@ -112,7 +114,9 @@ export const aitu: UniversityConfig = {
   getCoursesMessage: (courses: MoodleCourse[]): CourseItem[] => {
     return formatCoursesList(courses, {
       getCourseName: (course) => {
-        return `${parseCourseFullname(course.shortname).courseName} ${course.notingroup ? "❗" : ""}`;
+        const { courseName } = parseCourseFullname(course.shortname);
+
+        return `${courseName} ${course.notingroup ? "❗" : ""}`;
       },
     });
   },
@@ -146,6 +150,7 @@ export const aitu: UniversityConfig = {
     return formatDeadlinesList(deadlines, short, {
       getCourseName: (event) => {
         const { courseName } = parseCourseFullname(event.course.shortname);
+
         return courseName;
       },
       getDeadlineName: (event) => {
