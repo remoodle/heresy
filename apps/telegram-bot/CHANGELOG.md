@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.8](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.7...remoodle/telegram-bot-v2.0.8) (2025-06-24)
+
+
+### Bug Fixes
+
+* configure course name parser properly ([48a7dda](https://github.com/remoodle/remoodle/commit/48a7dda3a293b5d04f9e69aaf938b17df82b71b5))
+
 ## [2.0.7](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.6...remoodle/telegram-bot-v2.0.7) (2025-06-24)
 
 
