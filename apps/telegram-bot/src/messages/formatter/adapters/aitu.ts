@@ -142,7 +142,16 @@ export const aitu: UniversityConfig = {
   getGradesMessage: (grades: MoodleGrade[], course: MoodleCourse): string => {
     const blocks: GradeBlock[] = [];
 
-    blocks.push(...calculateTotalGrades(grades));
+    const calculationBlocks = calculateTotalGrades(grades);
+    blocks.push(...calculationBlocks);
+
+    if (calculationBlocks.length > 0) {
+      blocks.push({
+        type: "separator",
+        content: "",
+        priority: 2,
+      });
+    }
 
     grades.forEach((grade) => {
       const block = formatGradeItem(grade);
@@ -150,13 +159,30 @@ export const aitu: UniversityConfig = {
       if (block) {
         if (grade.itemname === "Attendance") {
           block.priority = 10;
-          blocks.push(block, createSeparator());
+          blocks.push(block);
+        } else if (grade.itemname.startsWith("Register")) {
+          block.priority = 5;
+          blocks.push(block);
         } else {
-          block.priority = grade.itemname.startsWith("Register") ? 5 : 15;
+          block.priority = 15;
           blocks.push(block);
         }
       }
     });
+
+    const hasRegisterOrAttendance = grades.some(
+      (grade) =>
+        grade.itemname === "Attendance" ||
+        grade.itemname.startsWith("Register"),
+    );
+
+    if (hasRegisterOrAttendance) {
+      blocks.push({
+        type: "separator",
+        content: "",
+        priority: 11,
+      });
+    }
 
     return formatCourseHeader(course) + renderBlocks(blocks);
   },
