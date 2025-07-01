@@ -32,60 +32,64 @@ const formatCourseHeader = (course: MoodleCourse): string => {
   return `${courseName}\nTeacher: ${teacher}\n\n`;
 };
 
-const calculateGPA = (total: number): string => {
-  const gradeMap: Record<number, number> = {
-    100: 4.0,
-    95: 4.0,
-    90: 3.67,
-    85: 3.33,
-    80: 3.0,
-    75: 2.67,
-    70: 2.33,
-    65: 2.0,
-    60: 1.67,
-    55: 1.33,
-    50: 1.0,
-  };
-  const grade = Math.floor(total / 5) * 5;
+const TOTAL_TO_GPA_THRESHOLDS = [
+  { min: 95, gpa: 4.0 },
+  { min: 90, gpa: 3.67 },
+  { min: 85, gpa: 3.33 },
+  { min: 80, gpa: 3.0 },
+  { min: 75, gpa: 2.67 },
+  { min: 70, gpa: 2.33 },
+  { min: 65, gpa: 2.0 },
+  { min: 60, gpa: 1.67 },
+  { min: 55, gpa: 1.33 },
+  { min: 50, gpa: 1.0 },
+];
 
-  return gradeMap[grade]?.toFixed(2) || "0.00";
+const calculateGPA = (total: number) => {
+  const threshold = TOTAL_TO_GPA_THRESHOLDS.find((t) => total >= t.min);
+
+  return threshold ? threshold.gpa : undefined;
 };
 
 const calculateTotalGrades = (grades: MoodleGrade[]): GradeBlock[] => {
-  const getGrade = (name: string) =>
-    grades.find((grade) => grade.itemname === name)?.graderaw ?? 0;
-
-  const regFinal = getGrade("Register Final");
-  const regMid = getGrade("Register Midterm");
-  const regEnd = getGrade("Register Endterm");
-  const regTerm = (regMid + regEnd) / 2;
-
   const blocks: GradeBlock[] = [];
 
-  if (regFinal !== 0 && regTerm !== 0) {
-    const totalGrade = getGrade("Total");
-    const total =
-      totalGrade === 0
-        ? regFinal * 0.4 + regMid * 0.3 + regEnd * 0.3
-        : totalGrade;
+  const getGrade = (name: string) =>
+    grades.find((grade) => grade.itemname === name);
 
-    let statusText = "";
-    if (total >= 90) {
-      statusText = "High scholarship 🎉🎉";
-    } else if (total >= 70) {
-      statusText = "Scholarship 🎉";
-    } else if (total >= 50) {
-      statusText = "No scholarship 😭";
-    } else {
-      statusText = "Retake 💀";
-    }
+  const getGradeByIdNumber = (idnumber: string) =>
+    grades.find((grade) => grade.idnumber === idnumber);
+
+  const total = getGradeByIdNumber("register");
+
+  const regMid = getGrade("Register Midterm");
+  const regEnd = getGrade("Register Endterm");
+
+  if (total?.graderaw && total.graderaw !== 0) {
+    const statusText =
+      total.graderaw >= 90
+        ? "High scholarship 🎉🎉"
+        : total.graderaw >= 70
+          ? "Scholarship 🎉"
+          : total.graderaw >= 50
+            ? "No scholarship 😭"
+            : "Retake 💀";
+
+    const gpa = calculateGPA(total.graderaw);
 
     blocks.push({
       type: "calculation",
-      content: `${statusText}\nTOTAL  →  ${total.toFixed(2)}\nGPA  →  ${calculateGPA(total)}`,
+      content: `${statusText}\nTOTAL  →  ${total.gradeformatted}\nGPA  →  ${gpa ?? "N/A"}`,
       priority: 1,
     });
-  } else if (regTerm !== 0 && regFinal === 0) {
+  } else if (
+    regMid?.graderaw &&
+    regMid.graderaw !== 0 &&
+    regEnd?.graderaw &&
+    regEnd.graderaw !== 0
+  ) {
+    const regTerm = (regMid.graderaw + regEnd.graderaw) / 2;
+
     const calculateTarget = (target: number) => (target - regTerm * 0.6) / 0.4;
 
     const targets = [
