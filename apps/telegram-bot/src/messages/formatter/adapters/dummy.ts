@@ -1,7 +1,7 @@
-import type { UniversityConfig } from "./core/types";
-import { formatGradeItem, renderBlocks } from "./core/grades";
-import { formatDeadlinesList } from "./core/deadlines";
-import { formatCoursesList } from "./core/courses";
+import type { UniversityConfig } from "../core/types";
+import { formatGradeItem, renderBlocks } from "../core/grades";
+import { formatDeadlinesList } from "../core/deadlines";
+import { formatCoursesList } from "../core/courses";
 
 export const dummy: UniversityConfig = {
   name: "Dummy University",

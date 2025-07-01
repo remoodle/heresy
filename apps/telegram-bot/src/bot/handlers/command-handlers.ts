@@ -1,9 +1,9 @@
 import { Context } from "grammy";
+import { config } from "../../config";
 import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
+import { uni } from "../../messages";
 import type { RegistrationContext } from "..";
-import { config } from "../../config";
-import { uni } from "../../university";
 import { getMiniAppUrl } from "../utils";
 import { keyboards } from "./keyboards";
 

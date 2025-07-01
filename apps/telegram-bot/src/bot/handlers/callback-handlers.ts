@@ -1,10 +1,10 @@
 import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { formatTimestamp } from "@remoodle/utils";
-import { request, getAuthHeaders } from "../../library/hc";
-import { getMiniAppUrl } from "../utils";
-import { uni } from "../../university";
 import { config } from "../../config";
+import { request, getAuthHeaders } from "../../library/hc";
+import { uni } from "../../messages";
+import { getMiniAppUrl } from "../utils";
 import {
   getTelegramNotificationKey,
   getTelegramNotificationKeys,

@@ -1,8 +1,8 @@
 import type { MoodleGrade, MoodleCourse, MoodleEvent } from "@remoodle/types";
-import type { UniversityConfig, GradeBlock, CourseItem } from "./core/types";
-import { formatGradeItem, createSeparator, renderBlocks } from "./core/grades";
-import { formatDeadlinesList } from "./core/deadlines";
-import { formatCoursesList } from "./core/courses";
+import type { UniversityConfig, GradeBlock, CourseItem } from "../core/types";
+import { formatGradeItem, createSeparator, renderBlocks } from "../core/grades";
+import { formatDeadlinesList } from "../core/deadlines";
+import { formatCoursesList } from "../core/courses";
 
 export function parseCourseFullname(fullname: string) {
   const lastPipeIndex = fullname.lastIndexOf("|");
