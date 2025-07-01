@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.0.9](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.8...remoodle/telegram-bot-v2.0.9) (2025-07-01)
+
+
+### Bug Fixes
+
+* return og grades formatting ([018f3b2](https://github.com/remoodle/remoodle/commit/018f3b23c92df94d520c2eb989d894e57ce36746))
+
+
+### Miscellaneous Chores
+
+* remove unused import ([70927a6](https://github.com/remoodle/remoodle/commit/70927a64ac11fb192e213ed6da67428747474ede))
+
+
+### Code Refactoring
+
+* move things around message formatter ([918fe23](https://github.com/remoodle/remoodle/commit/918fe23acd21f891ddaf3bfcc11d53a2c6bd422d))
+* **tgbot:** unify notification settings mgmt ([3533048](https://github.com/remoodle/remoodle/commit/353304898d83e60f0c31cf4abd22dd0846ac2c03))
+* unify assignment message formatting logic ([c982d69](https://github.com/remoodle/remoodle/commit/c982d69b748a3486ff6564ccc93a1118d450a21c))
+
 ## [2.0.8](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.7...remoodle/telegram-bot-v2.0.8) (2025-06-24)
 
 
