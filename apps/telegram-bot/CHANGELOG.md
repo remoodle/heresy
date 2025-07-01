@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.10](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.9...remoodle/telegram-bot-v2.0.10) (2025-07-01)
+
+
+### Bug Fixes
+
+* unfuck total calculation (kinda) ([caad609](https://github.com/remoodle/remoodle/commit/caad609ccc33b163ee32de7fd710c7f23baa7002))
+
 ## [2.0.9](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.8...remoodle/telegram-bot-v2.0.9) (2025-07-01)
 
 
