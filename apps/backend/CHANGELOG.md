@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.20](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.19...remoodle/backend-v2.3.20) (2025-07-01)
+
+
+### Bug Fixes
+
+* infinite ratelimit in dev ([5ea741a](https://github.com/remoodle/remoodle/commit/5ea741aafdbeda9e4607f0aa6ec6cf8b3d2a150d))
+
 ## [2.3.19](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.18...remoodle/backend-v2.3.19) (2025-06-07)
 
 
