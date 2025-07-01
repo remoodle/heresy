@@ -1,3 +1,4 @@
+import { env } from "../../../config";
 import { rateLimiter } from "hono-rate-limiter";
 import { HTTPException } from "hono/http-exception";
 
@@ -5,7 +6,7 @@ type ConfigType = Parameters<typeof rateLimiter>[0];
 
 const defaultRules: ConfigType = {
   windowMs: 15 * 60 * 1000,
-  limit: 100,
+  limit: env.isDev ? Infinity : 1000,
   standardHeaders: "draft-6",
   keyGenerator: (c) => {
     const authHeader = c.req.header("Authorization");
