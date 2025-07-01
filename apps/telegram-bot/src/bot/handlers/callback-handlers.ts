@@ -2,10 +2,14 @@ import { InlineKeyboard, Context } from "grammy";
 import TurndownService from "turndown";
 import { formatTimestamp } from "@remoodle/utils";
 import { request, getAuthHeaders } from "../../library/hc";
-import { getNotificationsKeyboard, getMiniAppUrl } from "../utils";
-import keyboards from "./keyboards";
+import { getMiniAppUrl } from "../utils";
 import { uni } from "../../university";
 import { config } from "../../config";
+import {
+  getTelegramNotificationKey,
+  getTelegramNotificationKeys,
+} from "./notifications";
+import { keyboards, getNotificationsKeyboard } from "./keyboards";
 
 // Menu buttons
 async function others(ctx: Context) {
@@ -385,51 +389,9 @@ async function changeNotifications(ctx: Context) {
   }
 
   const userId = ctx.from.id;
-  const type = ctx.match[0].split("_")[2];
-  const value = ctx.match[0].split("_")[3];
 
-  const [account, accountError] = await request((client) =>
-    client.v2.user.settings.$get(
-      {},
-      {
-        headers: getAuthHeaders(userId),
-      },
-    ),
-  );
-
-  if (accountError) {
-    await ctx.editMessageText("An error occurred. Try again later.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "settings"),
-    });
-    return;
-  }
-
-  if (type === "telegram") {
-    account.settings.notifications["gradeUpdates::telegram"] =
-      value === "on" ? 1 : 0;
-    account.settings.notifications["deadlineReminders::telegram"] =
-      value === "on" ? 1 : 0;
-  } else if (type === "grades") {
-    account.settings.notifications["gradeUpdates::telegram"] =
-      value === "on" ? 1 : 0;
-  } else if (type === "deadlines") {
-    account.settings.notifications["deadlineReminders::telegram"] =
-      value === "on" ? 1 : 0;
-  } else {
-    return;
-  }
-
-  const [_, error] = await request((client) =>
-    client.v2.user.settings.$post(
-      {
-        json: {
-          settings: account.settings,
-        },
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
-    ),
+  const [account, error] = await request((client) =>
+    client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
   );
 
   if (error) {
@@ -439,16 +401,42 @@ async function changeNotifications(ctx: Context) {
     return;
   }
 
-  const [data, __] = await request((client) =>
-    client.v2.user.settings.$get(
-      {},
-      {
-        headers: getAuthHeaders(userId),
-      },
+  const [, , type, value] = ctx.match[0].split("_");
+
+  // Toggle all telegram notifications
+  if (type === "telegram") {
+    getTelegramNotificationKeys().forEach((key) => {
+      account.settings.notifications[key] = value === "on" ? 1 : 0;
+    });
+  } else {
+    const key = getTelegramNotificationKey(type);
+
+    if (key) {
+      account.settings.notifications[key] = value === "on" ? 1 : 0;
+    } else {
+      return; // Unknown notification type
+    }
+  }
+
+  const [_, settingsUpdateError] = await request((client) =>
+    client.v2.user.settings.$post(
+      { json: { settings: account.settings } },
+      { headers: getAuthHeaders(userId) },
     ),
   );
 
-  if (!data) {
+  if (settingsUpdateError) {
+    await ctx.editMessageText("Could not update settings. Try again later.", {
+      reply_markup: new InlineKeyboard().text("Back ←", "settings"),
+    });
+    return;
+  }
+
+  const [settings, settingsError] = await request((client) =>
+    client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
+  );
+
+  if (settingsError) {
     return;
   }
 
@@ -459,7 +447,10 @@ async function changeNotifications(ctx: Context) {
   );
 
   await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(data.settings.notifications, url),
+    reply_markup: getNotificationsKeyboard(
+      settings.settings.notifications,
+      url,
+    ),
   });
 }
 
@@ -801,7 +792,7 @@ async function clearMessage(ctx: Context) {
   await ctx.deleteMessage();
 }
 
-const callbacks = {
+export const callbacks = {
   menu: {
     others: others,
     settings: settings,
@@ -835,5 +826,3 @@ const callbacks = {
     clearMessage: clearMessage,
   },
 };
-
-export default callbacks;

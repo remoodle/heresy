@@ -1,6 +1,12 @@
 import { InlineKeyboard } from "grammy";
+import type { NotificationSettings } from "@remoodle/types";
+import {
+  NOTIFICATION_CONFIG,
+  getTelegramNotificationKey,
+  getTelegramNotificationKeys,
+} from "./notifications";
 
-const keyboards = {
+export const keyboards = {
   main: new InlineKeyboard()
     .text("Deadlines", "deadlines")
     .row()
@@ -48,4 +54,50 @@ const keyboards = {
   ),
 };
 
-export default keyboards;
+export const getNotificationsKeyboard = (
+  notificationSettings: NotificationSettings,
+  websiteUrl: string | false = false,
+) => {
+  const keyboard = new InlineKeyboard();
+
+  const telegramEnabled = getTelegramNotificationKeys().some((key) => {
+    return notificationSettings[key] === 1;
+  });
+
+  keyboard
+    .text(
+      `Telegram Notifications ${telegramEnabled ? "🔔" : "🔕"}`,
+      `change_notifications_telegram_${telegramEnabled ? "off" : "on"}`,
+    )
+    .row();
+
+  const notificationsPerRow = 2;
+
+  for (let i = 0; i < NOTIFICATION_CONFIG.length; i += notificationsPerRow) {
+    const row = NOTIFICATION_CONFIG.slice(i, i + notificationsPerRow);
+    const keyboardRow = keyboard.row();
+
+    row.forEach((notification) => {
+      const key = getTelegramNotificationKey(notification.key);
+
+      if (!key) {
+        return;
+      }
+
+      const isEnabled = notificationSettings[key] === 1;
+
+      keyboardRow.text(
+        `${notification.name} ${isEnabled ? "🔔" : "🔕"}`,
+        `change_notifications_${notification.key}_${isEnabled ? "off" : "on"}`,
+      );
+    });
+  }
+
+  if (websiteUrl) {
+    keyboard.row().webApp("Advanced settings", websiteUrl);
+  }
+
+  keyboard.row().text("Back ←", "settings");
+
+  return keyboard;
+};

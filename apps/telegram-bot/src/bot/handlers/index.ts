@@ -1,7 +1,7 @@
 import { Composer } from "grammy";
-import callbacks from "./callback-handlers";
-import { commands } from "./command-handlers";
 import type { RegistrationContext } from "..";
+import { callbacks } from "./callback-handlers";
+import { commands } from "./command-handlers";
 
 const commandsHandler = new Composer<RegistrationContext>();
 

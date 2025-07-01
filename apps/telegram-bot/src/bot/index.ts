@@ -12,6 +12,7 @@ export type RegistrationContext = Context & SessionFlavor<RegistrationSession>;
 
 export function createBot(token: string) {
   const bot = new Bot<RegistrationContext>(token);
+
   bot.use(session({ initial: (): RegistrationSession => ({ step: null }) }));
 
   bot.use(commandsHandler);

@@ -1,11 +1,11 @@
 import { Context } from "grammy";
 import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
-import keyboards from "./keyboards";
 import type { RegistrationContext } from "..";
 import { config } from "../../config";
 import { uni } from "../../university";
 import { getMiniAppUrl } from "../utils";
+import { keyboards } from "./keyboards";
 
 async function start(ctx: RegistrationContext) {
   if (!ctx.message || !ctx.message.text || !ctx.from || !ctx.chat) {
