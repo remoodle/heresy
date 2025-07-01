@@ -5,7 +5,7 @@ import type {
   MoodleAssignment,
 } from "@remoodle/types";
 import type { UniversityConfig, GradeBlock, CourseItem } from "../core/types";
-import { formatGradeItem, createSeparator, renderBlocks } from "../core/grades";
+import { formatGradeItem, renderBlocks } from "../core/grades";
 import { formatDeadlinesList } from "../core/deadlines";
 import { formatCoursesList } from "../core/courses";
 import { formatAssignmentDetails } from "../core/assignments";
