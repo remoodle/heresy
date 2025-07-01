@@ -1,6 +1,6 @@
 {
   "name": "@remoodle/telegram-bot",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/app.ts",
