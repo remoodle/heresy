@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.11](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.10...remoodle/telegram-bot-v2.0.11) (2025-07-01)
+
+
+### Miscellaneous Chores
+
+* refactor adapters ([a539047](https://github.com/remoodle/remoodle/commit/a539047656f2786705458bb883b71595b7d3e38b))
+
 ## [2.0.10](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.9...remoodle/telegram-bot-v2.0.10) (2025-07-01)
 
 
