@@ -2,7 +2,7 @@ import { Context } from "grammy";
 import { config } from "../../config";
 import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
-import { uni } from "../../messages";
+import { uni } from "../../adapters";
 import type { RegistrationContext } from "..";
 import { getMiniAppUrl } from "../utils";
 import { keyboards } from "./keyboards";

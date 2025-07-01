@@ -1,5 +1,5 @@
 import type { MoodleGrade } from "@remoodle/types";
-import type { GradeBlock } from "./types";
+import type { GradeBlock } from "../types";
 
 export const formatGradeItem = (grade: MoodleGrade): GradeBlock | null => {
   if (["category", "course"].includes(grade.itemtype)) {

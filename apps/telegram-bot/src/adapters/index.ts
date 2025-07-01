@@ -1,4 +1,8 @@
 import { config } from "../config";
-import { adapters } from "./formatter/adapters";
+import { aitu } from "./aitu";
+
+export const adapters = {
+  aitu,
+} as const;
 
 export const uni = adapters[config.uni];

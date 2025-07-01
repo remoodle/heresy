@@ -1,7 +1,7 @@
 import { InlineKeyboard, Context } from "grammy";
 import { config } from "../../config";
 import { request, getAuthHeaders } from "../../library/hc";
-import { uni } from "../../messages";
+import { uni } from "../../adapters";
 import { getMiniAppUrl } from "../utils";
 import {
   getTelegramNotificationKey,
