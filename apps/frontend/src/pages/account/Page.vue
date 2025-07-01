@@ -14,14 +14,6 @@ import AccountNotificationsPage from "./AccountNotifications.vue";
 const userStore = useUserStore();
 
 const route = useRoute();
-
-const { isPending, data: account } = useQuery({
-  queryKey: ["private", "account"],
-  queryFn: async () =>
-    await requestUnwrap((client) =>
-      client.v2.user.settings.$get({}, { headers: getAuthHeaders() }),
-    ),
-});
 </script>
 
 <template>
@@ -44,37 +36,41 @@ const { isPending, data: account } = useQuery({
         <aside class="lg:w-1/5">
           <AccountSidebar />
         </aside>
-        <div class="flex-1">
-          <template v-if="isPending">
-            <div class="flex flex-col gap-4">
-              <Skeleton class="h-12" />
-              <Skeleton class="h-6 w-1/2" />
-              <Skeleton class="h-6" />
-            </div>
-            <div class="py-6"></div>
-            <div class="flex flex-col gap-4">
-              <Skeleton class="h-12" />
-              <Skeleton class="h-6 w-1/3" />
-              <Skeleton class="h-6" />
-            </div>
-            <div class="py-6"></div>
-            <div class="flex flex-col gap-4">
-              <Skeleton class="h-6 w-1/4" />
-              <Skeleton class="h-6" />
-              <Skeleton class="h-12" />
-            </div>
+        <div v-if="!userStore.isPending" class="flex-1">
+          <template v-if="route.name === RouteName.AccountProfile">
+            <Suspense>
+              <AccountProfilePage />
+              <template #fallback>
+                <div>
+                  <div class="flex flex-col gap-4">
+                    <Skeleton class="h-12" />
+                    <Skeleton class="h-6 w-1/2" />
+                    <Skeleton class="h-6" />
+                  </div>
+                  <div class="py-6"></div>
+                  <div class="flex flex-col gap-4">
+                    <Skeleton class="h-12" />
+                    <Skeleton class="h-6 w-1/3" />
+                    <Skeleton class="h-6" />
+                  </div>
+                </div>
+              </template>
+            </Suspense>
           </template>
-          <template v-else-if="account">
-            <div class="space-y-6">
-              <template v-if="route.name === RouteName.AccountProfile">
-                <AccountProfilePage :account />
+          <template v-else-if="route.name === RouteName.AccountNotifications">
+            <Suspense>
+              <AccountNotificationsPage />
+              <template #fallback>
+                <div class="flex flex-col gap-4">
+                  <Skeleton class="h-12" />
+                  <Skeleton class="h-12" />
+                  <Skeleton class="h-12" />
+                  <Skeleton class="h-12" />
+                  <Skeleton class="h-6 w-1/3" />
+                  <Skeleton class="h-6" />
+                </div>
               </template>
-              <template
-                v-else-if="route.name === RouteName.AccountNotifications"
-              >
-                <AccountNotificationsPage :account />
-              </template>
-            </div>
+            </Suspense>
           </template>
         </div>
       </div>

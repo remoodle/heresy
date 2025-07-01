@@ -65,15 +65,18 @@ export const useUserStore = defineStore("user", () => {
     posthog.reset();
   };
 
-  const { data, error } = useQuery({
-    queryKey: ["private", "check"],
-    queryFn: async () =>
-      await requestUnwrap((client) =>
-        client.v2.user.check.$get(
-          {},
-          { headers: getAuthHeaders(accessToken.value) },
-        ),
+  const getUser = async (): Promise<IUser> => {
+    return await requestUnwrap((client) =>
+      client.v2.user.check.$get(
+        {},
+        { headers: getAuthHeaders(accessToken.value) },
       ),
+    );
+  };
+
+  const { data, error, isPending } = useQuery({
+    queryKey: ["private", "user"],
+    queryFn: async () => await getUser(),
     enabled: authorized,
   });
 
@@ -91,6 +94,7 @@ export const useUserStore = defineStore("user", () => {
 
   return {
     user,
+    isPending,
     accessToken,
     refreshToken,
     authorized,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, defineAsyncComponent } from "vue";
-import { useMutation } from "@tanstack/vue-query";
+import { ref, computed, watchEffect, defineAsyncComponent } from "vue";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/vue-query";
 import { useUserStore } from "@/shared/stores/user";
 import {
   Dialog,
@@ -19,6 +19,7 @@ import { isEmptyString } from "@/shared/lib/helpers";
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 import { useToast } from "@/shared/ui/toast";
 import { features } from "@/shared/config/features";
+import type { IUser } from "@remoodle/types";
 
 const AccountDeletion = defineAsyncComponent(
   () => import("./ui/AccountDeletion.vue"),
@@ -28,16 +29,19 @@ const { toast } = useToast();
 
 const userStore = useUserStore();
 
-const props = defineProps<{
-  account: {
-    hasPassword: boolean;
-    handle: string;
-    name: string;
-  };
-}>();
+const { data: account, suspense } = useQuery({
+  queryKey: ["private", "user", "settings"],
+  queryFn: async () =>
+    await requestUnwrap((client) =>
+      client.v2.user.settings.$get({}, { headers: getAuthHeaders() }),
+    ),
+});
 
-const initialHandle = ref(props.account.handle || "");
-const handle = ref<string>(`${initialHandle.value}`);
+const handle = ref("");
+
+watchEffect(() => {
+  handle.value = userStore.user?.handle ?? "";
+});
 
 const MAX_HANDLE_LENGTH = 20;
 const canUpdateHandle = computed(() => {
@@ -50,24 +54,27 @@ const canUpdateHandle = computed(() => {
   return (
     !handle.value.match(USERNAME_REGEX) ||
     isEmptyString(handle.value) ||
-    handle.value === initialHandle.value
+    handle.value === userStore.user?.handle
   );
 });
 
+const queryClient = useQueryClient();
+
 const { mutate: updateHandle, isPending: updatingHandle } = useMutation({
-  mutationFn: async () =>
+  mutationFn: async (handle: string) =>
     requestUnwrap((client) =>
       client.v2.user.settings.$post(
-        { json: { handle: handle.value } },
+        { json: { handle } },
         { headers: getAuthHeaders() },
       ),
     ),
-  onSuccess: () => {
-    initialHandle.value = handle.value;
-
-    if (userStore.user) {
-      userStore.user.handle = handle.value;
-    }
+  onSuccess: (data, variables) => {
+    queryClient.setQueryData(["private", "user"], (old: IUser) => {
+      return {
+        ...old,
+        handle: variables,
+      };
+    });
   },
   onError: (error) => {
     toast({
@@ -75,8 +82,6 @@ const { mutate: updateHandle, isPending: updatingHandle } = useMutation({
     });
   },
 });
-
-const hasPassword = ref(props.account.hasPassword);
 
 const showPasswordDialog = ref(false);
 const currentPassword = ref<string>("");
@@ -107,7 +112,16 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
     resetPasswordFields();
 
     showPasswordDialog.value = false;
-    hasPassword.value = true;
+
+    queryClient.setQueryData(
+      ["private", "user", "settings"],
+      (old: Record<string, unknown>) => {
+        return {
+          ...old,
+          hasPassword: true,
+        };
+      },
+    );
 
     toast({
       title: "Password updated",
@@ -119,93 +133,97 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
     });
   },
 });
+
+await suspense();
 </script>
 
 <template>
-  <div>
-    <h1 class="text-xl font-medium">Profile</h1>
-    <p class="text-muted-foreground text-sm">Account information</p>
-  </div>
-  <Separator />
-  <form @submit.prevent="updateHandle()">
-    <div class="grid gap-2">
-      <Label for="name">Handle</Label>
-      <Input
-        id="name"
-        v-model="handle"
-        placeholder="user-177"
-        type="string"
-        auto-capitalize="none"
-        auto-correct="off"
-        :maxlength="MAX_HANDLE_LENGTH"
-        :disabled="updatingHandle"
-        required
-      />
-    </div>
-    <div class="py-2"></div>
-    <Button type="submit" :disabled="canUpdateHandle">Save</Button>
-  </form>
-
-  <Separator />
-
-  <div class="grid gap-2">
-    <Label for="password">Password</Label>
+  <section class="space-y-6">
     <div>
-      <Dialog
-        v-model:open="showPasswordDialog"
-        @update:open="
-          (value) => {
-            if (!value) {
-              resetPasswordFields();
-            }
-          }
-        "
-      >
-        <DialogTrigger>
-          <Button variant="outline">
-            {{ hasPassword ? "Change" : "Set" }} password
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {{ hasPassword ? "Change" : "Set" }} password
-            </DialogTitle>
-            <DialogDescription>
-              <p v-if="!hasPassword" class="break-words">
-                for <strong>{{ account.handle }}</strong>
-              </p>
-            </DialogDescription>
-          </DialogHeader>
-
-          <form class="space-y-6" @submit.prevent="updatePassword()">
-            <div class="grid gap-2">
-              <Label for="user_new_password">New password</Label>
-              <Input
-                id="user_new_password"
-                v-model="newPassword"
-                placeholder="••••••••••••"
-                type="password"
-                passwordrules="minlength: 15; allowed: unicode;"
-                autocomplete="off"
-                spellcheck="false"
-                :disabled="updatingPassword"
-                required
-              />
-            </div>
-
-            <DialogFooter class="sm:justify-start">
-              <Button type="submit" :disabled="canUpdatePassword">
-                Save changes
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <h1 class="text-xl font-medium">Profile</h1>
+      <p class="text-muted-foreground text-sm">Account information</p>
     </div>
-  </div>
+    <Separator />
+    <form @submit.prevent="updateHandle(handle)">
+      <div class="grid gap-2">
+        <Label for="name">Handle</Label>
+        <Input
+          id="name"
+          v-model="handle"
+          placeholder="user-177"
+          type="string"
+          auto-capitalize="none"
+          auto-correct="off"
+          :maxlength="MAX_HANDLE_LENGTH"
+          :disabled="updatingHandle"
+          required
+        />
+      </div>
+      <div class="py-2"></div>
+      <Button type="submit" :disabled="canUpdateHandle">Save</Button>
+    </form>
 
-  <Separator />
+    <Separator />
 
-  <AccountDeletion v-if="features.enableAccountDeletion" />
+    <div v-if="account" class="grid gap-2">
+      <Label for="password">Password</Label>
+      <div>
+        <Dialog
+          v-model:open="showPasswordDialog"
+          @update:open="
+            (value) => {
+              if (!value) {
+                resetPasswordFields();
+              }
+            }
+          "
+        >
+          <DialogTrigger>
+            <Button variant="outline">
+              {{ account.hasPassword ? "Change" : "Set" }} password
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {{ account.hasPassword ? "Change" : "Set" }} password
+              </DialogTitle>
+              <DialogDescription>
+                <p v-if="!account.hasPassword" class="break-words">
+                  for <strong>{{ userStore.user?.handle }}</strong>
+                </p>
+              </DialogDescription>
+            </DialogHeader>
+
+            <form class="space-y-6" @submit.prevent="updatePassword()">
+              <div class="grid gap-2">
+                <Label for="user_new_password">New password</Label>
+                <Input
+                  id="user_new_password"
+                  v-model="newPassword"
+                  placeholder="••••••••••••"
+                  type="password"
+                  passwordrules="minlength: 15; allowed: unicode;"
+                  autocomplete="off"
+                  spellcheck="false"
+                  :disabled="updatingPassword"
+                  required
+                />
+              </div>
+
+              <DialogFooter class="sm:justify-start">
+                <Button type="submit" :disabled="canUpdatePassword">
+                  Save changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+
+    <Separator />
+
+    <AccountDeletion v-if="features.enableAccountDeletion" />
+  </section>
 </template>

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { useMutation } from "@tanstack/vue-query";
+import { ref, toRaw, watch, watchEffect } from "vue";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/vue-query";
 import type { UserSettings } from "@remoodle/types";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
@@ -28,22 +28,28 @@ import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 import { useUserStore } from "@/shared/stores/user";
 import { TELEGRAM_BOT_URL } from "@/shared/config";
 
-const props = defineProps<{
-  account: {
-    telegramId?: number;
-    settings: UserSettings;
-  };
-}>();
+const { data: account, suspense } = useQuery({
+  queryKey: ["private", "user", "settings"],
+  queryFn: async () =>
+    await requestUnwrap((client) =>
+      client.v2.user.settings.$get({}, { headers: getAuthHeaders() }),
+    ),
+});
+
+const queryClient = useQueryClient();
 
 const { toast } = useToast();
 
 const userStore = useUserStore();
 
-const settings = ref<UserSettings>(
-  JSON.parse(JSON.stringify(props.account.settings)),
-);
+const settings = ref<UserSettings>();
 
-const telegramId = ref<number | undefined>(props.account?.telegramId);
+watchEffect(() => {
+  if (account.value) {
+    settings.value = structuredClone(toRaw(account.value.settings));
+  }
+});
+
 const otp = ref<string>("");
 const showOtpModal = ref(false);
 
@@ -65,7 +71,15 @@ const { mutate: verifyOtp, isPending: verifying } = useMutation({
     showOtpModal.value = false;
     otp.value = "";
 
-    telegramId.value = parseInt(data.telegramId);
+    queryClient.setQueryData(
+      ["private", "user", "settings"],
+      (old: Record<string, unknown>) => {
+        return {
+          ...old,
+          telegramId: data.telegramId,
+        };
+      },
+    );
 
     userStore.closeTelegramBanner();
 
@@ -85,11 +99,7 @@ const { mutate: updateNotifications, isPending: updatingNotifications } =
     mutationFn: async (settings: UserSettings) =>
       requestUnwrap((client) =>
         client.v2.user.settings.$post(
-          {
-            json: {
-              settings,
-            },
-          },
+          { json: { settings } },
           { headers: getAuthHeaders() },
         ),
       ),
@@ -103,7 +113,9 @@ const { mutate: updateNotifications, isPending: updatingNotifications } =
 watch(
   settings,
   (value) => {
-    updateNotifications(value);
+    if (value) {
+      updateNotifications(value);
+    }
   },
   { deep: true },
 );
@@ -118,149 +130,154 @@ const AVAILABLE_THRESHOLDS = [
   "3 days",
   "4 days",
 ];
+
+await suspense();
 </script>
 
 <template>
-  <div>
-    <h1 class="text-xl font-medium">Notifications</h1>
-    <p class="text-muted-foreground text-sm">
-      Configure how you receive notifications
-    </p>
-  </div>
-  <Separator />
-
-  <section>
-    <Table class="max-w-2xl">
-      <TableHeader>
-        <TableRow>
-          <TableHead class="w-[420px]"> </TableHead>
-          <TableHead class="text-right"> Telegram </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableRow>
-          <TableCell class="font-medium"> 📘 Updated grades </TableCell>
-          <TableCell class="text-right">
-            <Switch
-              :model-value="
-                !telegramId
-                  ? false
-                  : settings.notifications['gradeUpdates::telegram'] === 1
-              "
-              :disabled="!telegramId || updatingNotifications"
-              @update:model-value="
-                (value) =>
-                  (settings.notifications['gradeUpdates::telegram'] = value
-                    ? 1
-                    : 0)
-              "
-            />
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell class="font-medium">
-            🔔 Upcoming deadlines
-
-            <div
-              class="mt-5 grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
-            >
-              <template
-                v-for="threshold in AVAILABLE_THRESHOLDS"
-                :key="threshold"
-              >
-                <div class="flex flex-col gap-4">
-                  <div class="flex items-center space-x-2">
-                    <Checkbox
-                      :id="threshold"
-                      :model-value="
-                        telegramId
-                          ? settings.deadlineReminders.thresholds.includes(
-                              threshold,
-                            )
-                          : false
-                      "
-                      :disabled="
-                        !telegramId ||
-                        updatingNotifications ||
-                        settings.notifications[
-                          'deadlineReminders::telegram'
-                        ] === 0
-                      "
-                      @update:model-value="
-                        (value) =>
-                          (settings.deadlineReminders.thresholds = value
-                            ? [
-                                ...settings.deadlineReminders.thresholds,
-                                threshold,
-                              ]
-                            : settings.deadlineReminders.thresholds.filter(
-                                (t) => t !== threshold,
-                              ))
-                      "
-                    />
-                    <label
-                      :for="threshold"
-                      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
-                      {{ threshold }}
-                    </label>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </TableCell>
-          <TableCell class="text-right">
-            <Switch
-              :model-value="
-                !telegramId
-                  ? false
-                  : settings.notifications['deadlineReminders::telegram'] === 1
-              "
-              :disabled="!telegramId || updatingNotifications"
-              @update:model-value="
-                (value) =>
-                  (settings.notifications['deadlineReminders::telegram'] = value
-                    ? 1
-                    : 0)
-              "
-            />
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  </section>
-
-  <div class="max-w-sm">
+  <section class="space-y-6">
     <div>
-      <div class="text-muted-foreground mb-2">
-        Telegram ID: <strong>{{ telegramId || "not connected" }}</strong>
-      </div>
-      <Dialog v-model:open="showOtpModal">
-        <DialogTrigger as-child>
-          <Button size="sm" @click="connect">
-            {{ telegramId ? "Change Telegram" : "Connect Telegram" }}
-          </Button>
-        </DialogTrigger>
-        <DialogContent class="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Enter OTP </DialogTitle>
-            <DialogDescription>
-              It was sent to your Telegram account
-            </DialogDescription>
-          </DialogHeader>
-
-          <form @submit.prevent="verifyOtp()">
-            <div class="flex max-w-sm items-center gap-2">
-              <Input
-                v-model="otp"
-                :disabled="verifying"
-                placeholder="Telegram OTP"
-              />
-              <Button type="submit" :disabled="verifying"> Verify </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <h1 class="text-xl font-medium">Notifications</h1>
+      <p class="text-muted-foreground text-sm">
+        Configure how you receive notifications
+      </p>
     </div>
-  </div>
+    <Separator />
+
+    <section v-if="account && settings">
+      <Table class="max-w-2xl">
+        <TableHeader>
+          <TableRow>
+            <TableHead class="w-[420px]"> </TableHead>
+            <TableHead class="text-right"> Telegram </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell class="font-medium"> 📘 Updated grades </TableCell>
+            <TableCell class="text-right">
+              <Switch
+                :model-value="
+                  !account.telegramId
+                    ? false
+                    : settings.notifications['gradeUpdates::telegram'] === 1
+                "
+                :disabled="!account.telegramId || updatingNotifications"
+                @update:model-value="
+                  (value) =>
+                    (settings!.notifications['gradeUpdates::telegram'] = value
+                      ? 1
+                      : 0)
+                "
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell class="font-medium">
+              🔔 Upcoming deadlines
+
+              <div
+                class="mt-5 grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
+              >
+                <template
+                  v-for="threshold in AVAILABLE_THRESHOLDS"
+                  :key="threshold"
+                >
+                  <div class="flex flex-col gap-4">
+                    <div class="flex items-center space-x-2">
+                      <Checkbox
+                        :id="threshold"
+                        :model-value="
+                          account.telegramId
+                            ? settings.deadlineReminders.thresholds.includes(
+                                threshold,
+                              )
+                            : false
+                        "
+                        :disabled="
+                          !account.telegramId ||
+                          updatingNotifications ||
+                          settings.notifications[
+                            'deadlineReminders::telegram'
+                          ] === 0
+                        "
+                        @update:model-value="
+                          (value) =>
+                            (settings!.deadlineReminders.thresholds = value
+                              ? [
+                                  ...settings!.deadlineReminders.thresholds,
+                                  threshold,
+                                ]
+                              : settings!.deadlineReminders.thresholds.filter(
+                                  (t) => t !== threshold,
+                                ))
+                        "
+                      />
+                      <label
+                        :for="threshold"
+                        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        {{ threshold }}
+                      </label>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </TableCell>
+            <TableCell class="text-right">
+              <Switch
+                :model-value="
+                  !account.telegramId
+                    ? false
+                    : settings.notifications['deadlineReminders::telegram'] ===
+                      1
+                "
+                :disabled="!account.telegramId || updatingNotifications"
+                @update:model-value="
+                  (value) =>
+                    (settings!.notifications['deadlineReminders::telegram'] =
+                      value ? 1 : 0)
+                "
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </section>
+
+    <div v-if="account" class="max-w-sm">
+      <div>
+        <div class="text-muted-foreground mb-2">
+          Telegram ID:
+          <strong>{{ account.telegramId || "not connected" }}</strong>
+        </div>
+        <Dialog v-model:open="showOtpModal">
+          <DialogTrigger as-child>
+            <Button size="sm" @click="connect">
+              {{ account.telegramId ? "Change Telegram" : "Connect Telegram" }}
+            </Button>
+          </DialogTrigger>
+          <DialogContent class="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Enter OTP </DialogTitle>
+              <DialogDescription>
+                It was sent to your Telegram account
+              </DialogDescription>
+            </DialogHeader>
+
+            <form @submit.prevent="verifyOtp()">
+              <div class="flex max-w-sm items-center gap-2">
+                <Input
+                  v-model="otp"
+                  :disabled="verifying"
+                  placeholder="Telegram OTP"
+                />
+                <Button type="submit" :disabled="verifying"> Verify </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  </section>
 </template>

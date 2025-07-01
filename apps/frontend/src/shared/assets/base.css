@@ -126,3 +126,10 @@ html.dark {
 html.light {
   color-scheme: light;
 }
+
+body {
+  /* keep scroll always visible to prevent layout shifts */
+  overflow-y: scroll;
+  /* https://github.com/unovue/reka-ui/issues/1540 */
+  pointer-events: auto !important;
+}
