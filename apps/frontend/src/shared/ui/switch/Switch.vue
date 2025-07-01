@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { HTMLAttributes } from "vue";
+import { reactiveOmit } from "@vueuse/core";
 import {
   SwitchRoot,
   type SwitchRootEmits,
@@ -8,28 +10,37 @@ import {
 } from "reka-ui";
 import { cn } from "@/shared/ui/utils";
 
-const props = defineProps<SwitchRootProps & { class?: string }>();
+const props = defineProps<
+  SwitchRootProps & { class?: HTMLAttributes["class"] }
+>();
+
 const emits = defineEmits<SwitchRootEmits>();
 
-const forwarded = useForwardPropsEmits(props, emits);
+const delegatedProps = reactiveOmit(props, "class");
+
+const forwarded = useForwardPropsEmits(delegatedProps, emits);
 </script>
 
 <template>
   <SwitchRoot
+    data-slot="switch"
     v-bind="forwarded"
     :class="
       cn(
-        'focus-visible:ring-ring focus-visible:ring-offset-background data-[state=checked]:bg-primary data-[state=unchecked]:bg-input peer inline-flex h-[24px] w-[44px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        'data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:border-ring focus-visible:ring-ring/50 dark:data-[state=unchecked]:bg-input/80 shadow-xs peer inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent outline-none transition-all focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50',
         props.class,
       )
     "
   >
     <SwitchThumb
+      data-slot="switch-thumb"
       :class="
         cn(
-          'bg-background pointer-events-none block h-5 w-5 rounded-full shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0',
+          'bg-background dark:data-[state=unchecked]:bg-foreground dark:data-[state=checked]:bg-primary-foreground pointer-events-none block size-4 rounded-full ring-0 transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0',
         )
       "
-    />
+    >
+      <slot name="thumb" />
+    </SwitchThumb>
   </SwitchRoot>
 </template>

@@ -18,6 +18,7 @@
     "@radix-icons/vue": "^1.0.0",
     "@remoodle/utils": "workspace:*",
     "@tanstack/vue-query": "^5.80.6",
+    "@tanstack/vue-table": "^8.21.3",
     "@vueuse/core": "^13.3.0",
     "@vueuse/router": "^13.3.0",
     "class-variance-authority": "^0.7.1",

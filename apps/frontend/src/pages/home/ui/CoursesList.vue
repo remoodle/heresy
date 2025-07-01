@@ -67,7 +67,7 @@ watchEffect(() => {
         v-model="toggledCourseCategories"
         class="flex flex-wrap items-start justify-start"
         type="multiple"
-        variant="primary"
+        variant="outline"
       >
         <ToggleGroupItem
           v-for="category in courseCategories"

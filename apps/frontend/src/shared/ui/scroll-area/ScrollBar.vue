@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { type HTMLAttributes, computed } from "vue";
+import type { HTMLAttributes } from "vue";
+import { reactiveOmit } from "@vueuse/core";
 import {
   ScrollAreaScrollbar,
   type ScrollAreaScrollbarProps,
@@ -14,27 +15,27 @@ const props = withDefaults(
   },
 );
 
-const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
-
-  return delegated;
-});
+const delegatedProps = reactiveOmit(props, "class");
 </script>
 
 <template>
   <ScrollAreaScrollbar
+    data-slot="scroll-area-scrollbar"
     v-bind="delegatedProps"
     :class="
       cn(
-        'flex touch-none select-none transition-colors',
+        'flex touch-none select-none p-px transition-colors',
         orientation === 'vertical' &&
-          'h-full w-2.5 border-l border-l-transparent p-px',
+          'h-full w-2.5 border-l border-l-transparent',
         orientation === 'horizontal' &&
-          'h-2.5 flex-col border-t border-t-transparent p-px',
+          'h-2.5 flex-col border-t border-t-transparent',
         props.class,
       )
     "
   >
-    <ScrollAreaThumb class="bg-border relative flex-1 rounded-full" />
+    <ScrollAreaThumb
+      data-slot="scroll-area-thumb"
+      class="bg-border relative flex-1 rounded-full"
+    />
   </ScrollAreaScrollbar>
 </template>
