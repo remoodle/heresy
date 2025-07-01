@@ -1,4 +1,9 @@
-import type { MoodleGrade, MoodleEvent, MoodleCourse } from "@remoodle/types";
+import type {
+  MoodleGrade,
+  MoodleEvent,
+  MoodleCourse,
+  MoodleAssignment,
+} from "@remoodle/types";
 
 export type UniversityConfig = {
   name: string;
@@ -12,6 +17,11 @@ export type UniversityConfig = {
     short?: false | number,
   ) => string;
   getCoursesMessage: (courses: MoodleCourse[]) => CourseItem[];
+  getAssignmentMessage: (
+    assignment: MoodleAssignment,
+    course: MoodleCourse,
+    grades?: MoodleGrade[],
+  ) => string;
 };
 
 export type GradeBlock = {

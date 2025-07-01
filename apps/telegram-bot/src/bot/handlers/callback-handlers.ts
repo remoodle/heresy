@@ -1,6 +1,4 @@
 import { InlineKeyboard, Context } from "grammy";
-import TurndownService from "turndown";
-import { formatTimestamp } from "@remoodle/utils";
 import { config } from "../../config";
 import { request, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../messages";
@@ -660,8 +658,9 @@ async function courseAssignmentById(ctx: Context) {
   }
 
   const userId = ctx.from.id;
-  const courseId = ctx.match[0].split("_")[1];
-  const assignmentId = parseInt(ctx.match[0].split("_")[2]);
+
+  const [, courseId, assignmentIdStr] = ctx.match[0].split("_");
+
   const keyboardBack = new InlineKeyboard().text(
     "Back ←",
     `course_assignments_${courseId}`,
@@ -669,17 +668,8 @@ async function courseAssignmentById(ctx: Context) {
 
   const [course, courseError] = await request((client) =>
     client.v2.course[":courseId"].$get(
-      {
-        param: {
-          courseId: courseId,
-        },
-        query: {
-          content: "0",
-        },
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
+      { param: { courseId: courseId }, query: { content: "0" } },
+      { headers: getAuthHeaders(userId) },
     ),
   );
 
@@ -692,14 +682,8 @@ async function courseAssignmentById(ctx: Context) {
 
   const [grades, gradesError] = await request((client) =>
     client.v2.course[":courseId"].grades.$get(
-      {
-        param: {
-          courseId: courseId,
-        },
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
+      { param: { courseId: courseId } },
+      { headers: getAuthHeaders(userId) },
     ),
   );
 
@@ -712,74 +696,32 @@ async function courseAssignmentById(ctx: Context) {
 
   const [assignments, assignmentsError] = await request((client) =>
     client.v2.course[":courseId"].assignments.$get(
-      {
-        param: {
-          courseId: courseId,
-        },
-      },
-      {
-        headers: getAuthHeaders(userId),
-      },
+      { param: { courseId: courseId } },
+      { headers: getAuthHeaders(userId) },
     ),
   );
 
-  if (assignmentsError && assignmentsError.status === 404) {
-    await ctx.editMessageText("Assignments were not found.", {
+  if (assignmentsError) {
+    await ctx.editMessageText("Assignments are not available.", {
       reply_markup: keyboardBack,
     });
     return;
   }
 
-  if (assignmentsError && assignmentsError.status === 401) {
-    await ctx.editMessageText("You are not connected to ReMoodle.", {
-      reply_markup: keyboardBack,
-    });
-    return;
-  }
-
-  if (!assignments) {
-    await ctx.editMessageText("Assignment is not available.", {
-      reply_markup: keyboardBack,
-    });
-    return;
-  }
+  const assignmentId = parseInt(assignmentIdStr);
 
   const assignment = assignments.find(
     (assignment) => assignment.id === assignmentId,
   );
 
-  if (!assignment || !assignmentId) {
+  if (!assignment) {
     await ctx.editMessageText("Assignment is not available.", {
       reply_markup: keyboardBack,
     });
     return;
   }
 
-  let text = `*${assignment.name}*\n`;
-  text += `*${course.fullname}*\n\n`;
-
-  if (assignment.duedate && assignment.allowsubmissionsfromdate) {
-    text += `*Opened:* ${formatTimestamp(assignment.allowsubmissionsfromdate * 1000, { year: "numeric" })}\n`;
-    text += `*Due:* ${formatTimestamp(assignment.duedate * 1000, { year: "numeric" })};\n`;
-  }
-
-  const grade = grades.find((g) => g.iteminstance === assignmentId);
-
-  if (grade) {
-    text += `*Grade:* ${grade.gradeformatted}%\n`;
-  }
-
-  if (assignment.intro) {
-    const turndownService = new TurndownService();
-    turndownService.remove(["script", "img", "iframe"]);
-    const markdownIntro = turndownService.turndown(assignment.intro);
-
-    if (assignment.intro.length > 700) {
-      text += `\n${markdownIntro.slice(0, 700)}...\n\n`;
-    } else {
-      text += `\n${markdownIntro}\n\n`;
-    }
-  }
+  const text = uni.getAssignmentMessage(assignment, course, grades);
 
   return await ctx.editMessageText(text, {
     reply_markup: keyboardBack,

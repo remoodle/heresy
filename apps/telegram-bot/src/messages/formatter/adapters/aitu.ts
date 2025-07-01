@@ -1,8 +1,14 @@
-import type { MoodleGrade, MoodleCourse, MoodleEvent } from "@remoodle/types";
+import type {
+  MoodleGrade,
+  MoodleCourse,
+  MoodleEvent,
+  MoodleAssignment,
+} from "@remoodle/types";
 import type { UniversityConfig, GradeBlock, CourseItem } from "../core/types";
 import { formatGradeItem, createSeparator, renderBlocks } from "../core/grades";
 import { formatDeadlinesList } from "../core/deadlines";
 import { formatCoursesList } from "../core/courses";
+import { formatAssignmentDetails } from "../core/assignments";
 
 export function parseCourseFullname(fullname: string) {
   const lastPipeIndex = fullname.lastIndexOf("|");
@@ -64,10 +70,15 @@ const calculateTotalGrades = (grades: MoodleGrade[]): GradeBlock[] => {
         : totalGrade;
 
     let statusText = "";
-    if (total >= 90) statusText = "High scholarship 🎉🎉";
-    else if (total >= 70) statusText = "Scholarship 🎉";
-    else if (total >= 50) statusText = "No scholarship 😭";
-    else statusText = "Retake 💀";
+    if (total >= 90) {
+      statusText = "High scholarship 🎉🎉";
+    } else if (total >= 70) {
+      statusText = "Scholarship 🎉";
+    } else if (total >= 50) {
+      statusText = "No scholarship 😭";
+    } else {
+      statusText = "Retake 💀";
+    }
 
     blocks.push({
       type: "calculation",
@@ -165,5 +176,13 @@ export const aitu: UniversityConfig = {
       },
       fireThresholdHours: 3,
     });
+  },
+
+  getAssignmentMessage: (
+    assignment: MoodleAssignment,
+    course: MoodleCourse,
+    grades?: MoodleGrade[],
+  ): string => {
+    return formatAssignmentDetails(assignment, course, grades);
   },
 };
