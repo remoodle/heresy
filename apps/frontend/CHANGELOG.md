@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.17...remoodle/frontend-v1.10.0) (2025-07-01)
+
+
+### Features
+
+* **ui:** upgrade ui ([9035689](https://github.com/remoodle/remoodle/commit/9035689fa6e60b447d5eb2c65721883b739d1e5f))
+
+
+### Code Refactoring
+
+* change data flow in settings ([9227dd9](https://github.com/remoodle/remoodle/commit/9227dd9e9a39641daca57364079f1932dd27ca3a))
+
 ## [1.9.17](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.16...remoodle/frontend-v1.9.17) (2025-06-24)
 
 
