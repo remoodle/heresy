@@ -1,4 +1,4 @@
-import { Composer } from "grammy";
+import { Composer, InlineKeyboard } from "grammy";
 import { config } from "../../config";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
@@ -8,20 +8,24 @@ const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
+const DOCS = "https://ext.remoodle.app/docs";
+const PRIVACY_POLICY = "https://ext.remoodle.app/privacy-policy";
+const CREATORS = "https://ext.remoodle.app/creators";
+const REPO = "https://github.com/remoodle/remoodle";
+
 const ABOUT_MESSAGE = `
-Bot Adapter: \`${uni.name}\`
-Bot Version:  \`${config.version}\`
-Source Code: https://github\\.com/remoodle/remoodle 
+<b>Bot Adapter:</b> ${uni.name}
+<b>Bot Version:</b> ${config.version}
+<b>Source Code:</b> <a href="${REPO}">${REPO}</a>
 
-💬\\ **Community Chat**: @remoodle 
+💬 <b>Community Chat:</b> @remoodle
 
-🫰\\ **Help us**: <3 @donateremoodle 
+🫰 <b>Help us:</b> &lt;3 @donateremoodle
 
-💁‍♂️\\ **More**: [Docs](https://ext\\.remoodle\\.app/docs) \\| [Privacy Policy](https://ext\\.remoodle\\.app/privacy\\-policy) \\| [Creators](https://remoodle.notion.site/Creators-1e4b62ac705f8034a7dac79161fd97ed)
-`;
+💁‍♂️ <b>More:</b> <a href="${DOCS}">Docs</a> | <a href="${PRIVACY_POLICY}">Privacy Policy</a> | <a href="${CREATORS}">Creators</a>`;
 
 const ABOUT_MESSAGE_OPTIONS = {
-  parse_mode: "MarkdownV2" as const,
+  parse_mode: "HTML" as const,
   reply_markup: createBackToMenuKeyboard(),
   link_preview_options: { is_disabled: true },
 };
