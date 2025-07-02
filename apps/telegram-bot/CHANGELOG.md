@@ -1,5 +1,32 @@
 # Changelog
 
+## [2.1.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.11...remoodle/telegram-bot-v2.1.0) (2025-07-02)
+
+
+### Features
+
+* **tgbot:** introduce logging setup ([5a8dc7d](https://github.com/remoodle/remoodle/commit/5a8dc7d85e127d67dd5d7e3a1e4477f1fb6ec208))
+
+
+### Bug Fixes
+
+* support group and supergroup ([d858bee](https://github.com/remoodle/remoodle/commit/d858beed719dac8d56994e7e10000e52a0f3d239))
+
+
+### Miscellaneous Chores
+
+* cleanup ([4d34c2a](https://github.com/remoodle/remoodle/commit/4d34c2a7954a84f43a57a32cfd31547de023c118))
+
+
+### Code Refactoring
+
+* **about:** change message template ([0bbdedb](https://github.com/remoodle/remoodle/commit/0bbdedbaca4235b5d66ddb260166d018ef67a4ba))
+* define context ([3b49744](https://github.com/remoodle/remoodle/commit/3b4974402b2315daf5f321f9b7a1f23dfbda85bf))
+* overhaul tgbot architecture ([c94032b](https://github.com/remoodle/remoodle/commit/c94032b08b12c032fc0c6bd76bd4e77648a97ac1))
+* **tgbot:** introduce callback-data ([cd6bc1f](https://github.com/remoodle/remoodle/commit/cd6bc1f22336b87b33387bb4891288ff8edc6b33))
+* **tgbot:** split features and keyboards ([19bfd8a](https://github.com/remoodle/remoodle/commit/19bfd8afadeb9e7c4f208a334777b98c33e94e04))
+* use type-safe callbacks everywhere ([1ded6d0](https://github.com/remoodle/remoodle/commit/1ded6d04a29d157c4369deb087d9e839b3adb39f))
+
 ## [2.0.11](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.10...remoodle/telegram-bot-v2.0.11) (2025-07-01)
 
 
