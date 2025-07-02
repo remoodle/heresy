@@ -1,12 +1,22 @@
-import { Composer } from "grammy";
-import { requestUnwrap, getAuthHeaders } from "../../../library/hc";
-import { uni } from "../../../adapters";
-import type { Context } from "../../context";
-import { keyboards } from "../../keyboards";
+import { Composer, InlineKeyboard } from "grammy";
+import { requestUnwrap, getAuthHeaders } from "../../library/hc";
+import { uni } from "../../adapters";
+import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType(["private", "group", "supergroup"]);
+
+const keyboards = {
+  deadlines: new InlineKeyboard()
+    .text("Back ←", "back_to_menu")
+    .text("Refresh", "refresh_deadlines_menu"),
+
+  singleDeadline: new InlineKeyboard().text(
+    "Refresh",
+    "refresh_deadlines_single",
+  ),
+};
 
 feature.command(["deadlines", "ds"], async (ctx) => {
   const isShort = ctx.message.text.startsWith("/ds");

@@ -1,7 +1,7 @@
 import { Composer, InlineKeyboard } from "grammy";
-import type { Context } from "../../context";
-import { request, requestUnwrap, getAuthHeaders } from "../../../library/hc";
-import { uni } from "../../../adapters";
+import { request, requestUnwrap, getAuthHeaders } from "../../library/hc";
+import { uni } from "../../adapters";
+import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 

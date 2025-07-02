@@ -1,19 +1,62 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { Composer, InlineKeyboard } from "grammy";
-import { config } from "../../../config";
-import { request, getAuthHeaders, requestUnwrap } from "../../../library/hc";
-import { getMiniAppUrl } from "../../helpers/get-mini-app-url";
-import type { Context } from "../../context";
-import { keyboards } from "../../keyboards";
-import {
-  NOTIFICATION_CONFIG,
-  getTelegramNotificationKey,
-  getTelegramNotificationKeys,
-} from "./notifications";
+import { config } from "../../config";
+import { request, getAuthHeaders, requestUnwrap } from "../../library/hc";
+import type { Context } from "../context";
+import { getMiniAppUrl } from "../helpers/get-mini-app-url";
 
 const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
+
+const keyboards = {
+  settings: new InlineKeyboard()
+    .text("Notifications", "notifications")
+    .text("Account", "account")
+    .row()
+    .text("Back ←", "back_to_menu"),
+
+  account: new InlineKeyboard()
+    .text("⚠️ Delete Profile ⚠️", "delete_profile")
+    .row()
+    .text("Back ←", "settings"),
+
+  delete_profile: new InlineKeyboard()
+    .text("Yes", "delete_profile_yes")
+    .text("Cancel", "account"),
+};
+
+type NotificationConfig = {
+  key: string;
+  name: string;
+};
+
+export const NOTIFICATION_CONFIG: NotificationConfig[] = [
+  {
+    key: "gradeUpdates",
+    name: "Grades",
+  },
+  {
+    key: "deadlineReminders",
+    name: "Deadlines",
+  },
+];
+
+export const getTelegramNotificationKey = (key: string) => {
+  const setting = NOTIFICATION_CONFIG.find((config) => config.key === key);
+
+  if (!setting) {
+    return undefined;
+  }
+
+  return `${setting.key}::telegram` as keyof NotificationSettings;
+};
+
+export const getTelegramNotificationKeys = () => {
+  return NOTIFICATION_CONFIG.map(
+    (config) => `${config.key}::telegram` as keyof NotificationSettings,
+  );
+};
 
 feature.callbackQuery("settings", async (ctx) => {
   await ctx.editMessageText("Settings", { reply_markup: keyboards.settings });
@@ -145,7 +188,7 @@ feature.callbackQuery("delete_profile", async (ctx) => {
 
   await ctx.editMessageText(
     `Are you sure to delete your ReMoodle profile?\nThis action is irreversible and will remove all data related to you.`,
-    { reply_markup: keyboards.deleteProfile },
+    { reply_markup: keyboards.delete_profile },
   );
 });
 

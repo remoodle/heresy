@@ -1,12 +1,19 @@
-import { Composer } from "grammy";
-import { db } from "../../../library/db";
-import { request, getAuthHeaders } from "../../../library/hc";
-import type { Context } from "../../context";
-import { createMainKeyboard, keyboards } from "../../keyboards";
+import { Composer, InlineKeyboard } from "grammy";
+import { db } from "../../library/db";
+import { request, getAuthHeaders } from "../../library/hc";
+import type { Context } from "../context";
+import { createMenuKeyboard } from "../keyboards/menu-keyboard";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
+
+const keyboards = {
+  findToken: new InlineKeyboard().url(
+    "How to find your token",
+    "https://ext.remoodle.app/find-token",
+  ),
+};
 
 feature.command("start", async (ctx) => {
   const userId = ctx.from.id;
@@ -96,7 +103,7 @@ async function handleRegistration(ctx: Context, userId: number, token: string) {
 }
 
 async function showMainMenu(ctx: Context, userName: string, userId: number) {
-  const { text, keyboard } = await createMainKeyboard(userId, userName);
+  const { text, keyboard } = await createMenuKeyboard(userId, userName);
 
   return ctx.reply(text, { reply_markup: keyboard });
 }

@@ -1,0 +1,30 @@
+import { Composer } from "grammy";
+import { requestUnwrap, getAuthHeaders } from "../../library/hc";
+import type { Context } from "../context";
+import { createMenuKeyboard } from "../keyboards/menu-keyboard";
+
+const composer = new Composer<Context>();
+
+const feature = composer.chatType("private");
+
+feature.callbackQuery("back_to_menu", async (ctx) => {
+  const userId = ctx.from.id;
+
+  const user = await requestUnwrap((client) =>
+    client.v2.user.check.$get({}, { headers: getAuthHeaders(userId) }),
+  );
+
+  const { text, keyboard } = await createMenuKeyboard(userId, user.name);
+
+  await ctx.editMessageText(text, { reply_markup: keyboard });
+});
+
+feature.callbackQuery("remove_message", async (ctx) => {
+  try {
+    await ctx.deleteMessage();
+  } catch {
+    await ctx.editMessageText("✅ Cleared");
+  }
+});
+
+export { composer as menuFeature };
