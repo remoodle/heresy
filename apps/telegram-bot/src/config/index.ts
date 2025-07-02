@@ -7,6 +7,8 @@ export const env = cleanEnv(process.env, {
     default: "development",
   }),
 
+  VERSION_TAG: str({ default: "~" }),
+
   TELEGRAM_BOT_TOKEN: str(),
 
   BACKEND_URL: str({ default: "http://localhost:9000" }),
@@ -23,6 +25,7 @@ export const env = cleanEnv(process.env, {
 });
 
 export const config = {
+  version: env.VERSION_TAG,
   backend: {
     url: env.BACKEND_URL,
     secret: env.BACKEND_SECRET,

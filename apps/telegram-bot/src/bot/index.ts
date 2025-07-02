@@ -1,45 +1,38 @@
-import { Bot, Context, session, GrammyError, HttpError } from "grammy";
-import type { SessionFlavor } from "grammy";
-import { commandsHandler, callbacksHandler } from "./handlers";
-import { handleToken } from "./handlers/command-handlers";
-import { logWithTimestamp } from "./utils";
-
-interface RegistrationSession {
-  step?: "awaiting_token" | null;
-}
-
-export type RegistrationContext = Context & SessionFlavor<RegistrationSession>;
+import { Bot as TelegramBot } from "grammy";
+import type { BotContext } from "./types";
+import { errorHandler } from "./handlers/error";
+import { sessionMiddleware } from "./middleware/session";
+import {
+  welcomeFeature,
+  handleToken,
+  deadlinesFeature,
+  coursesFeature,
+  settingsFeature,
+  menuFeature,
+} from "./features";
 
 export function createBot(token: string) {
-  const bot = new Bot<RegistrationContext>(token);
+  const bot = new TelegramBot<BotContext>(token);
 
-  bot.use(session({ initial: (): RegistrationSession => ({ step: null }) }));
+  const protectedBot = bot.errorBoundary(errorHandler);
 
-  bot.use(commandsHandler);
+  protectedBot.use(sessionMiddleware);
+
+  protectedBot.use(welcomeFeature);
+  protectedBot.use(deadlinesFeature);
+  protectedBot.use(coursesFeature);
+  protectedBot.use(settingsFeature);
+  protectedBot.use(menuFeature);
+
   bot.use((ctx, next) => {
-    if (ctx.session.step === "awaiting_token") {
+    if (ctx.session.auth?.step === "awaiting_token") {
       return handleToken(ctx);
     }
+
     return next();
   });
 
-  bot.use(async (ctx, next) => {
-    try {
-      await next();
-    } catch (err) {
-      console.error("Error in update processing:", err);
-
-      if (err instanceof GrammyError) {
-        logWithTimestamp("Error in update processing:", err);
-      } else if (err instanceof HttpError) {
-        logWithTimestamp("Could not contact Telegram:", err);
-      } else if (err instanceof Error) {
-        logWithTimestamp("Error in update processing:", err);
-      }
-    }
-  });
-
-  bot.use(callbacksHandler);
-
   return bot;
 }
+
+export type Bot = ReturnType<typeof createBot>;

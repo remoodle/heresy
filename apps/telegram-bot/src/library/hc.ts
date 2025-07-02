@@ -3,7 +3,7 @@ import type { AppType } from "@remoodle/backend";
 
 import { config } from "../config";
 
-const { request } = createHC<AppType>(config.backend.url);
+const { request, requestUnwrap } = createHC<AppType>(config.backend.url);
 
 const getAuthHeaders = (telegramId: number) => {
   return {
@@ -11,4 +11,4 @@ const getAuthHeaders = (telegramId: number) => {
   };
 };
 
-export { request, getAuthHeaders };
+export { request, requestUnwrap, getAuthHeaders };

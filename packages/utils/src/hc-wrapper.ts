@@ -83,3 +83,5 @@ export const createHC = <A extends Hono<any, any, any>>(
 
   return { request, requestUnwrap };
 };
+
+export { HTTPException };
