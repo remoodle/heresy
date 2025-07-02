@@ -6,7 +6,7 @@ import { keyboards } from "../../keyboards";
 
 export const composer = new Composer<Context>();
 
-const feature = composer.chatType("private");
+const feature = composer.chatType(["private", "group", "supergroup"]);
 
 feature.command(["deadlines", "ds"], async (ctx) => {
   const isShort = ctx.message.text.startsWith("/ds");
