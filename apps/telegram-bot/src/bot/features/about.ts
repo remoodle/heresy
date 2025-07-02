@@ -1,4 +1,4 @@
-import { Composer, InlineKeyboard } from "grammy";
+import { Composer } from "grammy";
 import { config } from "../../config";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
@@ -11,6 +11,7 @@ const feature = composer.chatType("private");
 const DOCS = "https://ext.remoodle.app/docs";
 const PRIVACY_POLICY = "https://ext.remoodle.app/privacy-policy";
 const CREATORS = "https://ext.remoodle.app/creators";
+
 const REPO = "https://github.com/remoodle/remoodle";
 
 const ABOUT_MESSAGE = `
