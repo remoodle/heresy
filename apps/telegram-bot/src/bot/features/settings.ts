@@ -3,6 +3,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import { config } from "../../config";
 import { request, getAuthHeaders, requestUnwrap } from "../../library/hc";
 import type { Context } from "../context";
+import { logHandle } from "../helpers/logging";
 import { getMiniAppUrl } from "../helpers/get-mini-app-url";
 import {
   changeNotificationCallback,
@@ -71,37 +72,45 @@ const boolToInt = (value: boolean) => (value ? 1 : 0);
 
 const boolToEmoji = (value: boolean) => (value ? "🔔" : "🔕");
 
-feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
-  await ctx.editMessageText("Settings", { reply_markup: keyboards.settings });
-});
+feature.callbackQuery(
+  settingsCallback.filter(),
+  logHandle("settings"),
+  async (ctx) => {
+    await ctx.editMessageText("Settings", { reply_markup: keyboards.settings });
+  },
+);
 
-feature.callbackQuery(accountCallback.filter(), async (ctx) => {
-  const [user, error] = await request((client) =>
-    client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
-  );
+feature.callbackQuery(
+  accountCallback.filter(),
+  logHandle("account"),
+  async (ctx) => {
+    const [user, error] = await request((client) =>
+      client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
+    );
 
-  if (error) {
-    await ctx.editMessageText("An error occurred. Try again later.", {
-      reply_markup: keyboards.account,
-      parse_mode: "Markdown",
-    });
-    return;
-  }
+    if (error) {
+      await ctx.editMessageText("An error occurred. Try again later.", {
+        reply_markup: keyboards.account,
+        parse_mode: "Markdown",
+      });
+      return;
+    }
 
-  await ctx.editMessageText(
-    `Account
+    await ctx.editMessageText(
+      `Account
 
 Handle:  \`${user.handle}\`
 Name:  \`${user.name}\`
 Moodle ID:  \`${user.moodleId}\`
 Token health:  \`${user.health} ${user.health > 0 ? "🟢" : "🔴"}\`
 `,
-    {
-      reply_markup: keyboards.account,
-      parse_mode: "Markdown",
-    },
-  );
-});
+      {
+        reply_markup: keyboards.account,
+        parse_mode: "Markdown",
+      },
+    );
+  },
+);
 
 async function getNotificationsURL(userId: number) {
   const url = await getMiniAppUrl(
@@ -113,120 +122,134 @@ async function getNotificationsURL(userId: number) {
   return url;
 }
 
-feature.callbackQuery(notificationsCallback.filter(), async (ctx) => {
-  const userId = ctx.from.id;
+feature.callbackQuery(
+  notificationsCallback.filter(),
+  logHandle("notifications"),
+  async (ctx) => {
+    const userId = ctx.from.id;
 
-  const settings = await requestUnwrap((client) =>
-    client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
-  );
+    const settings = await requestUnwrap((client) =>
+      client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
+    );
 
-  const url = await getNotificationsURL(userId);
+    const url = await getNotificationsURL(userId);
 
-  await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(
-      settings.settings.notifications,
-      url,
-    ),
-  });
-});
-
-feature.callbackQuery(changeNotificationCallback.filter(), async (ctx) => {
-  const userId = ctx.from.id;
-
-  const data = changeNotificationCallback.unpack(ctx.callbackQuery.data);
-
-  const [account, error] = await request((client) =>
-    client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
-  );
-
-  if (error) {
-    await ctx.editMessageText("An error occurred. Try again later.", {
-      reply_markup: new InlineKeyboard().text(
-        "Back ←",
-        settingsCallback.pack({}),
+    await ctx.editMessageText("Notifications", {
+      reply_markup: getNotificationsKeyboard(
+        settings.settings.notifications,
+        url,
       ),
     });
-    return;
-  }
+  },
+);
 
-  const { type, value } = data;
+feature.callbackQuery(
+  changeNotificationCallback.filter(),
+  logHandle("change_notification"),
+  async (ctx) => {
+    const userId = ctx.from.id;
 
-  if (type === "telegram") {
-    getTelegramNotificationKeys().forEach((key) => {
-      account.settings.notifications[key] = boolToInt(value);
-    });
-  } else {
-    const key = getTelegramNotificationKey(type);
+    const data = changeNotificationCallback.unpack(ctx.callbackQuery.data);
 
-    if (key) {
-      account.settings.notifications[key] = boolToInt(value);
-    } else {
-      return; // Unknown notification type
+    const [account, error] = await request((client) =>
+      client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
+    );
+
+    if (error) {
+      await ctx.editMessageText("An error occurred. Try again later.", {
+        reply_markup: new InlineKeyboard().text(
+          "Back ←",
+          settingsCallback.pack({}),
+        ),
+      });
+      return;
     }
-  }
 
-  const [_, settingsUpdateError] = await request((client) =>
-    client.v2.user.settings.$post(
-      { json: { settings: account.settings } },
-      { headers: getAuthHeaders(userId) },
-    ),
-  );
+    const { type, value } = data;
 
-  if (settingsUpdateError) {
-    await ctx.editMessageText("Could not update settings. Try again later.", {
-      reply_markup: new InlineKeyboard().text(
-        "Back ←",
-        settingsCallback.pack({}),
+    if (type === "telegram") {
+      getTelegramNotificationKeys().forEach((key) => {
+        account.settings.notifications[key] = boolToInt(value);
+      });
+    } else {
+      const key = getTelegramNotificationKey(type);
+
+      if (key) {
+        account.settings.notifications[key] = boolToInt(value);
+      } else {
+        return; // Unknown notification type
+      }
+    }
+
+    const [_, settingsUpdateError] = await request((client) =>
+      client.v2.user.settings.$post(
+        { json: { settings: account.settings } },
+        { headers: getAuthHeaders(userId) },
+      ),
+    );
+
+    if (settingsUpdateError) {
+      await ctx.editMessageText("Could not update settings. Try again later.", {
+        reply_markup: new InlineKeyboard().text(
+          "Back ←",
+          settingsCallback.pack({}),
+        ),
+      });
+      return;
+    }
+
+    const [settings, settingsError] = await request((client) =>
+      client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
+    );
+
+    if (settingsError) {
+      return;
+    }
+
+    const url = await getNotificationsURL(userId);
+
+    await ctx.editMessageText("Notifications", {
+      reply_markup: getNotificationsKeyboard(
+        settings.settings.notifications,
+        url,
       ),
     });
-    return;
-  }
+  },
+);
 
-  const [settings, settingsError] = await request((client) =>
-    client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
-  );
+feature.callbackQuery(
+  deleteProfileCallback.filter(),
+  logHandle("delete_profile"),
+  async (ctx) => {
+    const user = await requestUnwrap((client) =>
+      client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
+    );
 
-  if (settingsError) {
-    return;
-  }
+    await ctx.editMessageText(
+      `Are you sure to delete your ReMoodle profile?\nThis action is irreversible and will remove all data related to you.`,
+      { reply_markup: keyboards.delete_profile },
+    );
+  },
+);
 
-  const url = await getNotificationsURL(userId);
+feature.callbackQuery(
+  deleteProfileYesCallback.filter(),
+  logHandle("delete_profile_yes"),
+  async (ctx) => {
+    const [, error] = await request((client) =>
+      client.v2.bye.$delete({}, { headers: getAuthHeaders(ctx.from.id) }),
+    );
 
-  await ctx.editMessageText("Notifications", {
-    reply_markup: getNotificationsKeyboard(
-      settings.settings.notifications,
-      url,
-    ),
-  });
-});
+    if (error) {
+      await ctx.deleteMessage();
+      await ctx.reply("An error occurred. Try again later.");
+      return;
+    }
 
-feature.callbackQuery(deleteProfileCallback.filter(), async (ctx) => {
-  const user = await requestUnwrap((client) =>
-    client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
-  );
-
-  console.log(user);
-
-  await ctx.editMessageText(
-    `Are you sure to delete your ReMoodle profile?\nThis action is irreversible and will remove all data related to you.`,
-    { reply_markup: keyboards.delete_profile },
-  );
-});
-
-feature.callbackQuery(deleteProfileYesCallback.filter(), async (ctx) => {
-  const [, error] = await request((client) =>
-    client.v2.bye.$delete({}, { headers: getAuthHeaders(ctx.from.id) }),
-  );
-
-  if (error) {
     await ctx.deleteMessage();
-    await ctx.reply("An error occurred. Try again later.");
-    return;
-  }
-
-  await ctx.deleteMessage();
-  await ctx.reply("Your ReMoodle profile has been deleted.");
-});
+    await ctx.reply("Your ReMoodle profile has been deleted.");
+  },
+);
 
 export const getNotificationsKeyboard = (
   notificationSettings: NotificationSettings,

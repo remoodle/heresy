@@ -10,12 +10,16 @@
     "lint": "eslint src/"
   },
   "dependencies": {
+    "@grammyjs/hydrate": "^1.4.1",
+    "@grammyjs/types": "^3.20.0",
     "@remoodle/db": "workspace:*",
     "@remoodle/utils": "workspace:*",
     "callback-data": "^1.1.1",
     "dotenv": "^16.5.0",
     "envalid": "^8.0.0",
     "grammy": "^1.36.3",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
     "turndown": "^7.2.0"
   },
   "devDependencies": {

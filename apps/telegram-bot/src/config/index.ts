@@ -7,6 +7,11 @@ export const env = cleanEnv(process.env, {
     default: "development",
   }),
 
+  LOG_LEVEL: str({
+    choices: ["trace", "debug", "info", "warn", "error", "fatal", "silent"],
+    default: "info",
+  }),
+
   VERSION_TAG: str({ default: "~" }),
 
   TELEGRAM_BOT_TOKEN: str(),
@@ -26,6 +31,7 @@ export const env = cleanEnv(process.env, {
 
 export const config = {
   version: env.VERSION_TAG,
+  logLevel: env.LOG_LEVEL,
   backend: {
     url: env.BACKEND_URL,
     secret: env.BACKEND_SECRET,

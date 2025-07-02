@@ -1,6 +1,7 @@
 import { HTTPException } from "@remoodle/utils";
 import type { ErrorHandler } from "grammy";
 import type { Context } from "../context";
+import { getUpdateInfo } from "../helpers/logging";
 
 export const errorHandler: ErrorHandler<Context> = async (error) => {
   const { ctx } = error;
@@ -16,5 +17,8 @@ export const errorHandler: ErrorHandler<Context> = async (error) => {
     }
   }
 
-  console.error(error.error);
+  ctx.logger.error({
+    err: error.error,
+    update: getUpdateInfo(ctx),
+  });
 };

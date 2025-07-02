@@ -3,6 +3,7 @@ import { db } from "../../library/db";
 import { request, getAuthHeaders } from "../../library/hc";
 import type { Context } from "../context";
 import { createMenuKeyboard } from "../keyboards/menu-keyboard";
+import { logHandle } from "../helpers/logging";
 
 export const composer = new Composer<Context>();
 
@@ -15,7 +16,7 @@ const keyboards = {
   ),
 };
 
-feature.command("start", async (ctx) => {
+feature.command("start", logHandle("start"), async (ctx) => {
   const userId = ctx.from.id;
 
   const [user, error] = await request((client) =>
@@ -70,6 +71,8 @@ export async function handleToken(ctx: Context) {
   if (!ctx.message || !ctx.message.text || !ctx.from) {
     return;
   }
+
+  ctx.logger.info({ msg: "Handle token input" });
 
   const token = ctx.message.text.trim();
 

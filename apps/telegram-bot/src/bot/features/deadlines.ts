@@ -2,6 +2,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import { requestUnwrap, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
+import { logHandle } from "../helpers/logging";
 import {
   refreshDeadlinesCallback,
   deadlinesCallback,
@@ -23,7 +24,7 @@ const keyboards = {
   ),
 };
 
-feature.command(["deadlines", "ds"], async (ctx) => {
+feature.command(["deadlines", "ds"], logHandle("deadlines"), async (ctx) => {
   const isShort = ctx.message.text.startsWith("/ds");
 
   const daysLimit = isShort
@@ -47,43 +48,51 @@ feature.command(["deadlines", "ds"], async (ctx) => {
   });
 });
 
-feature.callbackQuery(deadlinesCallback.filter(), async (ctx) => {
-  const deadlines = await requestUnwrap((client) =>
-    client.v2.deadlines.$get(
-      { query: {} },
-      { headers: getAuthHeaders(ctx.from.id) },
-    ),
-  );
+feature.callbackQuery(
+  deadlinesCallback.filter(),
+  logHandle("deadlines_callback"),
+  async (ctx) => {
+    const deadlines = await requestUnwrap((client) =>
+      client.v2.deadlines.$get(
+        { query: {} },
+        { headers: getAuthHeaders(ctx.from.id) },
+      ),
+    );
 
-  const text = uni.getDeadlinesMessage(deadlines);
+    const text = uni.getDeadlinesMessage(deadlines);
 
-  await ctx.editMessageText(text, {
-    parse_mode: "HTML",
-    reply_markup: keyboards.deadlines,
-  });
-});
+    await ctx.editMessageText(text, {
+      parse_mode: "HTML",
+      reply_markup: keyboards.deadlines,
+    });
+  },
+);
 
-feature.callbackQuery(refreshDeadlinesCallback.filter(), async (ctx) => {
-  const data = refreshDeadlinesCallback.unpack(ctx.callbackQuery.data);
+feature.callbackQuery(
+  refreshDeadlinesCallback.filter(),
+  logHandle("refresh_deadlines"),
+  async (ctx) => {
+    const data = refreshDeadlinesCallback.unpack(ctx.callbackQuery.data);
 
-  const { type } = data;
+    const { type } = data;
 
-  const deadlines = await requestUnwrap((client) =>
-    client.v2.deadlines.$get(
-      { query: {} },
-      { headers: getAuthHeaders(ctx.from.id) },
-    ),
-  );
+    const deadlines = await requestUnwrap((client) =>
+      client.v2.deadlines.$get(
+        { query: {} },
+        { headers: getAuthHeaders(ctx.from.id) },
+      ),
+    );
 
-  const text = uni.getDeadlinesMessage(deadlines);
+    const text = uni.getDeadlinesMessage(deadlines);
 
-  const keyboard =
-    type === "menu" ? keyboards.deadlines : keyboards.singleDeadline;
+    const keyboard =
+      type === "menu" ? keyboards.deadlines : keyboards.singleDeadline;
 
-  await ctx.editMessageText(text, {
-    parse_mode: "HTML",
-    reply_markup: keyboard,
-  });
-});
+    await ctx.editMessageText(text, {
+      parse_mode: "HTML",
+      reply_markup: keyboard,
+    });
+  },
+);
 
 export { composer as deadlinesFeature };

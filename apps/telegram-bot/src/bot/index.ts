@@ -1,7 +1,11 @@
-import { Bot as TelegramBot } from "grammy";
-import type { Context } from "./context";
+import { Bot as TelegramBot, MemorySessionStorage } from "grammy";
+import { hydrate } from "@grammyjs/hydrate";
+import { logger } from "../library/logger";
+import { env } from "../config";
+import type { Context, SessionData } from "./context";
 import { errorHandler } from "./handlers/error";
-import { sessionMiddleware } from "./middleware/session";
+import { session } from "./middleware/session";
+import { updateLogger } from "./middleware/update-logger";
 import { welcomeFeature, handleToken } from "./features/welcome";
 import { deadlinesFeature } from "./features/deadlines";
 import { coursesFeature } from "./features/courses";
@@ -9,13 +13,36 @@ import { settingsFeature } from "./features/settings";
 import { menuFeature } from "./features/menu";
 import { aboutFeature } from "./features/about";
 
+function getSessionKey(ctx: Omit<Context, "session">) {
+  return ctx.chat?.id.toString();
+}
+
 export function createBot(token: string) {
   const bot = new TelegramBot<Context>(token);
 
+  bot.use(async (ctx, next) => {
+    ctx.logger = logger.child({
+      update_id: ctx.update.update_id,
+    });
+
+    await next();
+  });
+
   const protectedBot = bot.errorBoundary(errorHandler);
 
-  protectedBot.use(sessionMiddleware);
+  // Middlewares
+  if (env.isDev) {
+    protectedBot.use(updateLogger());
+  }
+  protectedBot.use(hydrate());
+  protectedBot.use(
+    session({
+      getSessionKey,
+      storage: new MemorySessionStorage<SessionData>(),
+    }),
+  );
 
+  // Handlers
   protectedBot.use(welcomeFeature);
   protectedBot.use(menuFeature);
   protectedBot.use(aboutFeature);

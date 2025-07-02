@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { logger } from "./library/logger";
 import { createBot } from "./bot";
 
 async function startPolling() {
@@ -8,7 +9,12 @@ async function startPolling() {
     await bot.stop();
   });
 
-  console.log("Bot is running");
+  await bot.init();
+
+  logger.info({
+    msg: "Bot running...",
+    username: bot.botInfo.username,
+  });
 
   bot.start();
 }

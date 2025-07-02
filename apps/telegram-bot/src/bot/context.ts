@@ -1,9 +1,17 @@
 import type { Context as DefaultContext, SessionFlavor } from "grammy";
+import type { HydrateFlavor } from "@grammyjs/hydrate";
+import type { Logger } from "../library/logger";
 
-export interface BotSession {
+export interface SessionData {
   auth?: {
     step: "awaiting_token";
   };
 }
 
-export type Context = DefaultContext & SessionFlavor<BotSession>;
+interface ExtendedContextFlavor {
+  logger: Logger;
+}
+
+export type Context = HydrateFlavor<
+  DefaultContext & ExtendedContextFlavor & SessionFlavor<SessionData>
+>;

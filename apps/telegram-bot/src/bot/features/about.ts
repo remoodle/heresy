@@ -2,6 +2,7 @@ import { Composer } from "grammy";
 import { config } from "../../config";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
+import { logHandle } from "../helpers/logging";
 import { createBackToMenuKeyboard } from "../keyboards/menu-keyboard";
 import { aboutCallback } from "../callback-data";
 
@@ -32,12 +33,16 @@ const ABOUT_MESSAGE_OPTIONS = {
   link_preview_options: { is_disabled: true },
 };
 
-feature.command("about", async (ctx) => {
+feature.command("about", logHandle("about"), async (ctx) => {
   await ctx.reply(ABOUT_MESSAGE, ABOUT_MESSAGE_OPTIONS);
 });
 
-feature.callbackQuery(aboutCallback.filter(), async (ctx) => {
-  await ctx.editMessageText(ABOUT_MESSAGE, ABOUT_MESSAGE_OPTIONS);
-});
+feature.callbackQuery(
+  aboutCallback.filter(),
+  logHandle("about_callback"),
+  async (ctx) => {
+    await ctx.editMessageText(ABOUT_MESSAGE, ABOUT_MESSAGE_OPTIONS);
+  },
+);
 
 export { composer as aboutFeature };
