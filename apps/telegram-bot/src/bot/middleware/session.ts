@@ -1,5 +1,5 @@
 import { session } from "grammy";
-import type { BotSession } from "../types";
+import type { BotSession } from "../context";
 
 export const sessionMiddleware = session({
   initial: (): BotSession => ({}),

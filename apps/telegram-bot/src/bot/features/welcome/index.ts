@@ -1,10 +1,10 @@
 import { Composer } from "grammy";
 import { db } from "../../../library/db";
 import { request, getAuthHeaders } from "../../../library/hc";
-import type { BotContext } from "../../types";
+import type { Context } from "../../context";
 import { createMainKeyboard, keyboards } from "../../keyboards";
 
-export const composer = new Composer<BotContext>();
+export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
@@ -59,7 +59,7 @@ feature.command("start", async (ctx) => {
   ctx.session.auth = { step: "awaiting_token" };
 });
 
-export async function handleToken(ctx: BotContext) {
+export async function handleToken(ctx: Context) {
   if (!ctx.message || !ctx.message.text || !ctx.from) {
     return;
   }
@@ -69,11 +69,7 @@ export async function handleToken(ctx: BotContext) {
   await handleRegistration(ctx, ctx.from.id, token);
 }
 
-async function handleRegistration(
-  ctx: BotContext,
-  userId: number,
-  token: string,
-) {
+async function handleRegistration(ctx: Context, userId: number, token: string) {
   const [data, error] = await request((client) =>
     client.v2.auth.token.$post(
       { json: { moodleToken: token } },
@@ -99,7 +95,7 @@ async function handleRegistration(
   await showMainMenu(ctx, data.user.name, userId);
 }
 
-async function showMainMenu(ctx: BotContext, userName: string, userId: number) {
+async function showMainMenu(ctx: Context, userName: string, userId: number) {
   const { text, keyboard } = await createMainKeyboard(userId, userName);
 
   return ctx.reply(text, { reply_markup: keyboard });

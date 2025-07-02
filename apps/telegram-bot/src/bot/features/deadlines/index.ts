@@ -1,10 +1,10 @@
 import { Composer } from "grammy";
-import type { BotContext } from "../../types";
 import { requestUnwrap, getAuthHeaders } from "../../../library/hc";
 import { uni } from "../../../adapters";
+import type { Context } from "../../context";
 import { keyboards } from "../../keyboards";
 
-export const composer = new Composer<BotContext>();
+export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 

@@ -1,5 +1,5 @@
 import { Bot as TelegramBot } from "grammy";
-import type { BotContext } from "./types";
+import type { Context } from "./context";
 import { errorHandler } from "./handlers/error";
 import { sessionMiddleware } from "./middleware/session";
 import {
@@ -12,7 +12,7 @@ import {
 } from "./features";
 
 export function createBot(token: string) {
-  const bot = new TelegramBot<BotContext>(token);
+  const bot = new TelegramBot<Context>(token);
 
   const protectedBot = bot.errorBoundary(errorHandler);
 

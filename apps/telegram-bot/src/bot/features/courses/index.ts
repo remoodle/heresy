@@ -1,9 +1,9 @@
 import { Composer, InlineKeyboard } from "grammy";
-import type { BotContext } from "../../types";
+import type { Context } from "../../context";
 import { request, requestUnwrap, getAuthHeaders } from "../../../library/hc";
 import { uni } from "../../../adapters";
 
-export const composer = new Composer<BotContext>();
+export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 

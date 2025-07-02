@@ -1,9 +1,9 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { Composer, InlineKeyboard } from "grammy";
-import type { BotContext } from "../../types";
 import { config } from "../../../config";
 import { request, getAuthHeaders, requestUnwrap } from "../../../library/hc";
 import { getMiniAppUrl } from "../../helpers/get-mini-app-url";
+import type { Context } from "../../context";
 import { keyboards } from "../../keyboards";
 import {
   NOTIFICATION_CONFIG,
@@ -11,7 +11,7 @@ import {
   getTelegramNotificationKeys,
 } from "./notifications";
 
-const composer = new Composer<BotContext>();
+const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 

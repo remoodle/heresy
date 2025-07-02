@@ -1,8 +1,8 @@
 import { HTTPException } from "@remoodle/utils";
 import type { ErrorHandler } from "grammy";
-import type { BotContext } from "../types";
+import type { Context } from "../context";
 
-export const errorHandler: ErrorHandler<BotContext> = async (error) => {
+export const errorHandler: ErrorHandler<Context> = async (error) => {
   const { ctx } = error;
 
   if (error.error instanceof HTTPException) {
