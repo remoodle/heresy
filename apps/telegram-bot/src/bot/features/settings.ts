@@ -1,5 +1,6 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { Composer, InlineKeyboard } from "grammy";
+import { createCallbackData } from "callback-data";
 import { config } from "../../config";
 import { request, getAuthHeaders, requestUnwrap } from "../../library/hc";
 import type { Context } from "../context";
@@ -8,6 +9,11 @@ import { getMiniAppUrl } from "../helpers/get-mini-app-url";
 const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
+
+const changeNotificationCallback = createCallbackData("change_notification", {
+  type: String,
+  value: Boolean,
+});
 
 const keyboards = {
   settings: new InlineKeyboard()
@@ -57,6 +63,10 @@ export const getTelegramNotificationKeys = () => {
     (config) => `${config.key}::telegram` as keyof NotificationSettings,
   );
 };
+
+const boolToInt = (value: boolean) => (value ? 1 : 0);
+
+const boolToEmoji = (value: boolean) => (value ? "🔔" : "🔕");
 
 feature.callbackQuery("settings", async (ctx) => {
   await ctx.editMessageText("Settings", { reply_markup: keyboards.settings });
@@ -117,8 +127,10 @@ feature.callbackQuery("notifications", async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^change_notifications_(.+)_(.+)/, async (ctx) => {
+feature.callbackQuery(changeNotificationCallback.filter(), async (ctx) => {
   const userId = ctx.from.id;
+
+  const data = changeNotificationCallback.unpack(ctx.callbackQuery.data);
 
   const [account, error] = await request((client) =>
     client.v2.user.settings.$get({}, { headers: getAuthHeaders(userId) }),
@@ -131,17 +143,17 @@ feature.callbackQuery(/^change_notifications_(.+)_(.+)/, async (ctx) => {
     return;
   }
 
-  const [, , type, value] = ctx.match[0].split("_");
+  const { type, value } = data;
 
   if (type === "telegram") {
     getTelegramNotificationKeys().forEach((key) => {
-      account.settings.notifications[key] = value === "on" ? 1 : 0;
+      account.settings.notifications[key] = boolToInt(value);
     });
   } else {
     const key = getTelegramNotificationKey(type);
 
     if (key) {
-      account.settings.notifications[key] = value === "on" ? 1 : 0;
+      account.settings.notifications[key] = boolToInt(value);
     } else {
       return; // Unknown notification type
     }
@@ -219,8 +231,11 @@ export const getNotificationsKeyboard = (
 
   keyboard
     .text(
-      `Telegram Notifications ${telegramEnabled ? "🔔" : "🔕"}`,
-      `change_notifications_telegram_${telegramEnabled ? "off" : "on"}`,
+      `Telegram Notifications ${boolToEmoji(telegramEnabled)}`,
+      changeNotificationCallback.pack({
+        type: "telegram",
+        value: !telegramEnabled,
+      }),
     )
     .row();
 
@@ -240,8 +255,11 @@ export const getNotificationsKeyboard = (
       const isEnabled = notificationSettings[key] === 1;
 
       keyboardRow.text(
-        `${notification.name} ${isEnabled ? "🔔" : "🔕"}`,
-        `change_notifications_${notification.key}_${isEnabled ? "off" : "on"}`,
+        `${notification.name} ${boolToEmoji(isEnabled)}`,
+        changeNotificationCallback.pack({
+          type: notification.key,
+          value: !isEnabled,
+        }),
       );
     });
   }

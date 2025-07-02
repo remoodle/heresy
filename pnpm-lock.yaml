@@ -271,6 +271,9 @@ importers:
       '@remoodle/utils':
         specifier: workspace:*
         version: link:../../packages/utils
+      callback-data:
+        specifier: ^1.1.1
+        version: 1.1.1
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
@@ -1649,6 +1652,9 @@ packages:
   cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
     engines: {node: '>=8'}
+
+  callback-data@1.1.1:
+    resolution: {integrity: sha512-1XoQQTsTkuU0/Ee2vRS64d+mKmM+zfEWgarI3ETPfYV3R5UvArM7C0sXSGPff+Aztea1Vrom6LDs9HQWSZucXQ==}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -4820,6 +4826,8 @@ snapshots:
       load-tsconfig: 0.2.5
 
   cac@6.7.14: {}
+
+  callback-data@1.1.1: {}
 
   callsites@3.1.0: {}
 

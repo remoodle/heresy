@@ -1,4 +1,5 @@
 import { Composer, InlineKeyboard } from "grammy";
+import { createCallbackData } from "callback-data";
 import { request, requestUnwrap, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
@@ -6,6 +7,28 @@ import type { Context } from "../context";
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
+
+const inprogressCourseCallback = createCallbackData("inprogress_course", {
+  courseId: Number,
+});
+
+const oldCourseCallback = createCallbackData("old_course", {
+  page: Number,
+});
+
+const pastCourseCallback = createCallbackData("past_course", {
+  courseId: Number,
+  page: Number,
+});
+
+const courseAssignmentsCallback = createCallbackData("course_assignments", {
+  courseId: Number,
+});
+
+const assignmentCallback = createCallbackData("assignment", {
+  courseId: Number,
+  assignmentId: Number,
+});
 
 feature.callbackQuery("courses", async (ctx) => {
   const courses = await requestUnwrap((client) =>
@@ -19,13 +42,18 @@ feature.callbackQuery("courses", async (ctx) => {
   const courseItems = uni.getCoursesMessage(courses);
 
   courseItems.forEach((course) => {
-    coursesKeyboard.row().text(course.name, `inprogress_course_${course.id}`);
+    coursesKeyboard
+      .row()
+      .text(
+        course.name,
+        inprogressCourseCallback.pack({ courseId: course.id }),
+      );
   });
 
   coursesKeyboard
     .row()
     .text("Back ←", "back_to_menu")
-    .text("Past courses", "old_course_1");
+    .text("Past courses", oldCourseCallback.pack({ page: 1 }));
 
   if (!courses.length) {
     await ctx.editMessageText("You have no courses 🥰", {
@@ -39,19 +67,21 @@ feature.callbackQuery("courses", async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^inprogress_course_(\d+)/, async (ctx) => {
-  const courseId = ctx.match[1];
+feature.callbackQuery(inprogressCourseCallback.filter(), async (ctx) => {
+  const data = inprogressCourseCallback.unpack(ctx.callbackQuery.data);
+
+  const { courseId } = data;
 
   const [grades] = await request((client) =>
     client.v2.course[":courseId"].grades.$get(
-      { param: { courseId } },
+      { param: { courseId: courseId.toString() } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
 
   const [course] = await request((client) =>
     client.v2.course[":courseId"].$get(
-      { param: { courseId }, query: { content: "0" } },
+      { param: { courseId: courseId.toString() }, query: { content: "0" } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -66,7 +96,7 @@ feature.callbackQuery(/^inprogress_course_(\d+)/, async (ctx) => {
   const message = uni.getGradesMessage(grades, course);
 
   const keyboard = new InlineKeyboard()
-    .text("Assignments", `course_assignments_${courseId}`)
+    .text("Assignments", courseAssignmentsCallback.pack({ courseId }))
     .row()
     .text("Back ←", "courses");
 
@@ -76,8 +106,10 @@ feature.callbackQuery(/^inprogress_course_(\d+)/, async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^old_course_(\d+)/, async (ctx) => {
-  const page = parseInt(ctx.match[1]);
+feature.callbackQuery(oldCourseCallback.filter(), async (ctx) => {
+  const data = oldCourseCallback.unpack(ctx.callbackQuery.data);
+
+  const { page } = data;
 
   const [courses] = await request((client) =>
     client.v2.courses.$get(
@@ -110,19 +142,24 @@ feature.callbackQuery(/^old_course_(\d+)/, async (ctx) => {
   const coursesKeyboard = new InlineKeyboard();
 
   slicedCourses.forEach((course) => {
-    coursesKeyboard.row().text(course.name, `past_course_${course.id}_${page}`);
+    coursesKeyboard
+      .row()
+      .text(
+        course.name,
+        pastCourseCallback.pack({ courseId: course.id, page }),
+      );
   });
 
   coursesKeyboard.row();
 
   if (page > 1) {
-    coursesKeyboard.text("←", `old_course_${page - 1}`);
+    coursesKeyboard.text("←", oldCourseCallback.pack({ page: page - 1 }));
   }
 
   coursesKeyboard.text("Back", "courses");
 
   if (page < totalPages) {
-    coursesKeyboard.text("→", `old_course_${page + 1}`);
+    coursesKeyboard.text("→", oldCourseCallback.pack({ page: page + 1 }));
   }
 
   await ctx.editMessageText(`Your past courses (${page}/${totalPages}):`, {
@@ -130,25 +167,29 @@ feature.callbackQuery(/^old_course_(\d+)/, async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^past_course_(\d+)_(\d+)/, async (ctx) => {
-  const courseId = ctx.match[1];
-  const page = ctx.match[2];
+feature.callbackQuery(pastCourseCallback.filter(), async (ctx) => {
+  const data = pastCourseCallback.unpack(ctx.callbackQuery.data);
+
+  const { courseId, page } = data;
 
   const [grades] = await request((client) =>
     client.v2.course[":courseId"].grades.$get(
-      { param: { courseId } },
+      { param: { courseId: courseId.toString() } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
 
   const [course] = await request((client) =>
     client.v2.course[":courseId"].$get(
-      { param: { courseId }, query: { content: "0" } },
+      { param: { courseId: courseId.toString() }, query: { content: "0" } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
 
-  const keyboard = new InlineKeyboard().text("Back ←", `old_course_${page}`);
+  const keyboard = new InlineKeyboard().text(
+    "Back ←",
+    oldCourseCallback.pack({ page }),
+  );
 
   if (!grades || !course) {
     await ctx.editMessageText("Grades for this course are not available.", {
@@ -165,12 +206,14 @@ feature.callbackQuery(/^past_course_(\d+)_(\d+)/, async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^course_assignments_(\d+)/, async (ctx) => {
-  const courseId = ctx.match[1];
+feature.callbackQuery(courseAssignmentsCallback.filter(), async (ctx) => {
+  const data = courseAssignmentsCallback.unpack(ctx.callbackQuery.data);
+
+  const { courseId } = data;
 
   const [course] = await request((client) =>
     client.v2.course[":courseId"].$get(
-      { param: { courseId }, query: { content: "0" } },
+      { param: { courseId: courseId.toString() }, query: { content: "0" } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -184,7 +227,7 @@ feature.callbackQuery(/^course_assignments_(\d+)/, async (ctx) => {
 
   const [assignments] = await request((client) =>
     client.v2.course[":courseId"].assignments.$get(
-      { param: { courseId } },
+      { param: { courseId: courseId.toString() } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -193,7 +236,7 @@ feature.callbackQuery(/^course_assignments_(\d+)/, async (ctx) => {
     await ctx.editMessageText("Assignments are not available.", {
       reply_markup: new InlineKeyboard().text(
         "Back ←",
-        `inprogress_course_${courseId}`,
+        inprogressCourseCallback.pack({ courseId }),
       ),
     });
     return;
@@ -202,15 +245,16 @@ feature.callbackQuery(/^course_assignments_(\d+)/, async (ctx) => {
   const keyboard = new InlineKeyboard();
 
   assignments.forEach((assignment) => {
-    keyboard
-      .row()
-      .text(
-        assignment.name,
-        `assignment_${assignment.course}_${assignment.id}`,
-      );
+    keyboard.row().text(
+      assignment.name,
+      assignmentCallback.pack({
+        courseId: assignment.course,
+        assignmentId: assignment.id,
+      }),
+    );
   });
 
-  keyboard.row().text("Back ←", `inprogress_course_${courseId}`);
+  keyboard.row().text("Back ←", inprogressCourseCallback.pack({ courseId }));
 
   await ctx.editMessageText(`Assignments\n*${course.fullname}*`, {
     reply_markup: keyboard,
@@ -218,18 +262,19 @@ feature.callbackQuery(/^course_assignments_(\d+)/, async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^assignment_(\d+)_(\d+)/, async (ctx) => {
-  const courseId = ctx.match[1];
-  const assignmentIdStr = ctx.match[2];
+feature.callbackQuery(assignmentCallback.filter(), async (ctx) => {
+  const data = assignmentCallback.unpack(ctx.callbackQuery.data);
+
+  const { courseId, assignmentId } = data;
 
   const keyboardBack = new InlineKeyboard().text(
     "Back ←",
-    `course_assignments_${courseId}`,
+    courseAssignmentsCallback.pack({ courseId }),
   );
 
   const [course] = await request((client) =>
     client.v2.course[":courseId"].$get(
-      { param: { courseId }, query: { content: "0" } },
+      { param: { courseId: courseId.toString() }, query: { content: "0" } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -243,7 +288,7 @@ feature.callbackQuery(/^assignment_(\d+)_(\d+)/, async (ctx) => {
 
   const [grades] = await request((client) =>
     client.v2.course[":courseId"].grades.$get(
-      { param: { courseId } },
+      { param: { courseId: courseId.toString() } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -257,7 +302,7 @@ feature.callbackQuery(/^assignment_(\d+)_(\d+)/, async (ctx) => {
 
   const [assignments] = await request((client) =>
     client.v2.course[":courseId"].assignments.$get(
-      { param: { courseId } },
+      { param: { courseId: courseId.toString() } },
       { headers: getAuthHeaders(ctx.from.id) },
     ),
   );
@@ -269,7 +314,6 @@ feature.callbackQuery(/^assignment_(\d+)_(\d+)/, async (ctx) => {
     return;
   }
 
-  const assignmentId = parseInt(assignmentIdStr);
   const assignment = assignments.find((a) => a.id === assignmentId);
 
   if (!assignment) {

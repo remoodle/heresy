@@ -1,4 +1,5 @@
 import { Composer, InlineKeyboard } from "grammy";
+import { createCallbackData } from "callback-data";
 import { requestUnwrap, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
@@ -7,14 +8,18 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType(["private", "group", "supergroup"]);
 
+const refreshDeadlinesCallback = createCallbackData("refresh_deadlines", {
+  type: String,
+});
+
 const keyboards = {
   deadlines: new InlineKeyboard()
     .text("Back ←", "back_to_menu")
-    .text("Refresh", "refresh_deadlines_menu"),
+    .text("Refresh", refreshDeadlinesCallback.pack({ type: "menu" })),
 
   singleDeadline: new InlineKeyboard().text(
     "Refresh",
-    "refresh_deadlines_single",
+    refreshDeadlinesCallback.pack({ type: "single" }),
   ),
 };
 
@@ -58,8 +63,10 @@ feature.callbackQuery("deadlines", async (ctx) => {
   });
 });
 
-feature.callbackQuery(/^refresh_deadlines_(.+)/, async (ctx) => {
-  const type = ctx.match[1];
+feature.callbackQuery(refreshDeadlinesCallback.filter(), async (ctx) => {
+  const data = refreshDeadlinesCallback.unpack(ctx.callbackQuery.data);
+
+  const { type } = data;
 
   const deadlines = await requestUnwrap((client) =>
     client.v2.deadlines.$get(

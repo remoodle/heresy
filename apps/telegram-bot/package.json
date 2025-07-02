@@ -12,6 +12,7 @@
   "dependencies": {
     "@remoodle/db": "workspace:*",
     "@remoodle/utils": "workspace:*",
+    "callback-data": "^1.1.1",
     "dotenv": "^16.5.0",
     "envalid": "^8.0.0",
     "grammy": "^1.36.3",
