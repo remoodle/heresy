@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.0...remoodle/telegram-bot-v2.1.1) (2025-07-02)
+
+
+### Code Refactoring
+
+* **tgbot:** use actual callback-data bindings in keyboards ([75df6f1](https://github.com/remoodle/remoodle/commit/75df6f104e94bdc65b53c8c9b40cc4adb36b53fa))
+
 ## [2.1.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.0.11...remoodle/telegram-bot-v2.1.0) (2025-07-02)
 
 
