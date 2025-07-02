@@ -1,20 +1,27 @@
 import { InlineKeyboard } from "grammy";
 import { config } from "../../config";
 import { getMiniAppUrl } from "../helpers/get-mini-app-url";
+import {
+  deadlinesCallback,
+  coursesListCallback,
+  settingsCallback,
+  aboutCallback,
+  backToMenuCallback,
+} from "../callback-data";
 
 export const createMenuKeyboard = async (userId: number, userName: string) => {
   const url = await getMiniAppUrl(userId, config.frontend.url);
 
   const keyboard = new InlineKeyboard()
-    .text("Deadlines", "deadlines")
+    .text("Deadlines", deadlinesCallback.pack({}))
     .row()
-    .text("Courses", "courses")
+    .text("Courses", coursesListCallback.pack({}))
     .row()
     .webApp("Map", "https://aitumap.remoodle.app")
     .webApp("Schedule", "https://calendar.remoodle.app")
     .row()
-    .text("⚙️", "settings")
-    .text("About", "about")
+    .text("⚙️", settingsCallback.pack({}))
+    .text("About", aboutCallback.pack({}))
     .row()
     .webApp("🌐 Website", url);
 
@@ -25,5 +32,5 @@ export const createMenuKeyboard = async (userId: number, userName: string) => {
 };
 
 export const createBackToMenuKeyboard = () => {
-  return new InlineKeyboard().text("Back ←", "back_to_menu");
+  return new InlineKeyboard().text("Back ←", backToMenuCallback.pack({}));
 };
