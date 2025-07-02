@@ -1,20 +1,20 @@
 import { Composer, InlineKeyboard } from "grammy";
-import { createCallbackData } from "callback-data";
 import { requestUnwrap, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
+import {
+  refreshDeadlinesCallback,
+  deadlinesCallback,
+  backToMenuCallback,
+} from "../callback-data";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType(["private", "group", "supergroup"]);
 
-const refreshDeadlinesCallback = createCallbackData("refresh_deadlines", {
-  type: String,
-});
-
 const keyboards = {
   deadlines: new InlineKeyboard()
-    .text("Back ←", "back_to_menu")
+    .text("Back ←", backToMenuCallback.pack({}))
     .text("Refresh", refreshDeadlinesCallback.pack({ type: "menu" })),
 
   singleDeadline: new InlineKeyboard().text(
@@ -47,7 +47,7 @@ feature.command(["deadlines", "ds"], async (ctx) => {
   });
 });
 
-feature.callbackQuery("deadlines", async (ctx) => {
+feature.callbackQuery(deadlinesCallback.filter(), async (ctx) => {
   const deadlines = await requestUnwrap((client) =>
     client.v2.deadlines.$get(
       { query: {} },

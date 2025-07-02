@@ -2,12 +2,13 @@ import { Composer } from "grammy";
 import { requestUnwrap, getAuthHeaders } from "../../library/hc";
 import type { Context } from "../context";
 import { createMenuKeyboard } from "../keyboards/menu-keyboard";
+import { backToMenuCallback } from "../callback-data";
 
 const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-feature.callbackQuery("back_to_menu", async (ctx) => {
+feature.callbackQuery(backToMenuCallback.filter(), async (ctx) => {
   const userId = ctx.from.id;
 
   const user = await requestUnwrap((client) =>

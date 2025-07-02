@@ -1,36 +1,22 @@
 import { Composer, InlineKeyboard } from "grammy";
-import { createCallbackData } from "callback-data";
 import { request, requestUnwrap, getAuthHeaders } from "../../library/hc";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
+import {
+  inprogressCourseCallback,
+  oldCourseCallback,
+  pastCourseCallback,
+  courseAssignmentsCallback,
+  assignmentCallback,
+  coursesListCallback,
+  backToMenuCallback,
+} from "../callback-data";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-const inprogressCourseCallback = createCallbackData("inprogress_course", {
-  courseId: Number,
-});
-
-const oldCourseCallback = createCallbackData("old_course", {
-  page: Number,
-});
-
-const pastCourseCallback = createCallbackData("past_course", {
-  courseId: Number,
-  page: Number,
-});
-
-const courseAssignmentsCallback = createCallbackData("course_assignments", {
-  courseId: Number,
-});
-
-const assignmentCallback = createCallbackData("assignment", {
-  courseId: Number,
-  assignmentId: Number,
-});
-
-feature.callbackQuery("courses", async (ctx) => {
+feature.callbackQuery(coursesListCallback.filter(), async (ctx) => {
   const courses = await requestUnwrap((client) =>
     client.v2.courses.$get(
       { query: { status: "inprogress" } },
@@ -52,7 +38,7 @@ feature.callbackQuery("courses", async (ctx) => {
 
   coursesKeyboard
     .row()
-    .text("Back ←", "back_to_menu")
+    .text("Back ←", backToMenuCallback.pack({}))
     .text("Past courses", oldCourseCallback.pack({ page: 1 }));
 
   if (!courses.length) {
@@ -88,7 +74,10 @@ feature.callbackQuery(inprogressCourseCallback.filter(), async (ctx) => {
 
   if (!grades || !course) {
     await ctx.editMessageText("Grades for this course are not available.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "courses"),
+      reply_markup: new InlineKeyboard().text(
+        "Back ←",
+        coursesListCallback.pack({}),
+      ),
     });
     return;
   }
@@ -98,7 +87,7 @@ feature.callbackQuery(inprogressCourseCallback.filter(), async (ctx) => {
   const keyboard = new InlineKeyboard()
     .text("Assignments", courseAssignmentsCallback.pack({ courseId }))
     .row()
-    .text("Back ←", "courses");
+    .text("Back ←", coursesListCallback.pack({}));
 
   await ctx.editMessageText(message, {
     reply_markup: keyboard,
@@ -120,14 +109,20 @@ feature.callbackQuery(oldCourseCallback.filter(), async (ctx) => {
 
   if (!courses) {
     await ctx.editMessageText("Past courses are not available.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "courses"),
+      reply_markup: new InlineKeyboard().text(
+        "Back ←",
+        coursesListCallback.pack({}),
+      ),
     });
     return;
   }
 
   if (!courses.length) {
     await ctx.editMessageText("You have no past courses 🥰", {
-      reply_markup: new InlineKeyboard().text("Back", "courses"),
+      reply_markup: new InlineKeyboard().text(
+        "Back",
+        coursesListCallback.pack({}),
+      ),
     });
     return;
   }
@@ -156,7 +151,7 @@ feature.callbackQuery(oldCourseCallback.filter(), async (ctx) => {
     coursesKeyboard.text("←", oldCourseCallback.pack({ page: page - 1 }));
   }
 
-  coursesKeyboard.text("Back", "courses");
+  coursesKeyboard.text("Back", coursesListCallback.pack({}));
 
   if (page < totalPages) {
     coursesKeyboard.text("→", oldCourseCallback.pack({ page: page + 1 }));
@@ -220,7 +215,10 @@ feature.callbackQuery(courseAssignmentsCallback.filter(), async (ctx) => {
 
   if (!course) {
     await ctx.editMessageText("Course is not available.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "courses"),
+      reply_markup: new InlineKeyboard().text(
+        "Back ←",
+        coursesListCallback.pack({}),
+      ),
     });
     return;
   }

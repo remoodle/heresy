@@ -1,35 +1,38 @@
 import type { NotificationSettings } from "@remoodle/types";
 import { Composer, InlineKeyboard } from "grammy";
-import { createCallbackData } from "callback-data";
 import { config } from "../../config";
 import { request, getAuthHeaders, requestUnwrap } from "../../library/hc";
 import type { Context } from "../context";
 import { getMiniAppUrl } from "../helpers/get-mini-app-url";
+import {
+  changeNotificationCallback,
+  settingsCallback,
+  accountCallback,
+  notificationsCallback,
+  deleteProfileCallback,
+  deleteProfileYesCallback,
+  backToMenuCallback,
+} from "../callback-data";
 
 const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-const changeNotificationCallback = createCallbackData("change_notification", {
-  type: String,
-  value: Boolean,
-});
-
 const keyboards = {
   settings: new InlineKeyboard()
-    .text("Notifications", "notifications")
-    .text("Account", "account")
+    .text("Notifications", notificationsCallback.pack({}))
+    .text("Account", accountCallback.pack({}))
     .row()
-    .text("Back ←", "back_to_menu"),
+    .text("Back ←", backToMenuCallback.pack({})),
 
   account: new InlineKeyboard()
-    .text("⚠️ Delete Profile ⚠️", "delete_profile")
+    .text("⚠️ Delete Profile ⚠️", deleteProfileCallback.pack({}))
     .row()
-    .text("Back ←", "settings"),
+    .text("Back ←", settingsCallback.pack({})),
 
   delete_profile: new InlineKeyboard()
-    .text("Yes", "delete_profile_yes")
-    .text("Cancel", "account"),
+    .text("Yes", deleteProfileYesCallback.pack({}))
+    .text("Cancel", accountCallback.pack({})),
 };
 
 type NotificationConfig = {
@@ -68,11 +71,11 @@ const boolToInt = (value: boolean) => (value ? 1 : 0);
 
 const boolToEmoji = (value: boolean) => (value ? "🔔" : "🔕");
 
-feature.callbackQuery("settings", async (ctx) => {
+feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
   await ctx.editMessageText("Settings", { reply_markup: keyboards.settings });
 });
 
-feature.callbackQuery("account", async (ctx) => {
+feature.callbackQuery(accountCallback.filter(), async (ctx) => {
   const [user, error] = await request((client) =>
     client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
   );
@@ -110,7 +113,7 @@ async function getNotificationsURL(userId: number) {
   return url;
 }
 
-feature.callbackQuery("notifications", async (ctx) => {
+feature.callbackQuery(notificationsCallback.filter(), async (ctx) => {
   const userId = ctx.from.id;
 
   const settings = await requestUnwrap((client) =>
@@ -138,7 +141,10 @@ feature.callbackQuery(changeNotificationCallback.filter(), async (ctx) => {
 
   if (error) {
     await ctx.editMessageText("An error occurred. Try again later.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "settings"),
+      reply_markup: new InlineKeyboard().text(
+        "Back ←",
+        settingsCallback.pack({}),
+      ),
     });
     return;
   }
@@ -168,7 +174,10 @@ feature.callbackQuery(changeNotificationCallback.filter(), async (ctx) => {
 
   if (settingsUpdateError) {
     await ctx.editMessageText("Could not update settings. Try again later.", {
-      reply_markup: new InlineKeyboard().text("Back ←", "settings"),
+      reply_markup: new InlineKeyboard().text(
+        "Back ←",
+        settingsCallback.pack({}),
+      ),
     });
     return;
   }
@@ -191,7 +200,7 @@ feature.callbackQuery(changeNotificationCallback.filter(), async (ctx) => {
   });
 });
 
-feature.callbackQuery("delete_profile", async (ctx) => {
+feature.callbackQuery(deleteProfileCallback.filter(), async (ctx) => {
   const user = await requestUnwrap((client) =>
     client.v2.user.check.$get({}, { headers: getAuthHeaders(ctx.from.id) }),
   );
@@ -204,7 +213,7 @@ feature.callbackQuery("delete_profile", async (ctx) => {
   );
 });
 
-feature.callbackQuery("delete_profile_yes", async (ctx) => {
+feature.callbackQuery(deleteProfileYesCallback.filter(), async (ctx) => {
   const [, error] = await request((client) =>
     client.v2.bye.$delete({}, { headers: getAuthHeaders(ctx.from.id) }),
   );
@@ -268,7 +277,7 @@ export const getNotificationsKeyboard = (
     keyboard.row().webApp("Advanced settings", websiteUrl);
   }
 
-  keyboard.row().text("Back ←", "settings");
+  keyboard.row().text("Back ←", settingsCallback.pack({}));
 
   return keyboard;
 };

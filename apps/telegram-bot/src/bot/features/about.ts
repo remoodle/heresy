@@ -3,6 +3,7 @@ import { config } from "../../config";
 import { uni } from "../../adapters";
 import type { Context } from "../context";
 import { createBackToMenuKeyboard } from "../keyboards/menu-keyboard";
+import { aboutCallback } from "../callback-data";
 
 const composer = new Composer<Context>();
 
@@ -35,7 +36,7 @@ feature.command("about", async (ctx) => {
   await ctx.reply(ABOUT_MESSAGE, ABOUT_MESSAGE_OPTIONS);
 });
 
-feature.callbackQuery("about", async (ctx) => {
+feature.callbackQuery(aboutCallback.filter(), async (ctx) => {
   await ctx.editMessageText(ABOUT_MESSAGE, ABOUT_MESSAGE_OPTIONS);
 });
 
