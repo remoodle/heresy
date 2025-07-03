@@ -61,7 +61,7 @@
     "oxlint": "^0.18.0",
     "stale-dep": "^0.8.2",
     "typescript": "~5.8.3",
-    "vite": "^6.3.5",
+    "vite": "^7.0.0",
     "vite-plugin-vue-devtools": "^7.7.6",
     "vitest": "^3.2.2",
     "vue-tsc": "^2.2.10"
