@@ -31,7 +31,7 @@ importers:
         version: 1.14.4(hono@4.7.11)
       '@hono/prometheus':
         specifier: ^1.0.1
-        version: 1.0.1(hono@4.7.11)(prom-client@15.1.3)
+        version: 1.0.2(hono@4.7.11)(prom-client@15.1.3)
       '@hono/zod-validator':
         specifier: ^0.7.0
         version: 0.7.0(hono@4.7.11)(zod@3.25.56)
@@ -810,8 +810,8 @@ packages:
     peerDependencies:
       hono: ^4
 
-  '@hono/prometheus@1.0.1':
-    resolution: {integrity: sha512-PjMbjAppCgbvRP2aLxqJc1XJLxfmg4dLsS5R5ITt7qCf9Ab/xSRul/LHNVvYK2/ECi3BOPprSnlSizksBJmXBQ==}
+  '@hono/prometheus@1.0.2':
+    resolution: {integrity: sha512-7z2nBMaiHEaAFfNWfIV2H5/HRezv9kLH0jDY6ZotQQAr3QR7cIYAd6FGiyTIng4GUAw6ZWeX3C0Y4QS36SLRjg==}
     peerDependencies:
       hono: '>=3.*'
       prom-client: ^15.0.0
@@ -4025,7 +4025,7 @@ snapshots:
     dependencies:
       hono: 4.7.11
 
-  '@hono/prometheus@1.0.1(hono@4.7.11)(prom-client@15.1.3)':
+  '@hono/prometheus@1.0.2(hono@4.7.11)(prom-client@15.1.3)':
     dependencies:
       hono: 4.7.11
       prom-client: 15.1.3
