@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.1...remoodle/telegram-bot-v2.1.2) (2025-07-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17 ([#451](https://github.com/remoodle/remoodle/issues/451)) ([cac62b8](https://github.com/remoodle/remoodle/commit/cac62b838a6ab60a9a44df92c911d50fb702e1f6))
+
 ## [2.1.1](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.0...remoodle/telegram-bot-v2.1.1) (2025-07-02)
 
 
