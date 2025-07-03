@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.10.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.0...remoodle/frontend-v1.10.1) (2025-07-03)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#445](https://github.com/remoodle/remoodle/issues/445)) ([0c5079d](https://github.com/remoodle/remoodle/commit/0c5079db488a905072bef1714313bfd0e416f175))
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency @vitejs/plugin-vue to v6 ([#447](https://github.com/remoodle/remoodle/issues/447)) ([a5bf0d9](https://github.com/remoodle/remoodle/commit/a5bf0d90915e7d46e455c14532733d9d67e53957))
+* **deps:** update dependency vite to v7 ([#448](https://github.com/remoodle/remoodle/issues/448)) ([9dddd7f](https://github.com/remoodle/remoodle/commit/9dddd7fff818fcf0427c7e62fa39f07e2e7734d7))
+* **deps:** update dependency vue-tsc to v3 ([#449](https://github.com/remoodle/remoodle/issues/449)) ([398ea58](https://github.com/remoodle/remoodle/commit/398ea588f985861d3f932c63290cb87b10c316f7))
+* **deps:** update oxlint monorepo to v1 ([#450](https://github.com/remoodle/remoodle/issues/450)) ([a82804e](https://github.com/remoodle/remoodle/commit/a82804eb87930d3305b45811441c3b410fc2bc75))
+
 ## [1.10.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.9.17...remoodle/frontend-v1.10.0) (2025-07-01)
 
 
