@@ -74,6 +74,7 @@ export const syncEvents = async (userId: string) => {
 export const syncCourses = async (
   userId: string,
   classification: MoodleCourseClassification[] = ["inprogress", "past"],
+  trackChanges = false,
 ) => {
   const user = await db.user.findById(userId);
 
@@ -82,6 +83,11 @@ export const syncCourses = async (
   }
 
   const client = new Moodle(user.moodleToken);
+
+  // Get existing courses before sync for change tracking
+  const existingCourses = trackChanges 
+    ? await db.course.find({ userId }).lean()
+    : [];
 
   const courses: {
     data: MoodleCourse;
@@ -125,6 +131,16 @@ export const syncCourses = async (
     { userId, "data.id": { $nin: courses.map((course) => course.data.id) } },
     { deleted: true },
   );
+
+  if (trackChanges && existingCourses.length > 0) {
+    // Get updated courses after sync
+    const updatedCourses = await db.course.find({ userId }).lean();
+    
+    return {
+      existingCourses,
+      updatedCourses,
+    };
+  }
 };
 
 export const syncCourseGrades = async (

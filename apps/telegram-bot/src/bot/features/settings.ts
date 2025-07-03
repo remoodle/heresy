@@ -50,6 +50,10 @@ export const NOTIFICATION_CONFIG: NotificationConfig[] = [
     key: "deadlineReminders",
     name: "Deadlines",
   },
+  {
+    key: "courseChanges",
+    name: "Course Changes",
+  },
 ];
 
 export const getTelegramNotificationKey = (key: string) => {

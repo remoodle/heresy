@@ -241,6 +241,29 @@ await suspense();
               />
             </TableCell>
           </TableRow>
+          <TableRow>
+            <TableCell class="font-medium">
+              📋 Course changes
+              <div class="text-sm text-muted-foreground mt-1">
+                Get notified when courses are added, removed, or change status (e.g., from in progress to past)
+              </div>
+            </TableCell>
+            <TableCell class="text-right">
+              <Switch
+                :model-value="
+                  !account.telegramId
+                    ? false
+                    : settings.notifications['courseChanges::telegram'] === 1
+                "
+                :disabled="!account.telegramId || updatingNotifications"
+                @update:model-value="
+                  (value) =>
+                    (settings!.notifications['courseChanges::telegram'] =
+                      value ? 1 : 0)
+                "
+              />
+            </TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </section>

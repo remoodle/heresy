@@ -32,6 +32,7 @@ export type IEvent = {
 export type NotificationSettings = {
   "gradeUpdates::telegram": 0 | 1 | 2;
   "deadlineReminders::telegram": 0 | 1 | 2;
+  "courseChanges::telegram": 0 | 1 | 2;
 };
 
 export type UserSettings = {

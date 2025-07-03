@@ -12,6 +12,7 @@ import {
   formatDeadlineReminders,
   trackDeadlineReminders,
 } from "./events/deadlines";
+import { trackCourseChanges, formatCourseChanges } from "./events/courses";
 
 export type Processor = {
   /*
@@ -114,7 +115,56 @@ export const processors: Record<QueueName, Processor> = {
 
       logger.cluster.info({ userId }, `syncing courses`);
 
-      await syncCourses(userId);
+      const result = await syncCourses(userId, ["inprogress", "past"], true);
+
+      if (!result) {
+        return "no course changes to track";
+      }
+
+      const { existingCourses, updatedCourses } = result;
+
+      const courseChanges = trackCourseChanges(existingCourses, updatedCourses);
+
+      if (!courseChanges.changes.length) {
+        return "no course changes detected";
+      }
+
+      const user = await db.user.findOne({ _id: userId });
+
+      if (!user) {
+        throw new Error(`User ${userId} not found`);
+      }
+
+      if (
+        user.telegramId &&
+        user.settings.notifications["courseChanges::telegram"] !== 0
+      ) {
+        const message = formatCourseChanges(courseChanges);
+
+        if (message) {
+          const job = await queues[QueueName.TELEGRAM].add(
+            QueueName.TELEGRAM,
+            {
+              userId,
+              message,
+            },
+            {
+              attempts: 3,
+              backoff: {
+                type: "exponential",
+                delay: 2000,
+              },
+              deduplication: {
+                id: `${userId}::course-changes::${Date.now()}`,
+              },
+            },
+          );
+
+          return job.data;
+        }
+      }
+
+      return courseChanges;
     },
   },
   [QueueName.GRADES_SYNC]: {

@@ -632,10 +632,11 @@ const userRoutes = new Hono<{
         password: z.string().optional(),
         settings: z
           .object({
-            notifications: z.object({
-              "deadlineReminders::telegram": z.number(),
-              "gradeUpdates::telegram": z.number(),
-            }),
+                    notifications: z.object({
+          "deadlineReminders::telegram": z.number(),
+          "gradeUpdates::telegram": z.number(),
+          "courseChanges::telegram": z.number(),
+        }),
             deadlineReminders: z.object({
               thresholds: z.array(z.string()),
             }),
