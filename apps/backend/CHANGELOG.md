@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.21](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.20...remoodle/backend-v2.3.21) (2025-07-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v17 ([#451](https://github.com/remoodle/remoodle/issues/451)) ([cac62b8](https://github.com/remoodle/remoodle/commit/cac62b838a6ab60a9a44df92c911d50fb702e1f6))
+
 ## [2.3.20](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.19...remoodle/backend-v2.3.20) (2025-07-01)
 
 
