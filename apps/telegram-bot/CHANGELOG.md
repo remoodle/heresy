@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.4](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.3...remoodle/telegram-bot-v2.1.4) (2025-07-05)
+
+
+### Code Refactoring
+
+* **tgbot:** simplify notification settings ([6180ebb](https://github.com/remoodle/remoodle/commit/6180ebb1899cf707e4ab91ef8e16dbc3b7233572))
+
 ## [2.1.3](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.2...remoodle/telegram-bot-v2.1.3) (2025-07-05)
 
 
