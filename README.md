@@ -16,7 +16,6 @@ Enhancing Moodle experience with care
 ## Quick Start
 
 1. Create Telegram Bot
-
    - Message @BotFather on Telegram
    - Save the API token
 

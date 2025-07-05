@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, toRaw, watch, watchEffect } from "vue";
+import { ref, computed, toRaw, watch, watchEffect } from "vue";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/vue-query";
+import { objectEntries } from "@remoodle/utils";
 import type { UserSettings } from "@remoodle/types";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
-import { Switch } from "@/shared/ui/switch";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Separator } from "@/shared/ui/separator";
 import { useToast } from "@/shared/ui/toast";
@@ -27,6 +27,12 @@ import {
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 import { useUserStore } from "@/shared/stores/user";
 import { TELEGRAM_BOT_URL } from "@/shared/config";
+import {
+  NOTIFICATIONS_CONFIG,
+  NOTIFICATION_SETTING_STATE,
+  TRANSPORT_TYPES,
+} from "./lib";
+import NotificationCheckbox from "./ui/NotificationCheckbox.vue";
 
 const { data: account, suspense } = useQuery({
   queryKey: ["private", "user", "settings"],
@@ -132,6 +138,17 @@ const AVAILABLE_THRESHOLDS = [
 ];
 
 await Promise.all([suspense(), userStore.suspense()]);
+
+const isDeadlinesEnabled = computed(() => {
+  if (!settings.value?.notifications) {
+    return false;
+  }
+
+  return (
+    settings.value.notifications["deadlineReminders::telegram"] !==
+    NOTIFICATION_SETTING_STATE.disabled
+  );
+});
 </script>
 
 <template>
@@ -142,107 +159,123 @@ await Promise.all([suspense(), userStore.suspense()]);
         Configure how you receive notifications
       </p>
     </div>
+
     <Separator />
 
-    <section v-if="account && settings">
-      <Table class="max-w-2xl">
-        <TableHeader>
-          <TableRow>
-            <TableHead class="w-[420px]"> </TableHead>
-            <TableHead class="text-right"> Telegram </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell class="font-medium"> 📘 Updated grades </TableCell>
-            <TableCell class="text-right">
-              <Switch
-                :model-value="
-                  !account.telegramId
-                    ? false
-                    : settings.notifications['gradeUpdates::telegram'] === 1
-                "
-                :disabled="!account.telegramId || updatingNotifications"
-                @update:model-value="
-                  (value) =>
-                    (settings!.notifications['gradeUpdates::telegram'] = value
-                      ? 1
-                      : 0)
-                "
-              />
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell class="font-medium">
-              🔔 Upcoming deadlines
+    <section v-if="account && settings" class="max-w-2xl">
+      <div class="flex flex-col">
+        <h2>Settings</h2>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead> </TableHead>
+              <template v-for="type in TRANSPORT_TYPES" :key="type">
+                <TableHead class="w-14 text-center md:w-32">
+                  <p class="text-muted-foreground font-medium">
+                    <span class="capitalize">
+                      {{ type }}
+                    </span>
+                  </p>
+                </TableHead>
+              </template>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <template
+              v-for="{ key, name } in objectEntries(settings.notifications).map(
+                ([key, value]) => {
+                  const [name, transport] = key.split('::');
 
-              <div
-                class="mt-5 grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
-              >
-                <template
-                  v-for="threshold in AVAILABLE_THRESHOLDS"
-                  :key="threshold"
+                  return {
+                    key,
+                    name,
+                    transport,
+                    value,
+                  };
+                },
+              )"
+              :key="name"
+            >
+              <TableRow>
+                <TableCell class="p-4">
+                  {{
+                    name in NOTIFICATIONS_CONFIG
+                      ? NOTIFICATIONS_CONFIG[
+                          name as keyof typeof NOTIFICATIONS_CONFIG
+                        ].title
+                      : name
+                  }}
+                </TableCell>
+                <TableCell
+                  v-for="type in TRANSPORT_TYPES"
+                  :key="type"
+                  class="text-center"
                 >
-                  <div class="flex flex-col gap-4">
-                    <div class="flex items-center space-x-2">
-                      <Checkbox
-                        :id="threshold"
-                        :model-value="
-                          account.telegramId
-                            ? settings.deadlineReminders.thresholds.includes(
-                                threshold,
-                              )
-                            : false
-                        "
-                        :disabled="
-                          !account.telegramId ||
-                          updatingNotifications ||
-                          settings.notifications[
-                            'deadlineReminders::telegram'
-                          ] === 0
-                        "
-                        @update:model-value="
-                          (value) =>
-                            (settings!.deadlineReminders.thresholds = value
-                              ? [
-                                  ...settings!.deadlineReminders.thresholds,
-                                  threshold,
-                                ]
-                              : settings!.deadlineReminders.thresholds.filter(
-                                  (t) => t !== threshold,
-                                ))
-                        "
-                      />
-                      <label
-                        :for="threshold"
-                        class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        {{ threshold }}
-                      </label>
-                    </div>
-                  </div>
-                </template>
+                  <NotificationCheckbox
+                    :notification="key"
+                    :value="settings.notifications[key]"
+                    :disabled="!account.telegramId || updatingNotifications"
+                    @update="
+                      (key, value) => (settings!.notifications[key] = value)
+                    "
+                  />
+                </TableCell>
+              </TableRow>
+            </template>
+          </TableBody>
+        </Table>
+      </div>
+
+      <div class="py-3" />
+
+      <div class="flex flex-col gap-4">
+        <h2>
+          Deadline thresholds
+          <em v-if="!isDeadlinesEnabled" class="text-muted-foreground text-sm"
+            >(enable {{ NOTIFICATIONS_CONFIG["deadlineReminders"].title }} for
+            it to make sense )
+          </em>
+        </h2>
+        <div
+          class="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
+        >
+          <template v-for="threshold in AVAILABLE_THRESHOLDS" :key="threshold">
+            <div class="flex flex-col gap-4">
+              <div class="flex items-center space-x-2">
+                <Checkbox
+                  :id="threshold"
+                  :model-value="
+                    account.telegramId
+                      ? settings.deadlineReminders.thresholds.includes(
+                          threshold,
+                        )
+                      : false
+                  "
+                  :disabled="
+                    !account.telegramId ||
+                    updatingNotifications ||
+                    !isDeadlinesEnabled
+                  "
+                  @update:model-value="
+                    (value) =>
+                      (settings!.deadlineReminders.thresholds = value
+                        ? [...settings!.deadlineReminders.thresholds, threshold]
+                        : settings!.deadlineReminders.thresholds.filter(
+                            (t) => t !== threshold,
+                          ))
+                  "
+                />
+                <label
+                  :for="threshold"
+                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {{ threshold }}
+                </label>
               </div>
-            </TableCell>
-            <TableCell class="text-right">
-              <Switch
-                :model-value="
-                  !account.telegramId
-                    ? false
-                    : settings.notifications['deadlineReminders::telegram'] ===
-                      1
-                "
-                :disabled="!account.telegramId || updatingNotifications"
-                @update:model-value="
-                  (value) =>
-                    (settings!.notifications['deadlineReminders::telegram'] =
-                      value ? 1 : 0)
-                "
-              />
-            </TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+            </div>
+          </template>
+        </div>
+      </div>
     </section>
 
     <div v-if="account" class="max-w-sm">
