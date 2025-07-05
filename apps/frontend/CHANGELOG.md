@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.4](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.3...remoodle/frontend-v1.10.4) (2025-07-05)
+
+
+### Code Refactoring
+
+* simplify user initialization ([25ed52d](https://github.com/remoodle/remoodle/commit/25ed52d267eacde3ddf1070a1d18324a2cc7e71c))
+
 ## [1.10.3](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.2...remoodle/frontend-v1.10.3) (2025-07-05)
 
 
