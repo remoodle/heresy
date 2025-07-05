@@ -131,7 +131,7 @@ const AVAILABLE_THRESHOLDS = [
   "4 days",
 ];
 
-await suspense();
+await Promise.all([suspense(), userStore.suspense()]);
 </script>
 
 <template>

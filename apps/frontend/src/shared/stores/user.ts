@@ -74,7 +74,7 @@ export const useUserStore = defineStore("user", () => {
     );
   };
 
-  const { data, error, isPending } = useQuery({
+  const { data, error, isPending, suspense } = useQuery({
     queryKey: ["private", "user"],
     queryFn: async () => await getUser(),
     enabled: authorized,
@@ -95,6 +95,7 @@ export const useUserStore = defineStore("user", () => {
   return {
     user,
     isPending,
+    suspense,
     accessToken,
     refreshToken,
     authorized,

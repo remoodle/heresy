@@ -134,7 +134,7 @@ const { mutate: updatePassword, isPending: updatingPassword } = useMutation({
   },
 });
 
-await suspense();
+await Promise.all([suspense(), userStore.suspense()]);
 </script>
 
 <template>

@@ -36,7 +36,7 @@ const route = useRoute();
         <aside class="lg:w-1/5">
           <AccountSidebar />
         </aside>
-        <div v-if="!userStore.isPending" class="flex-1">
+        <div class="flex-1">
           <template v-if="route.name === RouteName.AccountProfile">
             <Suspense>
               <AccountProfilePage />
