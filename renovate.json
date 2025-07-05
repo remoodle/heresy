@@ -4,5 +4,6 @@
     "config:recommended",
     "group:allNonMajor"
   ],
+  "rangeStrategy": "bump",
   "postUpdateOptions": ["pnpmDedupe"]
 }
