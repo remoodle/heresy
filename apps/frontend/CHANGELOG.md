@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.2](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.1...remoodle/frontend-v1.10.2) (2025-07-05)
+
+
+### Bug Fixes
+
+* unblock parallel loading of settings ([c3498b1](https://github.com/remoodle/remoodle/commit/c3498b10357e696b49a0b4ebee2c12453318c6aa))
+
 ## [1.10.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.0...remoodle/frontend-v1.10.1) (2025-07-03)
 
 
