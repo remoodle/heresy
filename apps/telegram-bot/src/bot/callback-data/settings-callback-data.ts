@@ -13,6 +13,6 @@ export const changeNotificationCallback = createCallbackData(
   "change_notification",
   {
     type: String,
-    value: Boolean,
+    value: Number,
   },
 );
