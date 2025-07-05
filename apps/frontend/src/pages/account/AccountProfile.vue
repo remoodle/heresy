@@ -138,15 +138,17 @@ await Promise.all([suspense(), userStore.suspense()]);
 </script>
 
 <template>
-  <section class="space-y-6">
+  <section v-if="account" class="max-w-full space-y-6 md:max-w-2xl">
     <div>
-      <h1 class="text-xl font-medium">Profile</h1>
-      <p class="text-muted-foreground text-sm">Account information</p>
+      <h1 class="text-xl font-medium">Account</h1>
+      <p class="text-muted-foreground text-sm">Profile information</p>
     </div>
+
     <Separator />
-    <form @submit.prevent="updateHandle(handle)">
-      <div class="grid gap-2">
-        <Label for="name">Handle</Label>
+
+    <form class="flex flex-col gap-2" @submit.prevent="updateHandle(handle)">
+      <h2>Handle</h2>
+      <div class="flex items-center gap-2">
         <Input
           id="name"
           v-model="handle"
@@ -158,15 +160,12 @@ await Promise.all([suspense(), userStore.suspense()]);
           :disabled="updatingHandle"
           required
         />
+        <Button type="submit" :disabled="canUpdateHandle">Save</Button>
       </div>
-      <div class="py-2"></div>
-      <Button type="submit" :disabled="canUpdateHandle">Save</Button>
     </form>
 
-    <Separator />
-
-    <div v-if="account" class="grid gap-2">
-      <Label for="password">Password</Label>
+    <div class="flex flex-col gap-2">
+      <h2>Password</h2>
       <div>
         <Dialog
           v-model:open="showPasswordDialog"
@@ -222,8 +221,10 @@ await Promise.all([suspense(), userStore.suspense()]);
       </div>
     </div>
 
-    <Separator />
+    <template v-if="features.enableAccountDeletion">
+      <Separator />
 
-    <AccountDeletion v-if="features.enableAccountDeletion" />
+      <AccountDeletion />
+    </template>
   </section>
 </template>

@@ -5,6 +5,7 @@ import { objectEntries } from "@remoodle/utils";
 import type { UserSettings } from "@remoodle/types";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { Icon } from "@/shared/ui/icon";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Separator } from "@/shared/ui/separator";
 import { useToast } from "@/shared/ui/toast";
@@ -152,7 +153,7 @@ const isDeadlinesEnabled = computed(() => {
 </script>
 
 <template>
-  <section class="space-y-6">
+  <section v-if="account && settings" class="max-w-full space-y-6 md:max-w-2xl">
     <div>
       <h1 class="text-xl font-medium">Notifications</h1>
       <p class="text-muted-foreground text-sm">
@@ -162,155 +163,160 @@ const isDeadlinesEnabled = computed(() => {
 
     <Separator />
 
-    <section v-if="account && settings" class="max-w-2xl">
-      <div class="flex flex-col">
-        <h2>Settings</h2>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead> </TableHead>
-              <template v-for="type in TRANSPORT_TYPES" :key="type">
-                <TableHead class="w-14 text-center md:w-32">
-                  <p class="text-muted-foreground font-medium">
-                    <span class="capitalize">
-                      {{ type }}
-                    </span>
-                  </p>
-                </TableHead>
-              </template>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <template
-              v-for="{ key, name } in objectEntries(settings.notifications).map(
-                ([key, value]) => {
-                  const [name, transport] = key.split('::');
-
-                  return {
-                    key,
-                    name,
-                    transport,
-                    value,
-                  };
-                },
-              )"
-              :key="name"
-            >
-              <TableRow>
-                <TableCell class="p-4">
-                  {{
-                    name in NOTIFICATIONS_CONFIG
-                      ? NOTIFICATIONS_CONFIG[
-                          name as keyof typeof NOTIFICATIONS_CONFIG
-                        ].title
-                      : name
-                  }}
-                </TableCell>
-                <TableCell
-                  v-for="type in TRANSPORT_TYPES"
-                  :key="type"
-                  class="text-center"
-                >
-                  <NotificationCheckbox
-                    :notification="key"
-                    :value="settings.notifications[key]"
-                    :disabled="!account.telegramId || updatingNotifications"
-                    @update="
-                      (key, value) => (settings!.notifications[key] = value)
-                    "
-                  />
-                </TableCell>
-              </TableRow>
-            </template>
-          </TableBody>
-        </Table>
-      </div>
-
-      <div class="py-3" />
-
-      <div class="flex flex-col gap-4">
-        <h2>
-          Deadline thresholds
-          <em v-if="!isDeadlinesEnabled" class="text-muted-foreground text-sm"
-            >(enable {{ NOTIFICATIONS_CONFIG["deadlineReminders"].title }} for
-            it to make sense )
-          </em>
-        </h2>
-        <div
-          class="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
-        >
-          <template v-for="threshold in AVAILABLE_THRESHOLDS" :key="threshold">
-            <div class="flex flex-col gap-4">
-              <div class="flex items-center space-x-2">
-                <Checkbox
-                  :id="threshold"
-                  :model-value="
-                    account.telegramId
-                      ? settings.deadlineReminders.thresholds.includes(
-                          threshold,
-                        )
-                      : false
-                  "
-                  :disabled="
-                    !account.telegramId ||
-                    updatingNotifications ||
-                    !isDeadlinesEnabled
-                  "
-                  @update:model-value="
-                    (value) =>
-                      (settings!.deadlineReminders.thresholds = value
-                        ? [...settings!.deadlineReminders.thresholds, threshold]
-                        : settings!.deadlineReminders.thresholds.filter(
-                            (t) => t !== threshold,
-                          ))
-                  "
-                />
-                <label
-                  :for="threshold"
-                  class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {{ threshold }}
-                </label>
-              </div>
-            </div>
+    <Table>
+      <TableHeader class="[&_tr]:border-none">
+        <TableRow class="hover:bg-transparent">
+          <TableHead class="text-foreground !pl-0 text-base font-normal">
+            Settings
+          </TableHead>
+          <template v-for="type in TRANSPORT_TYPES" :key="type">
+            <TableHead class="w-14 text-center md:w-32">
+              <p class="text-muted-foreground font-medium">
+                <span class="capitalize">
+                  {{ type }}
+                </span>
+              </p>
+            </TableHead>
           </template>
-        </div>
-      </div>
-    </section>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <template
+          v-for="{ key, name } in objectEntries(settings.notifications).map(
+            ([key, value]) => {
+              const [name, transport] = key.split('::');
 
-    <div v-if="account" class="max-w-sm">
-      <div>
-        <div class="text-muted-foreground mb-2">
-          Telegram ID:
-          <strong>{{ account.telegramId || "not connected" }}</strong>
-        </div>
-        <Dialog v-model:open="showOtpModal">
-          <DialogTrigger as-child>
-            <Button size="sm" @click="connect">
-              {{ account.telegramId ? "Change Telegram" : "Connect Telegram" }}
-            </Button>
-          </DialogTrigger>
-          <DialogContent class="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Enter OTP </DialogTitle>
-              <DialogDescription>
-                It was sent to your Telegram account
-              </DialogDescription>
-            </DialogHeader>
+              return {
+                key,
+                name,
+                transport,
+                value,
+              };
+            },
+          )"
+          :key="name"
+        >
+          <TableRow class="border-none">
+            <TableCell class="px-0 py-4">
+              {{
+                name in NOTIFICATIONS_CONFIG
+                  ? NOTIFICATIONS_CONFIG[
+                      name as keyof typeof NOTIFICATIONS_CONFIG
+                    ].title
+                  : name
+              }}
+            </TableCell>
+            <TableCell
+              v-for="type in TRANSPORT_TYPES"
+              :key="type"
+              class="text-center"
+            >
+              <NotificationCheckbox
+                :notification="key"
+                :value="settings.notifications[key]"
+                :disabled="!account.telegramId || updatingNotifications"
+                @update="(key, value) => (settings!.notifications[key] = value)"
+              />
+            </TableCell>
+          </TableRow>
+        </template>
+      </TableBody>
+    </Table>
 
-            <form @submit.prevent="verifyOtp()">
-              <div class="flex max-w-sm items-center gap-2">
-                <Input
-                  v-model="otp"
-                  :disabled="verifying"
-                  placeholder="Telegram OTP"
-                />
-                <Button type="submit" :disabled="verifying"> Verify </Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+    <div class="flex flex-col gap-4">
+      <h2>
+        Deadline thresholds
+        <em v-if="!isDeadlinesEnabled" class="text-muted-foreground text-sm"
+          >(enable {{ NOTIFICATIONS_CONFIG["deadlineReminders"].title }} for it
+          to make sense )
+        </em>
+      </h2>
+      <div
+        class="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
+      >
+        <template v-for="threshold in AVAILABLE_THRESHOLDS" :key="threshold">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center space-x-2">
+              <Checkbox
+                :id="threshold"
+                :model-value="
+                  account.telegramId
+                    ? settings.deadlineReminders.thresholds.includes(threshold)
+                    : false
+                "
+                :disabled="
+                  !account.telegramId ||
+                  updatingNotifications ||
+                  !isDeadlinesEnabled
+                "
+                @update:model-value="
+                  (value) =>
+                    (settings!.deadlineReminders.thresholds = value
+                      ? [...settings!.deadlineReminders.thresholds, threshold]
+                      : settings!.deadlineReminders.thresholds.filter(
+                          (t) => t !== threshold,
+                        ))
+                "
+              />
+              <label
+                :for="threshold"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{ threshold }}
+              </label>
+            </div>
+          </div>
+        </template>
       </div>
+    </div>
+
+    <div class="flex flex-col">
+      <h2>Connected accounts</h2>
+      <ul class="flex flex-col">
+        <li
+          class="bg-background divide divide-border flex w-full flex-wrap items-center justify-between gap-2 rounded-lg py-2"
+        >
+          <div class="flex items-center gap-2">
+            <Icon name="telegram_logo" class="size-8" />
+            <div class="flex flex-col">
+              <p>Telegram</p>
+              <p class="text-muted-foreground text-xs">
+                Primary source {{ account.telegramId }}
+              </p>
+            </div>
+          </div>
+          <Dialog v-model:open="showOtpModal">
+            <DialogTrigger as-child>
+              <Button
+                size="sm"
+                :variant="account.telegramId ? 'outline' : 'default'"
+                @click="connect"
+              >
+                {{ account.telegramId ? "Change" : "Connect" }}
+              </Button>
+            </DialogTrigger>
+            <DialogContent class="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Enter OTP </DialogTitle>
+                <DialogDescription>
+                  It was sent to your Telegram account
+                </DialogDescription>
+              </DialogHeader>
+
+              <form @submit.prevent="verifyOtp()">
+                <div class="flex max-w-sm items-center gap-2">
+                  <Input
+                    v-model="otp"
+                    :disabled="verifying"
+                    placeholder="Telegram OTP"
+                  />
+                  <Button type="submit" :disabled="verifying"> Verify </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </li>
+      </ul>
     </div>
   </section>
 </template>

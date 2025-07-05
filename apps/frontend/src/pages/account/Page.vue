@@ -37,41 +37,43 @@ const route = useRoute();
           <AccountSidebar />
         </aside>
         <div class="flex-1">
-          <template v-if="route.name === RouteName.AccountProfile">
-            <Suspense>
-              <AccountProfilePage />
-              <template #fallback>
-                <div>
+          <KeepAlive>
+            <template v-if="route.name === RouteName.AccountProfile">
+              <Suspense>
+                <AccountProfilePage />
+                <template #fallback>
+                  <div>
+                    <div class="flex flex-col gap-4">
+                      <Skeleton class="h-12" />
+                      <Skeleton class="h-6 w-1/2" />
+                      <Skeleton class="h-6" />
+                    </div>
+                    <div class="py-6"></div>
+                    <div class="flex flex-col gap-4">
+                      <Skeleton class="h-12" />
+                      <Skeleton class="h-6 w-1/3" />
+                      <Skeleton class="h-6" />
+                    </div>
+                  </div>
+                </template>
+              </Suspense>
+            </template>
+            <template v-else-if="route.name === RouteName.AccountNotifications">
+              <Suspense>
+                <AccountNotificationsPage />
+                <template #fallback>
                   <div class="flex flex-col gap-4">
                     <Skeleton class="h-12" />
-                    <Skeleton class="h-6 w-1/2" />
-                    <Skeleton class="h-6" />
-                  </div>
-                  <div class="py-6"></div>
-                  <div class="flex flex-col gap-4">
+                    <Skeleton class="h-12" />
+                    <Skeleton class="h-12" />
                     <Skeleton class="h-12" />
                     <Skeleton class="h-6 w-1/3" />
                     <Skeleton class="h-6" />
                   </div>
-                </div>
-              </template>
-            </Suspense>
-          </template>
-          <template v-else-if="route.name === RouteName.AccountNotifications">
-            <Suspense>
-              <AccountNotificationsPage />
-              <template #fallback>
-                <div class="flex flex-col gap-4">
-                  <Skeleton class="h-12" />
-                  <Skeleton class="h-12" />
-                  <Skeleton class="h-12" />
-                  <Skeleton class="h-12" />
-                  <Skeleton class="h-6 w-1/3" />
-                  <Skeleton class="h-6" />
-                </div>
-              </template>
-            </Suspense>
-          </template>
+                </template>
+              </Suspense>
+            </template>
+          </KeepAlive>
         </div>
       </div>
     </RoundedSection>

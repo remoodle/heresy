@@ -14,7 +14,7 @@ const route = useRoute();
 
 const sidebarNavItems: Item[] = [
   {
-    title: "Profile",
+    title: "Account",
     route: RouteName.AccountProfile,
   },
   {

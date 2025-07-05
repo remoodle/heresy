@@ -52,6 +52,7 @@ export const icons = {
   people: "fluent:people-add-20-filled",
   telegram: "cib:telegram-plane",
   github: "mdi:github",
+  telegram_logo: "logos:telegram",
   close: "ic:round-close",
   ...fileIcons,
 } as const;
