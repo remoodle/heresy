@@ -23,11 +23,15 @@ export const useUserStore = defineStore("user", () => {
     return !!user.value && !!accessToken.value && !!refreshToken.value;
   });
 
-  const identify = (data: { _id: string; name: string }) => {
-    posthog.identify(data._id, {
-      name: data.name,
-    });
-  };
+  const posthog = usePosthog();
+
+  watchEffect(() => {
+    if (user.value) {
+      posthog.identify(user.value._id, {
+        name: user.value.name,
+      });
+    }
+  });
 
   const login = (
     accessTokenData: string,
@@ -37,7 +41,32 @@ export const useUserStore = defineStore("user", () => {
     accessToken.value = accessTokenData;
     refreshToken.value = refreshTokenData;
     user.value = userData;
-    identify(user.value);
+  };
+
+  const initializeUser = () => {
+    const url = new URL(window.location.href);
+
+    const usr = url.searchParams.get("usr");
+
+    if (!usr) {
+      return;
+    }
+
+    try {
+      const data = atob(usr);
+
+      const resp = JSON.parse(data) as {
+        user: IUser;
+        accessToken: string;
+        refreshToken: string;
+      };
+
+      if (resp.user && resp.accessToken && resp.refreshToken) {
+        login(resp.accessToken, resp.refreshToken, resp.user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const showTelegramBanner = useStorage(
@@ -50,8 +79,6 @@ export const useUserStore = defineStore("user", () => {
   };
 
   const queryClient = useQueryClient();
-
-  const posthog = usePosthog();
 
   const logout = () => {
     user.value = null;
@@ -101,7 +128,7 @@ export const useUserStore = defineStore("user", () => {
     authorized,
     login,
     logout,
-    identify,
+    initializeUser,
     showTelegramBanner,
     closeTelegramBanner,
   };

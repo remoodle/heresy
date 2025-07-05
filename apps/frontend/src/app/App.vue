@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { onMounted, watch } from "vue";
+import { watch } from "vue";
 import { storeToRefs } from "pinia";
-import type { IUser } from "@remoodle/types";
-import { RouterView, useRoute, useRouter } from "vue-router";
-import { useUrlSearchParams } from "@vueuse/core";
 import { ConfigProvider } from "reka-ui";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/shared/stores/user";
+import { Toaster } from "@/shared/ui/toast";
 import { RouteName } from "@/shared/lib/routes";
-import Toaster from "@/shared/ui/toast/Toaster.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -35,30 +33,7 @@ watch(authorized, async (now, was) => {
   }
 });
 
-onMounted(() => {
-  if (authorized.value && userStore.user) {
-    userStore.identify(userStore.user);
-    return;
-  }
-
-  const params = useUrlSearchParams("history");
-  const usr = params.usr as string | undefined;
-
-  if (!usr) {
-    return;
-  }
-
-  const data = atob(usr);
-  const resp = JSON.parse(data) as {
-    user: IUser;
-    accessToken: string;
-    refreshToken: string;
-  };
-
-  if (resp.user) {
-    userStore.login(resp.accessToken, resp.refreshToken, resp.user);
-  }
-});
+userStore.initializeUser();
 </script>
 
 <template>
