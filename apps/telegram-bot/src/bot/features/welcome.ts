@@ -30,6 +30,19 @@ feature.command("start", logHandle("start"), async (ctx) => {
 
   const token = ctx.message.text.split(" ")[1];
 
+  if (token === "connect") {
+    const { token: connectionToken, expiryDate } =
+      await db.telegramToken.set(userId);
+
+    await ctx.reply(
+      `🔗 Your connection token: \`${connectionToken}\`\n\n` +
+        `Enter this token in the web app to link your Telegram account.\n` +
+        `⏰ Expires: ${expiryDate.toLocaleString()}`,
+      { parse_mode: "Markdown" },
+    );
+    return;
+  }
+
   if (token) {
     await handleRegistration(ctx, userId, token);
     return;
@@ -42,19 +55,6 @@ feature.command("start", logHandle("start"), async (ctx) => {
     }
 
     await showMainMenu(ctx, user.name, userId);
-    return;
-  }
-
-  if (token === "connect") {
-    const { token: connectionToken, expiryDate } =
-      await db.telegramToken.set(userId);
-
-    await ctx.reply(
-      `🔗 Your connection token: \`${connectionToken}\`\n\n` +
-        `Enter this token in the web app to link your Telegram account.\n` +
-        `⏰ Expires: ${expiryDate.toLocaleString()}`,
-      { parse_mode: "Markdown" },
-    );
     return;
   }
 
