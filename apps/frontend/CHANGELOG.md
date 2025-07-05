@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.10.3](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.2...remoodle/frontend-v1.10.3) (2025-07-05)
+
+
+### Bug Fixes
+
+* update settings ui ([6e5db05](https://github.com/remoodle/remoodle/commit/6e5db05e3c8931eef790fc740a06d067f7a0b068))
+
+
+### Code Refactoring
+
+* **frontend:** simplify notification settings ([ee232f7](https://github.com/remoodle/remoodle/commit/ee232f75eeb545d9d981fa70a7da24ace3f253c0))
+
 ## [1.10.2](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.1...remoodle/frontend-v1.10.2) (2025-07-05)
 
 
