@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.2...remoodle/telegram-bot-v2.1.3) (2025-07-05)
+
+
+### Bug Fixes
+
+* **tgbot:** handle tgconnect properly ([29bc99c](https://github.com/remoodle/remoodle/commit/29bc99c9e8819fe4254c515051a6a169d1a67948))
+
 ## [2.1.2](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.1...remoodle/telegram-bot-v2.1.2) (2025-07-03)
 
 
