@@ -5,5 +5,16 @@
     "group:allNonMajor"
   ],
   "rangeStrategy": "bump",
+  "packageRules": [
+    {
+      "matchPackageNames": ["node"],
+      "matchManagers": ["dockerfile"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["nvm"],
+      "enabled": false
+    }
+  ],
   "postUpdateOptions": ["pnpmDedupe"]
 }
