@@ -12,6 +12,11 @@
       "enabled": false
     },
     {
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["packageManager"],
+      "enabled": false
+    },
+    {
       "matchManagers": ["nvm"],
       "enabled": false
     }
