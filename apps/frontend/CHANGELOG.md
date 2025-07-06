@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.7...remoodle/frontend-v1.10.8) (2025-07-06)
+
+
+### Bug Fixes
+
+* change wording ([1fa4ba1](https://github.com/remoodle/remoodle/commit/1fa4ba1624113ed06ac0423d989394b374e54bb3))
+
 ## [1.10.7](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.6...remoodle/frontend-v1.10.7) (2025-07-06)
 
 
