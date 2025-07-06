@@ -1,22 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, toRaw, watch, watchEffect } from "vue";
-import { useQueryClient, useMutation, useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import { objectEntries } from "@remoodle/utils";
 import type { UserSettings } from "@remoodle/types";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
-import { Icon } from "@/shared/ui/icon";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Separator } from "@/shared/ui/separator";
 import { useToast } from "@/shared/ui/toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/shared/ui/dialog";
 import {
   Table,
   TableBody,
@@ -27,12 +16,12 @@ import {
 } from "@/shared/ui/table";
 import { requestUnwrap, getAuthHeaders } from "@/shared/lib/hc";
 import { useUserStore } from "@/shared/stores/user";
-import { TELEGRAM_BOT_URL } from "@/shared/config";
 import {
   NOTIFICATIONS_CONFIG,
   NOTIFICATION_SETTING_STATE,
   TRANSPORT_TYPES,
 } from "./lib";
+import ConnectTelegram from "./ui/ConnectTelegram.vue";
 import NotificationCheckbox from "./ui/NotificationCheckbox.vue";
 
 const { data: account, suspense } = useQuery({
@@ -42,8 +31,6 @@ const { data: account, suspense } = useQuery({
       client.v2.user.settings.$get({}, { headers: getAuthHeaders() }),
     ),
 });
-
-const queryClient = useQueryClient();
 
 const { toast } = useToast();
 
@@ -55,50 +42,6 @@ watchEffect(() => {
   if (account.value) {
     settings.value = structuredClone(toRaw(account.value.settings));
   }
-});
-
-const otp = ref<string>("");
-const showOtpModal = ref(false);
-
-const connect = () => {
-  setTimeout(() => {
-    window.open(`${TELEGRAM_BOT_URL}?start=connect`, "_blank");
-  }, 1000);
-};
-
-const { mutate: verifyOtp, isPending: verifying } = useMutation({
-  mutationFn: async () =>
-    requestUnwrap((client) =>
-      client.v2.otp.verify.$post(
-        { json: { otp: otp.value } },
-        { headers: getAuthHeaders() },
-      ),
-    ),
-  onSuccess: (data) => {
-    showOtpModal.value = false;
-    otp.value = "";
-
-    queryClient.setQueryData(
-      ["private", "user", "settings"],
-      (old: Record<string, unknown>) => {
-        return {
-          ...old,
-          telegramId: data.telegramId,
-        };
-      },
-    );
-
-    userStore.closeTelegramBanner();
-
-    toast({
-      title: "Telegram connected",
-    });
-  },
-  onError: (error) => {
-    toast({
-      title: error.message,
-    });
-  },
 });
 
 const { mutate: updateNotifications, isPending: updatingNotifications } =
@@ -228,7 +171,7 @@ const isDeadlinesEnabled = computed(() => {
         Deadline thresholds
         <em v-if="!isDeadlinesEnabled" class="text-muted-foreground text-sm"
           >(enable {{ NOTIFICATIONS_CONFIG["deadlineReminders"].title }} for it
-          to make sense )
+          to make sense)
         </em>
       </h2>
       <div
@@ -273,49 +216,7 @@ const isDeadlinesEnabled = computed(() => {
     <div class="flex flex-col">
       <h2>Connected accounts</h2>
       <ul class="flex flex-col">
-        <li
-          class="bg-background divide divide-border flex w-full flex-wrap items-center justify-between gap-2 rounded-lg py-2"
-        >
-          <div class="flex items-center gap-2">
-            <Icon name="telegram_logo" class="size-8" />
-            <div class="flex flex-col">
-              <p>Telegram</p>
-              <p class="text-muted-foreground text-xs">
-                Primary source {{ account.telegramId }}
-              </p>
-            </div>
-          </div>
-          <Dialog v-model:open="showOtpModal">
-            <DialogTrigger as-child>
-              <Button
-                size="sm"
-                :variant="account.telegramId ? 'outline' : 'default'"
-                @click="connect"
-              >
-                {{ account.telegramId ? "Change" : "Connect" }}
-              </Button>
-            </DialogTrigger>
-            <DialogContent class="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Enter OTP </DialogTitle>
-                <DialogDescription>
-                  It was sent to your Telegram account
-                </DialogDescription>
-              </DialogHeader>
-
-              <form @submit.prevent="verifyOtp()">
-                <div class="flex max-w-sm items-center gap-2">
-                  <Input
-                    v-model="otp"
-                    :disabled="verifying"
-                    placeholder="Telegram OTP"
-                  />
-                  <Button type="submit" :disabled="verifying"> Verify </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </li>
+        <ConnectTelegram :telegram-id="account.telegramId" />
       </ul>
     </div>
   </section>
