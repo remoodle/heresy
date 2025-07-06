@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.6](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.5...remoodle/frontend-v1.10.6) (2025-07-06)
+
+
+### Code Refactoring
+
+* simplify connected account ui ([1fb24e6](https://github.com/remoodle/remoodle/commit/1fb24e6f99ea18d2a8e0ee27ab6c0794146f5e4b))
+
 ## [1.10.5](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.4...remoodle/frontend-v1.10.5) (2025-07-05)
 
 
