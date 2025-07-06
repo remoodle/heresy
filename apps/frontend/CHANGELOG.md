@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.7](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.6...remoodle/frontend-v1.10.7) (2025-07-06)
+
+
+### Bug Fixes
+
+* iterate over settings properly ([8654c7b](https://github.com/remoodle/remoodle/commit/8654c7bc7befb5562a7d9c70ac9440f7046b5680))
+
 ## [1.10.6](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.5...remoodle/frontend-v1.10.6) (2025-07-06)
 
 
