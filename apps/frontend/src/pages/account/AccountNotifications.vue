@@ -221,7 +221,7 @@ await Promise.all([suspense(), userStore.suspense()]);
     </div>
 
     <div class="flex flex-col">
-      <h2>Connected accounts</h2>
+      <h2>Connections</h2>
       <ul class="flex flex-col">
         <ConnectTelegram :telegram-id="account.telegramId" />
       </ul>
