@@ -70,6 +70,38 @@ watch(
   { deep: true },
 );
 
+const isDeadlinesEnabled = computed(() => {
+  if (!settings.value?.notifications) {
+    return false;
+  }
+
+  return (
+    settings.value.notifications["deadlineReminders::telegram"] !==
+    NOTIFICATION_SETTING_STATE.disabled
+  );
+});
+
+const notificationGroups = computed(() => {
+  if (!settings.value?.notifications) {
+    return {};
+  }
+
+  const groups: Record<
+    string,
+    Record<string, { key: string; value: number }>
+  > = {};
+
+  for (const [key, value] of objectEntries(settings.value.notifications)) {
+    const [name, transport] = key.split("::");
+    if (!groups[name]) {
+      groups[name] = {};
+    }
+    groups[name][transport] = { key, value };
+  }
+
+  return groups;
+});
+
 const AVAILABLE_THRESHOLDS = [
   "1 hour",
   "3 hours",
@@ -82,17 +114,6 @@ const AVAILABLE_THRESHOLDS = [
 ];
 
 await Promise.all([suspense(), userStore.suspense()]);
-
-const isDeadlinesEnabled = computed(() => {
-  if (!settings.value?.notifications) {
-    return false;
-  }
-
-  return (
-    settings.value.notifications["deadlineReminders::telegram"] !==
-    NOTIFICATION_SETTING_STATE.disabled
-  );
-});
 </script>
 
 <template>
@@ -124,21 +145,7 @@ const isDeadlinesEnabled = computed(() => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <template
-          v-for="{ key, name } in objectEntries(settings.notifications).map(
-            ([key, value]) => {
-              const [name, transport] = key.split('::');
-
-              return {
-                key,
-                name,
-                transport,
-                value,
-              };
-            },
-          )"
-          :key="name"
-        >
+        <template v-for="(transports, name) in notificationGroups" :key="name">
           <TableRow class="border-none">
             <TableCell class="px-0 py-4">
               {{
@@ -155,8 +162,8 @@ const isDeadlinesEnabled = computed(() => {
               class="text-center"
             >
               <NotificationCheckbox
-                :notification="key"
-                :value="settings.notifications[key]"
+                :notification="transports[type]?.key"
+                :value="transports[type]?.value"
                 :disabled="!account.telegramId || updatingNotifications"
                 @update="(key, value) => (settings!.notifications[key] = value)"
               />
