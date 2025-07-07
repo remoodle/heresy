@@ -43,17 +43,9 @@ export const useUserStore = defineStore("user", () => {
     user.value = userData;
   };
 
-  const initializeUser = () => {
-    const url = new URL(window.location.href);
-
-    const usr = url.searchParams.get("usr");
-
-    if (!usr) {
-      return;
-    }
-
+  const handleLaunchParams = (init: string) => {
     try {
-      const data = atob(usr);
+      const data = atob(init);
 
       const resp = JSON.parse(data) as {
         user: IUser;
@@ -128,7 +120,7 @@ export const useUserStore = defineStore("user", () => {
     authorized,
     login,
     logout,
-    initializeUser,
+    handleLaunchParams,
     showTelegramBanner,
     closeTelegramBanner,
   };

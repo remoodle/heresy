@@ -32,8 +32,6 @@ watch(authorized, async (now, was) => {
     await router.push({ name: RouteName.Home });
   }
 });
-
-userStore.initializeUser();
 </script>
 
 <template>

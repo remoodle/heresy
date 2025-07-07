@@ -155,6 +155,10 @@ router.beforeEach((to) => {
 
   const authorized = userStore.authorized;
 
+  if (to.query.usr && !authorized) {
+    userStore.handleLaunchParams(to.query.usr as string);
+  }
+
   if (to.meta.auth === "required" && !authorized) {
     return { name: RouteName.Login, query: { next: to.fullPath } };
   }
