@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.9](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.8...remoodle/frontend-v1.10.9) (2025-07-07)
+
+
+### Code Refactoring
+
+* handle launch params auth in router ([562516e](https://github.com/remoodle/remoodle/commit/562516e9ab89a3602cdf7e01e973defe79ac86af))
+
 ## [1.10.8](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.7...remoodle/frontend-v1.10.8) (2025-07-06)
 
 
