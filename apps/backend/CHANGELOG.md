@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.23](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.22...remoodle/backend-v2.3.23) (2025-07-07)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#469](https://github.com/remoodle/remoodle/issues/469)) ([dca44ca](https://github.com/remoodle/remoodle/commit/dca44ca4666c188e0737f30d395c503d95ab632c))
+
 ## [2.3.22](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.21...remoodle/backend-v2.3.22) (2025-07-05)
 
 
