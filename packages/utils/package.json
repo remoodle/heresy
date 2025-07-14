@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "dayjs": "^1.11.13",
-    "hono": "^4.8.4"
+    "hono": "^4.8.5"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
