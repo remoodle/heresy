@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.10.11](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.10...remoodle/frontend-v1.10.11) (2025-07-15)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#473](https://github.com/remoodle/remoodle/issues/473)) ([0218a77](https://github.com/remoodle/remoodle/commit/0218a779ea56dfdf77d28294fb5f8a0ee2b9d790))
+* **deps:** update all non-major dependencies ([#479](https://github.com/remoodle/remoodle/issues/479)) ([ffe2528](https://github.com/remoodle/remoodle/commit/ffe25283a7bea467039219455baebaab9dd702d8))
+* **deps:** update dependency filesize to v11 ([#475](https://github.com/remoodle/remoodle/issues/475)) ([aae70dc](https://github.com/remoodle/remoodle/commit/aae70dc2d7aa1511d5a126c279309a44b0c5a296))
+* **deps:** update dependency zod to v4 ([#474](https://github.com/remoodle/remoodle/issues/474)) ([c0405a8](https://github.com/remoodle/remoodle/commit/c0405a843bbdc324d7952f21ce7ed3f01d383128))
+
 ## [1.10.10](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.9...remoodle/frontend-v1.10.10) (2025-07-07)
 
 
