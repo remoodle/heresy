@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.3.24](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.23...remoodle/backend-v2.3.24) (2025-07-15)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#473](https://github.com/remoodle/remoodle/issues/473)) ([0218a77](https://github.com/remoodle/remoodle/commit/0218a779ea56dfdf77d28294fb5f8a0ee2b9d790))
+* **deps:** update all non-major dependencies ([#479](https://github.com/remoodle/remoodle/issues/479)) ([ffe2528](https://github.com/remoodle/remoodle/commit/ffe25283a7bea467039219455baebaab9dd702d8))
+* **deps:** update dependency zod to v4 ([#474](https://github.com/remoodle/remoodle/issues/474)) ([c0405a8](https://github.com/remoodle/remoodle/commit/c0405a843bbdc324d7952f21ce7ed3f01d383128))
+
 ## [2.3.23](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.22...remoodle/backend-v2.3.23) (2025-07-07)
 
 
