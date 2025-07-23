@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.1.7](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.6...remoodle/telegram-bot-v2.1.7) (2025-07-23)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#480](https://github.com/remoodle/remoodle/issues/480)) ([6c2a28b](https://github.com/remoodle/remoodle/commit/6c2a28b6d5c8ba2a27134f26f8e9219aa0601509))
+
+
+### Miscellaneous Chores
+
+* bump pnpm ([9473aa1](https://github.com/remoodle/remoodle/commit/9473aa15b8b54773954435c1bfc4b5c316572b9a))
+
 ## [2.1.6](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.5...remoodle/telegram-bot-v2.1.6) (2025-07-15)
 
 
