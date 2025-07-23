@@ -23,11 +23,7 @@ withDefaults(
   },
 );
 
-const getBuildInfo = () => {
-  return __BUILD_INFO__;
-};
-
-const buildInfo = getBuildInfo() ?? {
+const buildInfo = __BUILD_INFO__ ?? {
   version: "0",
 };
 </script>
