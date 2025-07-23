@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.10.12](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.11...remoodle/frontend-v1.10.12) (2025-07-23)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#480](https://github.com/remoodle/remoodle/issues/480)) ([6c2a28b](https://github.com/remoodle/remoodle/commit/6c2a28b6d5c8ba2a27134f26f8e9219aa0601509))
+* expect defined properties to exist ([e7d36a9](https://github.com/remoodle/remoodle/commit/e7d36a9681db9794c40167e051883087ee4c59e4))
+
 ## [1.10.11](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.10...remoodle/frontend-v1.10.11) (2025-07-15)
 
 
