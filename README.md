@@ -9,7 +9,7 @@ Enhancing Moodle experience with care
 ### Requirements
 
 - Node.js v22 ([install](https://github.com/Schniz/fnm))
-- pnpm v9 ([install](https://pnpm.io/installation))
+- pnpm ([install](https://pnpm.io/installation))
 - Redis ([install](https://redis.io/download))
 - MongoDB ([install](https://www.mongodb.com/docs/manual/installation/))
 
