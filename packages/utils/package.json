@@ -18,7 +18,7 @@
     "@remoodle/eslint-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^22.16.3",
+    "@types/node": "^22.16.5",
     "eslint": "^9.31.0",
     "typescript": "~5.8.3"
   }
