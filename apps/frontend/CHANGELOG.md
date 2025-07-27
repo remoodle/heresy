@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.10.13](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.12...remoodle/frontend-v1.10.13) (2025-07-27)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency vite-plugin-vue-devtools to v8 ([#485](https://github.com/remoodle/remoodle/issues/485)) ([437d153](https://github.com/remoodle/remoodle/commit/437d1535767a363d50badaa98ba57df1cd2b8645))
+
 ## [1.10.12](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.11...remoodle/frontend-v1.10.12) (2025-07-23)
 
 
