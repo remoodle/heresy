@@ -15,20 +15,17 @@ const notificationSettingsSchema = new Schema<NotificationSettings>(
     "deadlineReminders::telegram": {
       type: Number,
       default: 0,
-      min: 0,
-      max: 2,
+      enum: [0, 1, 2],
     },
     "gradeUpdates::telegram": {
       type: Number,
       default: 1,
-      min: 0,
-      max: 2,
+      enum: [0, 1, 2],
     },
     "courseChanges::telegram": {
       type: Number,
       default: 1,
-      min: 0,
-      max: 2,
+      enum: [0, 1, 2],
     },
   },
   { _id: false },
