@@ -117,6 +117,9 @@ const NOTIFICATIONS_CONFIG = {
   deadlineReminders: {
     title: "Deadlines",
   },
+  courseChanges: {
+    title: "Courses",
+  },
 } as const;
 
 const NOTIFICATION_SETTING_STATE = {

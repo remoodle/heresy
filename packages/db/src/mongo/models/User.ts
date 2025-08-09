@@ -24,6 +24,12 @@ const notificationSettingsSchema = new Schema<NotificationSettings>(
       min: 0,
       max: 2,
     },
+    "courseChanges::telegram": {
+      type: Number,
+      default: 1,
+      min: 0,
+      max: 2,
+    },
   },
   { _id: false },
 );

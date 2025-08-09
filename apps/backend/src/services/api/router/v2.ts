@@ -126,7 +126,7 @@ const authRoutes = new Hono<{
                 {
                   name: JobName.COURSES_UPDATE,
                   queueName: QueueName.COURSES,
-                  data: { userId },
+                  data: { userId, trackDiff: false },
                   opts: { lifo: true },
                 },
                 {
@@ -635,6 +635,7 @@ const userRoutes = new Hono<{
             notifications: z.object({
               "deadlineReminders::telegram": z.number(),
               "gradeUpdates::telegram": z.number(),
+              "courseChanges::telegram": z.number(),
             }),
             deadlineReminders: z.object({
               thresholds: z.array(z.string()),
