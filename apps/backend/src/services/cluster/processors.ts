@@ -159,7 +159,7 @@ export const processors: Record<QueueName, Processor> = {
                 delay: 2000,
               },
               deduplication: {
-                id: `${userId}::course-changes::${Date.now()}`,
+                id: `${userId}::course-changes`,
               },
             },
           );
