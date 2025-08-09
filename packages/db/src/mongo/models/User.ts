@@ -22,6 +22,11 @@ const notificationSettingsSchema = new Schema<NotificationSettings>(
       default: 1,
       enum: [0, 1, 2],
     },
+    "courseChanges::telegram": {
+      type: Number,
+      default: 1,
+      enum: [0, 1, 2],
+    },
   },
   { _id: false },
 );

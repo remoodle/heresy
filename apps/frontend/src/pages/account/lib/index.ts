@@ -5,6 +5,9 @@ export const NOTIFICATIONS_CONFIG = {
   deadlineReminders: {
     title: "🔔 Upcoming deadlines",
   },
+  courseChanges: {
+    title: "📚 Course changes",
+  },
 } as const;
 
 export const NOTIFICATION_SETTING_STATE = {
