@@ -44,6 +44,12 @@ watchEffect(() => {
     toggledCourseCategories.value.push(...courseCategories.value);
   }
 });
+
+const coursesByCategory = computed(() => {
+  return toggledCourseCategories.value
+    .filter(Boolean)
+    .flatMap((category) => (courses.value && courses.value[category]) || []);
+});
 </script>
 
 <template>
@@ -80,15 +86,20 @@ watchEffect(() => {
       </ToggleGroup>
       <div class="py-2" />
     </template>
-    <div class="flex flex-col gap-3">
+    <div v-if="coursesByCategory.length" class="flex flex-col gap-3">
       <CourseListCard
-        v-for="course in toggledCourseCategories
-          .filter(Boolean)
-          .flatMap((category) => (courses && courses[category]) || [])"
+        v-for="course in coursesByCategory"
         :key="course.id"
         :course="course"
         :show-category="toggledCourseCategories.length > 1"
       />
+    </div>
+    <div
+      v-else
+      class="text-muted-foreground flex flex-col items-center justify-center"
+    >
+      <span class="text-3xl"> 🌴 </span>
+      <p class="text-base font-medium">You don't have any courses</p>
     </div>
   </template>
 </template>
