@@ -58,12 +58,6 @@ describe("courses notifications", () => {
           to_classification: "inprogress",
         },
         {
-          type: "added",
-          course_id: 103,
-          course_name: "History",
-          to_classification: "inprogress",
-        },
-        {
           type: "deleted",
           course_id: 102,
           course_name: "Physics",
