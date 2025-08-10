@@ -463,7 +463,7 @@ export const processors: Record<QueueName, Processor> = {
       if (response.ok) {
         logger.cluster.info(
           {
-            moodleId: user.moodleId,
+            userId,
             name: user.name,
             message,
           },
@@ -472,7 +472,7 @@ export const processors: Record<QueueName, Processor> = {
       } else {
         logger.cluster.error(
           {
-            moodleId: user.moodleId,
+            userId,
             name: user.name,
             message,
             status: response.status,
