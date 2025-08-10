@@ -109,4 +109,29 @@ describe("courses notifications", () => {
     const data: CourseChanges = { changes: [] };
     expect(formatCourseChanges(data)).toBe("");
   });
+
+  test("trackCourseChanges: ignores added course if classification is past", () => {
+    const oldCourses: ICourse[] = fromPartial([
+      {
+        data: { id: 201, fullname: "Existing" },
+        classification: "inprogress",
+        deleted: false,
+      },
+    ]);
+
+    const newCourses: ICourse[] = fromPartial([
+      {
+        data: { id: 201, fullname: "Existing" },
+        classification: "inprogress",
+      },
+      {
+        data: { id: 202, fullname: "Old Stuff" },
+        classification: "past",
+      },
+    ]);
+
+    expect(trackCourseChanges(oldCourses, newCourses)).toStrictEqual({
+      changes: [],
+    });
+  });
 });

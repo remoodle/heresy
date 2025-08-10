@@ -32,13 +32,18 @@ export function trackCourseChanges(
     const oldCourse = oldCoursesMap.get(newCourse.data.id);
 
     if (!oldCourse || oldCourse.deleted) {
-      changes.push({
-        type: "added",
-        course_id: newCourse.data.id,
-        course_name: newCourse.data.fullname,
-        to_classification: newCourse.classification,
-      });
-    } else if (oldCourse.classification !== newCourse.classification) {
+      if (newCourse.classification !== "past") {
+        changes.push({
+          type: "added",
+          course_id: newCourse.data.id,
+          course_name: newCourse.data.fullname,
+          to_classification: newCourse.classification,
+        });
+      }
+      continue;
+    }
+
+    if (oldCourse.classification !== newCourse.classification) {
       // Check for classification changes (e.g., inprogress -> past)
       changes.push({
         type: "classification_changed",
