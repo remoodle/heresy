@@ -86,7 +86,10 @@ export const processors: Record<QueueName, Processor> = {
 
       const users = userId ? [{ userId }] : await getActiveUsers();
 
-      logger.cluster.info(`scheduling courses sync for ${users.length} users`);
+      logger.cluster.info(
+        { userId },
+        `scheduling courses sync for ${users.length} users`,
+      );
 
       const jobs = users.map((payload) => ({
         name: JobName.COURSES_UPDATE,
@@ -145,27 +148,23 @@ export const processors: Record<QueueName, Processor> = {
       ) {
         const message = formatCourseChanges(courseChanges);
 
-        if (message) {
-          const job = await queues[QueueName.TELEGRAM].add(
-            QueueName.TELEGRAM,
-            {
-              userId,
-              message,
+        await queues[QueueName.TELEGRAM].add(
+          QueueName.TELEGRAM,
+          {
+            userId,
+            message,
+          },
+          {
+            attempts: 3,
+            backoff: {
+              type: "exponential",
+              delay: 2000,
             },
-            {
-              attempts: 3,
-              backoff: {
-                type: "exponential",
-                delay: 2000,
-              },
-              deduplication: {
-                id: `${userId}::course-changes`,
-              },
+            deduplication: {
+              id: `${userId}::${message}`,
             },
-          );
-
-          return job.data;
-        }
+          },
+        );
       }
 
       return courseChanges;
@@ -185,11 +184,7 @@ export const processors: Record<QueueName, Processor> = {
       const users = userId ? [{ userId }] : await getActiveUsers();
 
       logger.cluster.info(
-        {
-          userId,
-          classification,
-          trackDiff,
-        },
+        { userId, classification, trackDiff },
         `scheduling grades sync for ${users.length} users`,
       );
 
@@ -272,18 +267,14 @@ export const processors: Record<QueueName, Processor> = {
       const { userId, courseId, courseName, trackDiff } = job.data;
 
       logger.cluster.info(
-        {
-          userId,
-          courseId,
-          trackDiff,
-        },
+        { userId, courseId, trackDiff },
         `syncing course grades`,
       );
 
       const result = await syncCourseGrades(userId, courseId, trackDiff);
 
       if (!result) {
-        return null;
+        return "no grade changes";
       }
 
       return trackCourseGradeChanges(
@@ -325,7 +316,7 @@ export const processors: Record<QueueName, Processor> = {
       ) {
         const message = formatGradeChanges(gradeChanges);
 
-        const job = await queues[QueueName.TELEGRAM].add(
+        await queues[QueueName.TELEGRAM].add(
           QueueName.TELEGRAM,
           {
             userId,
@@ -342,8 +333,6 @@ export const processors: Record<QueueName, Processor> = {
             },
           },
         );
-
-        return job.data;
       }
 
       return gradeChanges;
@@ -405,7 +394,7 @@ export const processors: Record<QueueName, Processor> = {
       ) {
         const message = formatDeadlineReminders(deadlineReminders);
 
-        const job = await queues[QueueName.TELEGRAM].add(
+        await queues[QueueName.TELEGRAM].add(
           QueueName.TELEGRAM,
           {
             userId,
@@ -422,8 +411,6 @@ export const processors: Record<QueueName, Processor> = {
             },
           },
         );
-
-        return job.data;
       }
 
       return deadlineReminders;
@@ -439,7 +426,7 @@ export const processors: Record<QueueName, Processor> = {
       const user = await db.user.findOne({ _id: userId });
 
       if (!user) {
-        throw new Error(`User ${user} not found `);
+        throw new Error(`User ${userId} not found`);
       }
 
       if (!user.telegramId) {
