@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
-import type { CourseGradeChanges } from "./grades";
-import { formatGradeChanges } from "./grades";
+import type { CourseGradeChanges } from "./grade-changes";
+import { formatGradeChanges } from "./grade-changes";
 
 describe("grades notifications", () => {
   test("formatGradeChanges: single", () => {
@@ -60,7 +60,7 @@ describe("grades notifications", () => {
 
     expect(formatGradeChanges(diffs)).toMatchInlineSnapshot(`
       "Updated grades:
-
+      
       📘 Course 1:
         • Midterm: <b>N/A → 100</b>
 

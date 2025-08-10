@@ -7,12 +7,18 @@ import { logger } from "../../library/logger";
 import { getActiveUsers } from "../../core/wrapper";
 import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
-import { formatGradeChanges, trackCourseGradeChanges } from "./events/grades";
+import {
+  formatGradeChanges,
+  trackCourseGradeChanges,
+} from "./events/grades/grade-changes";
 import {
   formatDeadlineReminders,
   trackDeadlineReminders,
-} from "./events/deadlines";
-import { trackCourseChanges, formatCourseChanges } from "./events/courses";
+} from "./events/deadlines/deadline-reminders";
+import {
+  formatCourseChanges,
+  trackCourseChanges,
+} from "./events/courses/course-changes";
 
 export type Processor = {
   /*

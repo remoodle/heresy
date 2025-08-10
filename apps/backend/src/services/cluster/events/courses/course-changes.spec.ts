@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { fromPartial } from "@total-typescript/shoehorn";
 import type { ICourse } from "@remoodle/types";
-import type { CourseChanges } from "./courses";
-import { trackCourseChanges, formatCourseChanges } from "./courses";
+import type { CourseChanges } from "./course-changes";
+import { trackCourseChanges, formatCourseChanges } from "./course-changes";
 
 describe("courses notifications", () => {
   test("trackCourseChanges: added, deleted, classification_changed", () => {

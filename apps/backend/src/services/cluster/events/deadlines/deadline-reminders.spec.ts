@@ -1,8 +1,11 @@
 import { describe, expect, test, vi } from "vitest";
 import { fromPartial } from "@total-typescript/shoehorn";
 import type { IEvent } from "@remoodle/types";
-import type { CourseDeadlineReminders } from "./deadlines";
-import { trackDeadlineReminders, formatDeadlineReminders } from "./deadlines";
+import type { CourseDeadlineReminders } from "./deadline-reminders";
+import {
+  trackDeadlineReminders,
+  formatDeadlineReminders,
+} from "./deadline-reminders";
 
 describe("deadlines notifications", () => {
   vi.setSystemTime(new Date("2024-09-15T12:24:00"));
