@@ -1,4 +1,5 @@
 import type { ICourse, MoodleCourseClassification } from "@remoodle/types";
+import { partition } from "@remoodle/utils";
 
 export type CourseChangeType = "added" | "deleted" | "classification_changed";
 
@@ -77,27 +78,30 @@ export function formatCourseChanges(data: CourseChanges): string {
     return "";
   }
 
-  const messages: string[] = [];
+  const grouped = partition(changes, (c) => c.type);
 
-  for (const change of changes) {
-    switch (change.type) {
-      case "added":
-        messages.push(
-          `✅ New course: <b>${change.course_name}</b> (${change.to_classification})`,
-        );
-        break;
-      case "deleted":
-        messages.push(`🗑️ Course removed: <b>${change.course_name}</b>`);
-        break;
-      case "classification_changed":
-        messages.push(
-          `📋 Course status changed: <b>${change.course_name}</b>\n  • ${change.from_classification} → ${change.to_classification}`,
-        );
-        break;
+  const sectionsConfig: Array<{
+    key: CourseChangeType;
+    title: string;
+    icon: string;
+  }> = [
+    { key: "added", title: "New courses", icon: "✅" },
+    { key: "classification_changed", title: "Changed status", icon: "📋" },
+    { key: "deleted", title: "Removed courses", icon: "🗑️" },
+  ];
+
+  const sections: string[] = [];
+
+  for (const { key, title, icon } of sectionsConfig) {
+    const items = (grouped[key] ?? []).map((c) => c.course_name);
+    if (items.length > 0) {
+      if (sections.length > 0) {
+        sections.push("");
+      }
+      sections.push(`${icon} ${title}:`);
+      sections.push(...items.map((name) => `- ${name}`));
     }
   }
 
-  const message = "Course updates:\n" + messages.join("\n");
-
-  return message;
+  return sections.join("\n");
 }

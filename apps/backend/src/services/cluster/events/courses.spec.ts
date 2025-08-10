@@ -101,7 +101,14 @@ describe("courses notifications", () => {
     };
 
     expect(formatCourseChanges(data)).toMatchInlineSnapshot(`
-      "Course updates:\n✅ New course: <b>Biology</b> (inprogress)\n🗑️ Course removed: <b>Physics</b>\n📋 Course status changed: <b>Algebra</b>\n  • inprogress → past"
+      "✅ New courses:
+      - Biology
+
+      📋 Changed status:
+      - Algebra
+
+      🗑️ Removed courses:
+      - Physics"
     `);
   });
 
