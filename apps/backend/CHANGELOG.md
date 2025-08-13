@@ -1,5 +1,28 @@
 # Changelog
 
+## [2.4.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.26...remoodle/backend-v2.4.0) (2025-08-13)
+
+
+### Features
+
+* add course change notifications ([95f0f12](https://github.com/remoodle/remoodle/commit/95f0f121ba4a577246fb8a093ece112d004628d6))
+
+
+### Bug Fixes
+
+* change course notification format ([b991b92](https://github.com/remoodle/remoodle/commit/b991b92127bcf12bfef8d4b7afbdc0dbbc2557c4))
+* **deps:** update all non-major dependencies ([083c5b5](https://github.com/remoodle/remoodle/commit/083c5b5e138a8b59efc96df2dd6ce4a617250181))
+* don't trigger notification for past courses ([6366c71](https://github.com/remoodle/remoodle/commit/6366c714cebdf3da53fdcf2677f238a98946cb62))
+* ignore deleted courses ([10db68e](https://github.com/remoodle/remoodle/commit/10db68ed7ce419ac9f9a4b008dcd64b777d95ca3))
+* use same logging patterns ([c7356d0](https://github.com/remoodle/remoodle/commit/c7356d01afb260f55a98479db37fd468c03c3380))
+
+
+### Code Refactoring
+
+* canonize processors ([5bee750](https://github.com/remoodle/remoodle/commit/5bee750ec204eeb50d896823b14b8b870f3b1e0f))
+* replace hono-pino-logger logging setup ([6f65520](https://github.com/remoodle/remoodle/commit/6f65520717f949e84e8c51f87ca58c4b1861bcd6))
+* restructure events structure ([a254aa9](https://github.com/remoodle/remoodle/commit/a254aa960ddb95a7cb8a15c5511b4fe9da96bf76))
+
 ## [2.3.26](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.3.25...remoodle/backend-v2.3.26) (2025-08-09)
 
 

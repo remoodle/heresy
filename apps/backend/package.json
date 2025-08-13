@@ -1,6 +1,6 @@
 {
   "name": "@remoodle/backend",
-  "version": "2.3.26",
+  "version": "2.4.0",
   "type": "module",
   "private": true,
   "main": "index.ts",
