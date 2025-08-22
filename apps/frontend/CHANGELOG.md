@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.11.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.14...remoodle/frontend-v1.11.0) (2025-08-22)
+
+
+### Features
+
+* add course change notifications ([95f0f12](https://github.com/remoodle/remoodle/commit/95f0f121ba4a577246fb8a093ece112d004628d6))
+
+
+### Bug Fixes
+
+* add empty state to courses ([ac03840](https://github.com/remoodle/remoodle/commit/ac038400c856d6e297e244e94853d4b495591412))
+* **deps:** update all non-major dependencies ([083c5b5](https://github.com/remoodle/remoodle/commit/083c5b5e138a8b59efc96df2dd6ce4a617250181))
+
 ## [1.10.14](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.10.13...remoodle/frontend-v1.10.14) (2025-08-04)
 
 
