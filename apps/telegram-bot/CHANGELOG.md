@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.8...remoodle/telegram-bot-v2.2.0) (2025-08-22)
+
+
+### Features
+
+* add course change notifications ([95f0f12](https://github.com/remoodle/remoodle/commit/95f0f121ba4a577246fb8a093ece112d004628d6))
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([083c5b5](https://github.com/remoodle/remoodle/commit/083c5b5e138a8b59efc96df2dd6ce4a617250181))
+
 ## [2.1.8](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.7...remoodle/telegram-bot-v2.1.8) (2025-08-09)
 
 
