@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.1](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.0...remoodle/telegram-bot-v2.2.1) (2025-08-26)
+
+
+### Miscellaneous Chores
+
+* trigger docker publish ([efcc674](https://github.com/remoodle/remoodle/commit/efcc674e5d2164d531b184ea4bc308cbd213c426))
+
+
+### Continuous Integration
+
+* trigger build ([e6a4141](https://github.com/remoodle/remoodle/commit/e6a4141ce07ad805af58f211ededa9bf60231a3e))
+
 ## [2.2.0](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.1.8...remoodle/telegram-bot-v2.2.0) (2025-08-22)
 
 
