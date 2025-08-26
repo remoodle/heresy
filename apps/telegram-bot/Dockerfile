@@ -22,7 +22,6 @@ COPY --from=builder /app/out/pnpm-workspace.yaml ./pnpm-workspace.yaml
 RUN corepack enable
 RUN pnpm install --frozen-lockfile
 
-# Build the project
 COPY --from=builder /app/out/full/ .
 RUN pnpm dlx turbo run build --filter=@remoodle/telegram-bot
 
