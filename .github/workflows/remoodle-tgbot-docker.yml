@@ -29,7 +29,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build image
-        id: build-image
         run: |
           IMAGE_ID=ghcr.io/remoodle/tgbot
           GITHUB_REF="${{ github.ref }}"
