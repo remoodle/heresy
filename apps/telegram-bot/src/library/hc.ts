@@ -1,5 +1,5 @@
+import type { AppType } from "@remoodle/backend/api";
 import { createHC } from "@remoodle/utils";
-import type { AppType } from "@remoodle/backend";
 
 import { config } from "../config";
 

@@ -1,6 +1,6 @@
+import type { AppType } from "@remoodle/backend/api";
 import type { APIError } from "@remoodle/types";
 import { createHC } from "@remoodle/utils";
-import type { AppType } from "@remoodle/backend";
 
 import { useUserStore } from "@/shared/stores/user";
 import { API_URL } from "@/shared/config";

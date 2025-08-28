@@ -11,15 +11,15 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "dayjs": "^1.11.13",
-    "hono": "^4.9.1"
+    "dayjs": "^1.11.15",
+    "hono": "^4.9.4"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^22.17.1",
-    "eslint": "^9.33.0",
+    "@types/node": "^22.18.0",
+    "eslint": "^9.34.0",
     "typescript": "~5.9.2"
   }
 }
