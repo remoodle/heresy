@@ -1,8 +1,8 @@
 {
   "extends": "@remoodle/tsconfig/base.json",
   "compilerOptions": {
-    "outDir": "dist",
     "strict": true,
+    "outDir": "dist",
     "lib": ["es2015"]
   },
   "include": ["src", "index.ts", "tsup.config.ts"],

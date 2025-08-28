@@ -1,13 +1,14 @@
 {
   "extends": "@remoodle/tsconfig/base.json",
   "compilerOptions": {
+    "strict": true,
     "outDir": "dist",
     "types": ["node"],
     "jsx": "react-jsx",
-    "strict": true,
     "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": false,
     "jsxImportSource": "hono/jsx"
   },
-  "include": ["src", "index.ts", "tsup.config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./src/**/*.ts", "tsup.config.ts"],
+  "exclude": ["dist", "node_modules"]
 }
