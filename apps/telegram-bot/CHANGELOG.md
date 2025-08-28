@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.2](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.1...remoodle/telegram-bot-v2.2.2) (2025-08-28)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#490](https://github.com/remoodle/remoodle/issues/490)) ([7fb0e12](https://github.com/remoodle/remoodle/commit/7fb0e12941cfddcf51fa8f07c835be2994120a38))
+
 ## [2.2.1](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.0...remoodle/telegram-bot-v2.2.1) (2025-08-26)
 
 
