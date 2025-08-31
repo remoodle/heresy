@@ -11,8 +11,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "dayjs": "^1.11.15",
-    "hono": "^4.9.4"
+    "dayjs": "^1.11.18",
+    "hono": "^4.9.5"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
