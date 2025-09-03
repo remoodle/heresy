@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.3](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.2...remoodle/telegram-bot-v2.2.3) (2025-09-03)
+
+
+### Bug Fixes
+
+* change sync logic ([05766ce](https://github.com/remoodle/remoodle/commit/05766cea8ed7649a0886dc65a916c244a04ef7d1))
+
 ## [2.2.2](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.1...remoodle/telegram-bot-v2.2.2) (2025-08-28)
 
 
