@@ -67,13 +67,13 @@ const authRoutes = new Hono<{
 
       const currentUser = await db.user.findOne({ telegramId });
 
-      const currentStudent = await db.user.findOne({ moodleToken });
+      const currentStudentUser = await db.user.findOne({ moodleToken });
 
       let syncedUserId: string | undefined;
       let shouldSync: boolean = false;
 
-      if (currentUser || currentStudent) {
-        const userId = currentUser?._id ?? currentStudent?._id;
+      if (currentUser || currentStudentUser) {
+        const userId = currentUser?._id ?? currentStudentUser?._id;
 
         await db.user.updateOne(
           { _id: userId },
@@ -89,23 +89,13 @@ const authRoutes = new Hono<{
           },
         );
 
-        if (currentUser && !currentStudent) {
+        if (currentUser && !currentStudentUser) {
           logger.api.info({
             msg: "student account changed",
             userId,
             currentUser,
-            currentStudent,
+            currentStudentUser,
           });
-
-          await db.course.updateMany(
-            { userId },
-            {
-              $set: {
-                classification: "past",
-                prevMoodleId: currentUser.moodleId,
-              },
-            },
-          );
 
           shouldSync = true;
         }
@@ -113,7 +103,7 @@ const authRoutes = new Hono<{
         syncedUserId = userId;
       }
 
-      if (!currentStudent && !currentUser) {
+      if (!currentStudentUser && !currentUser) {
         try {
           const user = (await db.user.create({
             name: student.fullname,
