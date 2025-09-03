@@ -79,10 +79,11 @@ const authRoutes = new Hono<{
           { _id: userId },
           {
             $set: {
+              name: student.fullname,
+              username: student.username,
+              moodleId: student.userid,
               moodleToken,
               telegramId,
-              username: student.username,
-              name: student.fullname,
               health: 7,
             },
           },
