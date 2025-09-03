@@ -11,7 +11,6 @@ export type ICourse = {
   userId: string;
   data: MoodleCourse;
   classification: MoodleCourseClassification;
-  deleted: boolean;
   moodleId: number;
 };
 

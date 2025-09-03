@@ -5,6 +5,7 @@ import type {
 } from "@remoodle/types";
 import { Moodle } from "../library/moodle";
 import { db } from "../library/db";
+import { deleteUserMoodleCourses } from "./wrapper";
 
 const handleTokenError = async (error: { message: string }, user: IUser) => {
   if (error.message.includes("Invalid token")) {
@@ -18,13 +19,10 @@ const handleTokenError = async (error: { message: string }, user: IUser) => {
 const handleNotInGroupError = async (
   error: { message: string },
   user: IUser,
-  courseId: number,
+  moodleCourseId: number,
 ) => {
   if (error.message.includes("error/notingroup")) {
-    await db.course.updateOne(
-      { userId: user._id, "data.id": courseId },
-      { $set: { deleted: true } },
-    );
+    await deleteUserMoodleCourses(user._id, [moodleCourseId]);
   }
 };
 
@@ -123,21 +121,26 @@ export const syncCourses = async (
         moodleId,
         data: course.data,
         classification: course.classification,
-        deleted: false,
       },
       { upsert: true },
     );
   }
 
-  // mark all other courses that are not in the response as deleted
-  await db.course.updateMany(
-    {
-      userId,
-      moodleId,
-      "data.id": { $nin: courses.map((course) => course.data.id) },
-    },
-    { deleted: true },
-  );
+  // find courses to delete (not present in the latest sync)
+  const coursesToDelete = await db.course
+    .find(
+      {
+        userId,
+        moodleId,
+        "data.id": { $nin: courses.map((course) => course.data.id) },
+      },
+      { _id: 1, "data.id": 1 },
+    )
+    .lean();
+
+  const moodleCourseIdsToDelete = coursesToDelete.map((c) => c.data.id);
+
+  await deleteUserMoodleCourses(userId, moodleCourseIdsToDelete);
 
   if (trackDiff && existingCourses.length > 0) {
     // Get updated courses after sync

@@ -29,7 +29,7 @@ export function trackCourseChanges(
   );
 
   // Check for new courses
-  for (const newCourse of newCourses.filter((c) => !c.deleted)) {
+  for (const newCourse of newCourses) {
     const oldCourse = oldCoursesMap.get(newCourse.data.id);
 
     // Brand new course
@@ -59,11 +59,7 @@ export function trackCourseChanges(
 
   // Check for deleted courses
   for (const oldCourse of oldCourses) {
-    if (
-      !oldCourse.deleted &&
-      (!newCoursesMap.has(oldCourse.data.id) ||
-        newCoursesMap.get(oldCourse.data.id)?.deleted)
-    ) {
+    if (!newCoursesMap.has(oldCourse.data.id)) {
       changes.push({
         type: "deleted",
         course_id: oldCourse.data.id,

@@ -411,7 +411,6 @@ const userRoutes = new Hono<{
 
       const courses = await db.course.find({
         userId,
-        deleted: false,
         ...(status && { classification: status }),
       });
 
@@ -463,7 +462,6 @@ const userRoutes = new Hono<{
       // TODO: MOVE TO WRAPPER
       const courses = await db.course.find({
         userId,
-        deleted: false,
         ...(status && { classification: status }),
       });
 

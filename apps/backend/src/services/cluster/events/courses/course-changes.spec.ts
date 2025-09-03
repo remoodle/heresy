@@ -10,17 +10,10 @@ describe("courses notifications", () => {
       {
         data: { id: 101, fullname: "Algebra" },
         classification: "inprogress",
-        deleted: false,
       },
       {
         data: { id: 102, fullname: "Physics" },
         classification: "inprogress",
-        deleted: false,
-      },
-      {
-        data: { id: 103, fullname: "History" },
-        classification: "inprogress",
-        deleted: true,
       },
     ]);
 
@@ -33,11 +26,6 @@ describe("courses notifications", () => {
       // newly added (not present before)
       {
         data: { id: 104, fullname: "Biology" },
-        classification: "inprogress",
-      },
-      // previously marked as deleted -> considered added now
-      {
-        data: { id: 103, fullname: "History" },
         classification: "inprogress",
       },
     ]);
@@ -116,7 +104,6 @@ describe("courses notifications", () => {
       {
         data: { id: 201, fullname: "Existing" },
         classification: "inprogress",
-        deleted: false,
       },
     ]);
 
