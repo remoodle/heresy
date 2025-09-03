@@ -55,52 +55,66 @@ const authRoutes = new Hono<{
     async (ctx) => {
       const { handle, moodleToken, password } = ctx.req.valid("json");
 
-      const telegramId = ctx.get("telegramId");
-
       const client = new Moodle(moodleToken);
-
       const [student, error] = await client.call(
         "core_webservice_get_site_info",
       );
-
       if (error) {
         throw new HTTPException(500, { message: error.message });
       }
 
-      const existingUser = await db.user.findOne({
-        moodleId: student.userid,
-      });
+      const telegramId = ctx.get("telegramId");
 
-      // changing telegram account
-      if (existingUser && telegramId) {
-        await db.user.updateOne(
-          { _id: existingUser._id },
-          { $set: { telegramId } },
-        );
-      }
+      const currentUser = await db.user.findOne({ telegramId });
 
-      // re-syncing moodle account with new token
-      if (existingUser && student.userid === existingUser.moodleId) {
+      const currentStudent = await db.user.findOne({ moodleToken });
+
+      let syncedUserId: string | undefined;
+      let shouldSync: boolean = false;
+
+      if (currentUser || currentStudent) {
+        const userId = currentUser?._id ?? currentStudent?._id;
+
         await db.user.updateOne(
-          { _id: existingUser._id },
+          { _id: userId },
           {
             $set: {
               moodleToken,
+              telegramId,
               username: student.username,
               name: student.fullname,
               health: 7,
             },
           },
         );
-        await db.course.updateMany(
-          { userId: existingUser._id, notingroup: true },
-          { $set: { notingroup: false } },
-        );
+
+        if (currentUser && !currentStudent) {
+          logger.api.info({
+            msg: "student account changed",
+            userId,
+            currentUser,
+            currentStudent,
+          });
+
+          await db.course.updateMany(
+            { userId },
+            {
+              $set: {
+                classification: "past",
+                prevMoodleId: currentUser.moodleId,
+              },
+            },
+          );
+
+          shouldSync = true;
+        }
+
+        syncedUserId = userId;
       }
 
-      if (!existingUser) {
+      if (!currentStudent && !currentUser) {
         try {
-          const newUser = (await db.user.create({
+          const user = (await db.user.create({
             name: student.fullname,
             username: student.username,
             handle: handle,
@@ -110,39 +124,10 @@ const authRoutes = new Hono<{
             ...(password && { password: hashPassword(password) }),
           })) as IUser;
 
-          const { _id: userId } = newUser;
+          const { _id: userId } = user;
 
-          try {
-            const flowProducer = new FlowProducer({
-              connection: db.redisConnection,
-            });
-
-            await flowProducer.add({
-              name: JobName.GRADES_SCHEDULE_SYNC,
-              queueName: QueueName.GRADES_SYNC,
-              data: { userId, trackDiff: false, classification: null },
-              opts: { lifo: true },
-              children: [
-                {
-                  name: JobName.COURSES_UPDATE,
-                  queueName: QueueName.COURSES,
-                  data: { userId, trackDiff: false },
-                  opts: { lifo: true },
-                },
-                {
-                  name: JobName.EVENTS_UPDATE,
-                  queueName: QueueName.EVENTS,
-                  data: { userId },
-                  opts: { lifo: true },
-                },
-              ],
-            });
-          } catch (error: any) {
-            await deleteUser(userId);
-            throw new HTTPException(500, {
-              message: "Failed to sync data: " + error.message,
-            });
-          }
+          syncedUserId = userId;
+          shouldSync = true;
 
           try {
             increaseUserCounter();
@@ -161,8 +146,45 @@ const authRoutes = new Hono<{
         }
       }
 
+      if (shouldSync && syncedUserId) {
+        try {
+          const flowProducer = new FlowProducer({
+            connection: db.redisConnection,
+          });
+
+          await flowProducer.add({
+            name: JobName.GRADES_SCHEDULE_SYNC,
+            queueName: QueueName.GRADES_SYNC,
+            data: {
+              userId: syncedUserId,
+              trackDiff: false,
+              classification: null,
+            },
+            opts: { lifo: true },
+            children: [
+              {
+                name: JobName.COURSES_UPDATE,
+                queueName: QueueName.COURSES,
+                data: { userId: syncedUserId, trackDiff: false },
+                opts: { lifo: true },
+              },
+              {
+                name: JobName.EVENTS_UPDATE,
+                queueName: QueueName.EVENTS,
+                data: { userId: syncedUserId },
+                opts: { lifo: true },
+              },
+            ],
+          });
+        } catch (error: any) {
+          throw new HTTPException(500, {
+            message: "Failed to sync data: " + error.message,
+          });
+        }
+      }
+
       const user: IUser | null = await db.user.findOne({
-        moodleId: student.userid,
+        _id: syncedUserId,
       });
 
       if (!user) {
@@ -422,16 +444,13 @@ const userRoutes = new Hono<{
           throw new HTTPException(500, { message: error.message });
         }
 
-        return ctx.json(
-          response.courses as (MoodleCourse & { notingroup?: boolean })[],
-        );
+        return ctx.json(response.courses as MoodleCourse[]);
       }
 
       return ctx.json(
         courses.map((course) => {
           return {
             ...course.data,
-            notingroup: course.notingroup,
           };
         }),
       );

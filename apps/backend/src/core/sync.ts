@@ -23,7 +23,7 @@ const handleNotInGroupError = async (
   if (error.message.includes("error/notingroup")) {
     await db.course.updateOne(
       { userId: user._id, "data.id": courseId },
-      { $set: { notingroup: true } },
+      { $set: { deleted: true } },
     );
   }
 };

@@ -138,7 +138,7 @@ export const aitu: UniversityConfig = {
       getCourseName: (course) => {
         const { courseName } = parseCourseFullname(course.shortname);
 
-        return `${courseName} ${course.notingroup ? "❗" : ""}`;
+        return `${courseName}`;
       },
     });
   },
