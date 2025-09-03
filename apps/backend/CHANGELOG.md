@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.5.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.4.3...remoodle/backend-v2.5.0) (2025-09-03)
+
+
+### Features
+
+* add moodleId to course model ([ef26b0d](https://github.com/remoodle/remoodle/commit/ef26b0dae7d8c4f70a9169c32321e41b50bdcc72))
+
+
+### Bug Fixes
+
+* change sync logic ([05766ce](https://github.com/remoodle/remoodle/commit/05766cea8ed7649a0886dc65a916c244a04ef7d1))
+* delete courses for real ([07a0e17](https://github.com/remoodle/remoodle/commit/07a0e1715c32852bd7e844cf2e64b20c182335dd))
+* update moodleid too ([388de29](https://github.com/remoodle/remoodle/commit/388de298778d58a90bf61d4f5c5270895e0a084a))
+* update sync ([2ff5463](https://github.com/remoodle/remoodle/commit/2ff546394c4b86044479e03259ab3f013f5108de))
+
 ## [2.4.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.4.2...remoodle/backend-v2.4.3) (2025-08-31)
 
 
