@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.5.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.5.0...remoodle/backend-v2.5.1) (2025-09-03)
+
+
+### Bug Fixes
+
+* mark previous courses as past ([a9b137f](https://github.com/remoodle/remoodle/commit/a9b137f47a55c1ce6f32d275c4b9a8f7ba3d26a2))
+
 ## [2.5.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.4.3...remoodle/backend-v2.5.0) (2025-09-03)
 
 
