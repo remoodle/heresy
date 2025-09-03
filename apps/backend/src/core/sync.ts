@@ -82,11 +82,13 @@ export const syncCourses = async (
     throw new Error("User not found");
   }
 
+  const moodleId = user.moodleId;
+
   const client = new Moodle(user.moodleToken);
 
   // Get existing courses before sync for change tracking
   const existingCourses = trackDiff
-    ? await db.course.find({ userId }).lean()
+    ? await db.course.find({ userId, moodleId }).lean()
     : [];
 
   const courses: {
@@ -115,9 +117,10 @@ export const syncCourses = async (
 
   for (const course of courses) {
     await db.course.findOneAndUpdate(
-      { userId, "data.id": course.data.id },
+      { userId, moodleId, "data.id": course.data.id },
       {
         userId,
+        moodleId,
         data: course.data,
         classification: course.classification,
         deleted: false,
@@ -128,13 +131,17 @@ export const syncCourses = async (
 
   // mark all other courses that are not in the response as deleted
   await db.course.updateMany(
-    { userId, "data.id": { $nin: courses.map((course) => course.data.id) } },
+    {
+      userId,
+      moodleId,
+      "data.id": { $nin: courses.map((course) => course.data.id) },
+    },
     { deleted: true },
   );
 
   if (trackDiff && existingCourses.length > 0) {
     // Get updated courses after sync
-    const updatedCourses = await db.course.find({ userId }).lean();
+    const updatedCourses = await db.course.find({ userId, moodleId }).lean();
 
     return {
       existingCourses,
