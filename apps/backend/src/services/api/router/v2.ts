@@ -97,6 +97,11 @@ const authRoutes = new Hono<{
             currentStudentUser,
           });
 
+          await db.course.updateMany(
+            { moodleId: currentUser.moodleId },
+            { $set: { classification: "past" } },
+          );
+
           shouldSync = true;
         }
 
