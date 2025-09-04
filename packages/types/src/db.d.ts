@@ -9,9 +9,9 @@ import type {
 export type ICourse = {
   _id: string;
   userId: string;
+  userMoodleId: number;
   data: MoodleCourse;
   classification: MoodleCourseClassification;
-  moodleId: number;
   disabledAt: Date;
 };
 
