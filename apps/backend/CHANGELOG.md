@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.6.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.1...remoodle/backend-v2.6.2) (2025-09-04)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#510](https://github.com/remoodle/remoodle/issues/510)) ([88bbadb](https://github.com/remoodle/remoodle/commit/88bbadbe53f89d70ea0a43b388cc98bf265abe73))
+* pass jobname to telegram queue ([ed4172e](https://github.com/remoodle/remoodle/commit/ed4172e8d370675a6a3a0be377b82b54901e3b43))
+* rename moodleId to userMoodleId ([d196e1d](https://github.com/remoodle/remoodle/commit/d196e1d2129d94b1c196e99aad34cd183e5ad447))
+
+
+### Code Refactoring
+
+* follow same params order ([46362e0](https://github.com/remoodle/remoodle/commit/46362e0001ee2dc68e84fadd23ad13896fbdfc73))
+* isolate cluster tasks calls ([bea89e9](https://github.com/remoodle/remoodle/commit/bea89e98ec4d49b7ad4f1c94d7af57a55b326596))
+* move out event task out of the flow ([ad7bf72](https://github.com/remoodle/remoodle/commit/ad7bf72d165a1f167601a4fba3a8ffb445f82b2a))
+
 ## [2.6.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.0...remoodle/backend-v2.6.1) (2025-09-04)
 
 
