@@ -153,7 +153,7 @@ export const processors: Record<QueueName, Processor> = {
         const message = formatCourseChanges(courseChanges);
 
         await queues[QueueName.TELEGRAM].add(
-          QueueName.TELEGRAM,
+          JobName.TELEGRAM_SEND_MESSAGE,
           {
             userId,
             message,
@@ -320,7 +320,7 @@ export const processors: Record<QueueName, Processor> = {
         const message = formatGradeChanges(gradeChanges);
 
         await queues[QueueName.TELEGRAM].add(
-          QueueName.TELEGRAM,
+          JobName.TELEGRAM_SEND_MESSAGE,
           {
             userId,
             message,
@@ -398,7 +398,7 @@ export const processors: Record<QueueName, Processor> = {
         const message = formatDeadlineReminders(deadlineReminders);
 
         await queues[QueueName.TELEGRAM].add(
-          QueueName.TELEGRAM,
+          JobName.TELEGRAM_SEND_MESSAGE,
           {
             userId,
             message,
