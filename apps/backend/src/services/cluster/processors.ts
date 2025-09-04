@@ -474,10 +474,10 @@ export const processors: Record<QueueName, Processor> = {
   },
 };
 
-export const findJobQueueProcessor = (jobName: JobName) => {
-  const data = objectEntries(processors).find(
-    ([, processor]) => processor.jobName === jobName,
-  );
+export const getQueueProcessor = (jobName: JobName) => {
+  const data = objectEntries(processors).find(([, processor]) => {
+    return processor.jobName === jobName;
+  });
 
   if (!data) {
     throw new Error(`Processor for ${jobName} not found`);

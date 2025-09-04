@@ -5,14 +5,14 @@ import { queues, obliterateQueues, closeQueues } from "../../core/queues";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
 import { db } from "../../library/db";
-import { findJobQueueProcessor } from "./processors";
+import { getQueueProcessor } from "./processors";
 import { loadConfig, type Tasks } from "./config";
 
 const upsertSchedulers = async (tasks: Tasks) => {
   const repeatableTasks = tasks.filter((task) => task.repeat);
 
   for (const task of repeatableTasks) {
-    const [queueName, _] = findJobQueueProcessor(task.name);
+    const [queueName] = getQueueProcessor(task.name);
 
     const queue = queues[queueName];
 
@@ -36,7 +36,7 @@ const defaultWorkerOptions: WorkerOptions = {
 
 const spawnWorkers = async (tasks: Tasks) => {
   for (const task of tasks) {
-    const [queueName, { process }] = findJobQueueProcessor(task.name);
+    const [queueName, { process }] = getQueueProcessor(task.name);
 
     const worker = new Worker(queueName, process, {
       ...defaultWorkerOptions,
