@@ -21,11 +21,9 @@ import {
 } from "./events/courses/course-changes";
 
 export type Processor = {
-  /*
-   * Could become JobName | JobName[] in future to support Named Processors
-   * https://docs.bullmq.io/patterns/named-processor
-   * https://docs.nestjs.com/techniques/queues
-   */
+  // TODO: Consider using JobName | JobName[] to support Named Processors
+  // https://docs.bullmq.io/patterns/named-processor
+  // https://docs.nestjs.com/techniques/queues
   jobName: JobName;
   process(job: Job): Promise<any>;
 };
