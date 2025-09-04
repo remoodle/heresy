@@ -5,7 +5,6 @@ import type {
 } from "@remoodle/types";
 import { Moodle } from "../library/moodle";
 import { db } from "../library/db";
-import { deleteUserMoodleCourses } from "./wrapper";
 
 const handleTokenError = async (error: { message: string }, user: IUser) => {
   if (error.message.includes("Invalid token")) {
@@ -22,7 +21,7 @@ const handleNotInGroupError = async (
   moodleCourseId: number,
 ) => {
   if (error.message.includes("error/notingroup")) {
-    await deleteUserMoodleCourses(user._id, [moodleCourseId]);
+    await db.wrapper.deleteUserMoodleCourses(user._id, [moodleCourseId]);
   }
 };
 
@@ -140,7 +139,7 @@ export const syncCourses = async (
 
   const moodleCourseIdsToDelete = coursesToDelete.map((c) => c.data.id);
 
-  await deleteUserMoodleCourses(userId, moodleCourseIdsToDelete);
+  await db.wrapper.deleteUserMoodleCourses(userId, moodleCourseIdsToDelete);
 
   if (trackDiff && existingCourses.length > 0) {
     // Get updated courses after sync

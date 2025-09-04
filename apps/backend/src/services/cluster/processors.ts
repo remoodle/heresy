@@ -4,7 +4,6 @@ import { Telegram, getValues, partition, objectEntries } from "@remoodle/utils";
 import { config } from "../../config";
 import { db } from "../../library/db";
 import { logger } from "../../library/logger";
-import { getActiveUsers } from "../../core/wrapper";
 import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
 import {
@@ -34,7 +33,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [{ userId }] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId },
@@ -88,7 +87,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [{ userId }] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId },
@@ -185,7 +184,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const { lifo } = job.opts;
 
-      const users = userId ? [{ userId }] : await getActiveUsers();
+      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId, classification, trackDiff },
