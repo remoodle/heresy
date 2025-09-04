@@ -2,8 +2,6 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 
-import { FlowProducer } from "bullmq";
-
 import type {
   IUser,
   MoodleAssignment,
@@ -14,7 +12,6 @@ import type {
 
 import { config } from "../../../config";
 import { db, wrapper } from "../../../library/db";
-import { QueueName, JobName } from "../../../core/queues";
 import { Moodle } from "../../../library/moodle";
 import { logger } from "../../../library/logger";
 import {
@@ -26,6 +23,7 @@ import { zValidator } from "../helpers/zv";
 import { issueTokens } from "../helpers/jwt";
 import { createAlert } from "../helpers/alerts";
 import { increaseUserCounter, decreaseUserCounter } from "../helpers/metrics";
+import { syncUserData } from "../helpers/tasks";
 import { defaultRules, rateLimiter } from "../middleware/ratelimit";
 import { authMiddleware } from "../middleware/auth";
 import { errorHandler } from "../middleware/error";
@@ -143,34 +141,7 @@ const authRoutes = new Hono<{
 
       if (shouldSync && syncedUserId) {
         try {
-          const flowProducer = new FlowProducer({
-            connection: db.redisConnection,
-          });
-
-          await flowProducer.add({
-            name: JobName.GRADES_SCHEDULE_SYNC,
-            queueName: QueueName.GRADES_SYNC,
-            data: {
-              userId: syncedUserId,
-              trackDiff: false,
-              classification: null,
-            },
-            opts: { lifo: true },
-            children: [
-              {
-                name: JobName.COURSES_UPDATE,
-                queueName: QueueName.COURSES,
-                data: { userId: syncedUserId, trackDiff: false },
-                opts: { lifo: true },
-              },
-              {
-                name: JobName.EVENTS_UPDATE,
-                queueName: QueueName.EVENTS,
-                data: { userId: syncedUserId },
-                opts: { lifo: true },
-              },
-            ],
-          });
+          await syncUserData(syncedUserId);
         } catch (error: any) {
           throw new HTTPException(500, {
             message: "Failed to sync data: " + error.message,
