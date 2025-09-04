@@ -54,14 +54,15 @@ export const processors: Record<QueueName, Processor> = {
             name: JobName.EVENTS_UPDATE,
             data: { userId: user.userId },
             opts: {
-              deduplication: {
-                id: user.userId,
-              },
               attempts: 3,
               backoff: {
                 type: "exponential",
                 delay: 1000,
               },
+              deduplication: {
+                id: user.userId,
+              },
+              ignoreDependencyOnFailure: true,
             },
           },
         ],
