@@ -6,7 +6,7 @@ import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { config } from "../config";
 
 export const sdk = new NodeSDK({
-  serviceName: "cluster",
+  serviceName: config.otel.serviceName,
   traceExporter: new OTLPTraceExporter({
     url: config.otel.otlpEndpoint + "/v1/traces",
   }),
