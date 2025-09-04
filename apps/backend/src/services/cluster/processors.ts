@@ -275,7 +275,7 @@ export const processors: Record<QueueName, Processor> = {
       const result = await syncCourseGrades(userId, courseId, trackDiff);
 
       if (!result) {
-        return "no grade changes";
+        return null;
       }
 
       return trackCourseGradeChanges(
