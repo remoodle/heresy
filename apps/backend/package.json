@@ -27,6 +27,7 @@
     "@remoodle/utils": "workspace:*",
     "@total-typescript/shoehorn": "^0.1.2",
     "bullmq": "^5.58.4",
+    "bullmq-otel": "^1.0.1",
     "dotenv": "^17.2.1",
     "envalid": "^8.1.0",
     "hono": "^4.9.5",

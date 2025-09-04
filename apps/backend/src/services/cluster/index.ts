@@ -1,5 +1,6 @@
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
+import { BullMQOtel } from "bullmq-otel";
 import { queues, obliterateQueues, closeQueues } from "../../core/queues";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
@@ -40,6 +41,7 @@ const spawnWorkers = async (tasks: Tasks) => {
     const worker = new Worker(queueName, process, {
       ...defaultWorkerOptions,
       ...task.opts,
+      telemetry: new BullMQOtel("remoodle"),
     });
 
     workers.push(worker);

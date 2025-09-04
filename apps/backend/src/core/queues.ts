@@ -1,4 +1,5 @@
 import { Queue } from "bullmq";
+import { BullMQOtel } from "bullmq-otel";
 import { getValues } from "@remoodle/utils";
 import { db } from "../library/db";
 
@@ -40,6 +41,7 @@ export const queues: Record<QueueName, Queue> = queueNames.reduce(
   (acc, name) => {
     acc[name] = new Queue(name, {
       connection: db.redisConnection,
+      telemetry: new BullMQOtel("remoodle"),
     });
     return acc;
   },
