@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import { config } from "../../config";
-import { uni } from "../../adapters";
+import { uni } from "../../library/university";
 import type { Context } from "../context";
 import { logHandle } from "../helpers/logging";
 import { createBackToMenuKeyboard } from "../keyboards/menu-keyboard";

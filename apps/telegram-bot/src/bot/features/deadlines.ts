@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from "grammy";
 import { requestUnwrap, getAuthHeaders } from "../../library/hc";
-import { uni } from "../../adapters";
+import { uni } from "../../library/university";
 import type { Context } from "../context";
 import { logHandle } from "../helpers/logging";
 import {

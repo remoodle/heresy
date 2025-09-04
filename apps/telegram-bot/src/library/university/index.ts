@@ -1,4 +1,4 @@
-import { config } from "../config";
+import { config } from "../../config";
 import { aitu } from "./aitu";
 
 export const adapters = {

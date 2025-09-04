@@ -1,5 +1,5 @@
 import type { MoodleCourse } from "@remoodle/types";
-import type { CourseItem } from "../types";
+import type { CourseItem } from "./types";
 
 export interface CourseFormatOptions {
   getCourseName?: (course: MoodleCourse) => string;

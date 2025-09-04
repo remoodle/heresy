@@ -4,11 +4,11 @@ import type {
   MoodleEvent,
   MoodleAssignment,
 } from "@remoodle/types";
-import type { UniversityConfig, GradeBlock, CourseItem } from "./types";
-import { formatGradeItem, renderBlocks } from "./formatters/grades";
-import { formatDeadlinesList } from "./formatters/deadlines";
-import { formatCoursesList } from "./formatters/courses";
-import { formatAssignmentDetails } from "./formatters/assignments";
+import type { UniversityConfig, GradeBlock, CourseItem } from "./core/types";
+import { formatGradeItem, renderBlocks } from "./core/grades";
+import { formatDeadlinesList } from "./core/deadlines";
+import { formatCoursesList } from "./core/courses";
+import { formatAssignmentDetails } from "./core/assignments";
 
 export function parseCourseFullname(fullname: string) {
   const lastPipeIndex = fullname.lastIndexOf("|");
