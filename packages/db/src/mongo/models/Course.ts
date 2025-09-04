@@ -9,7 +9,7 @@ const course = new Schema<ICourse>(
     data: { type: Schema.Types.Mixed, required: true },
     classification: { type: String, required: true },
     moodleId: { type: Number, required: true },
-    disabled: { type: Boolean, default: false },
+    disabledAt: { type: Date, default: null },
   },
   { timestamps: true },
 );

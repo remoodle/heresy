@@ -27,7 +27,7 @@ const handleCourseError = async (
   ) {
     await db.course.updateOne(
       { userId: user._id, "data.id": moodleCourseId },
-      { $set: { disabled: true } },
+      { $set: { disabledAt: new Date() } },
     );
   }
 };
@@ -75,6 +75,7 @@ export const syncEvents = async (userId: string) => {
   });
 };
 
+// TODO: Add disabled courses reactivation policy, e.g., try to reset disabledAt after a week or so
 export const syncCourses = async (
   userId: string,
   classification: MoodleCourseClassification[] = ["inprogress", "past"],
