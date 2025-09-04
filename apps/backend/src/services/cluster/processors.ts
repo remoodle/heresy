@@ -45,8 +45,8 @@ export const processors: Record<QueueName, Processor> = {
       });
 
       const flows = users.map((user) => ({
-        name: JobName.REMINDERS_CHECK,
         queueName: QueueName.REMINDERS,
+        name: JobName.REMINDERS_CHECK,
         data: { userId: user.userId },
         children: [
           {
@@ -99,13 +99,13 @@ export const processors: Record<QueueName, Processor> = {
         name: JobName.COURSES_UPDATE,
         data: { userId: payload.userId },
         opts: {
-          deduplication: {
-            id: payload.userId,
-          },
           attempts: 2,
           backoff: {
             type: "exponential",
             delay: 1000,
+          },
+          deduplication: {
+            id: payload.userId,
           },
         },
       }));
@@ -154,10 +154,7 @@ export const processors: Record<QueueName, Processor> = {
 
         await queues[QueueName.TELEGRAM].add(
           JobName.TELEGRAM_SEND_MESSAGE,
-          {
-            userId,
-            message,
-          },
+          { userId, message },
           {
             attempts: 3,
             backoff: {
@@ -223,9 +220,9 @@ export const processors: Record<QueueName, Processor> = {
             };
 
             return {
+              queueName: QueueName.GRADES_FLOW_UPDATE,
               name: JobName.GRADES_UPDATE_COURSE,
               data,
-              queueName: QueueName.GRADES_FLOW_UPDATE,
               opts: {
                 lifo,
                 attempts: 4,
@@ -242,8 +239,8 @@ export const processors: Record<QueueName, Processor> = {
           });
 
           return {
-            name: JobName.GRADES_COMBINE_DIFFS,
             queueName: QueueName.GRADES_FLOW_COMBINE,
+            name: JobName.GRADES_COMBINE_DIFFS,
             data: {
               userId,
               courseIds,
@@ -321,10 +318,7 @@ export const processors: Record<QueueName, Processor> = {
 
         await queues[QueueName.TELEGRAM].add(
           JobName.TELEGRAM_SEND_MESSAGE,
-          {
-            userId,
-            message,
-          },
+          { userId, message },
           {
             attempts: 3,
             backoff: {
@@ -399,10 +393,7 @@ export const processors: Record<QueueName, Processor> = {
 
         await queues[QueueName.TELEGRAM].add(
           JobName.TELEGRAM_SEND_MESSAGE,
-          {
-            userId,
-            message,
-          },
+          { userId, message },
           {
             attempts: 3,
             backoff: {
