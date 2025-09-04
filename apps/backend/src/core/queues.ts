@@ -1,7 +1,7 @@
 import { Queue } from "bullmq";
-import { BullMQOtel } from "bullmq-otel";
 import { getValues } from "@remoodle/utils";
 import { db } from "../library/db";
+import { bullOtel } from "./telemetry";
 
 export enum JobName {
   COURSES_SCHEDULE_SYNC = "courses::schedule-sync",
@@ -41,7 +41,7 @@ export const queues: Record<QueueName, Queue> = queueNames.reduce(
   (acc, name) => {
     acc[name] = new Queue(name, {
       connection: db.redisConnection,
-      telemetry: new BullMQOtel("remoodle"),
+      telemetry: bullOtel,
     });
     return acc;
   },

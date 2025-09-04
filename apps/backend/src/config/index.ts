@@ -25,6 +25,10 @@ export const env = cleanEnv(process.env, {
   CLUSTER_SCHEDULER_ENABLED: str({ default: "0" }),
   CLUSTER_TASKS_CONFIG_PATH: str({ default: "./configs/example.json" }),
 
+  OTEL_ENABLED: str({ default: "0" }),
+  OTEL_SERVICE_NAME: str({ default: "remoodle" }),
+  OTEL_OTLP_ENDPOINT: str({ default: "http://127.0.0.1:4318" }),
+
   ALERT_WORKER_URL: str({ default: "http://localhost:8787" }),
   ALERT_WORKER_SECRET: str({ default: "UpqqN" }),
   ALERT_WORKER_ENABLED: str({ default: "0" }),
@@ -63,6 +67,11 @@ export const config = {
     scheduler: {
       enabled: env.CLUSTER_SCHEDULER_ENABLED === "1",
     },
+  },
+  otel: {
+    enabled: env.OTEL_ENABLED === "1",
+    serviceName: env.OTEL_SERVICE_NAME,
+    otlpEndpoint: env.OTEL_OTLP_ENDPOINT,
   },
   alert: {
     url: env.ALERT_WORKER_URL,

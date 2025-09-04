@@ -1,7 +1,7 @@
 import type { WorkerOptions } from "bullmq";
 import { Worker } from "bullmq";
-import { BullMQOtel } from "bullmq-otel";
 import { queues, obliterateQueues, closeQueues } from "../../core/queues";
+import { bullOtel, sdk } from "../../core/telemetry";
 import { config } from "../../config";
 import { logger } from "../../library/logger";
 import { db } from "../../library/db";
@@ -41,7 +41,7 @@ const spawnWorkers = async (tasks: Tasks) => {
     const worker = new Worker(queueName, process, {
       ...defaultWorkerOptions,
       ...task.opts,
-      telemetry: new BullMQOtel("remoodle"),
+      telemetry: bullOtel,
     });
 
     workers.push(worker);
@@ -50,6 +50,10 @@ const spawnWorkers = async (tasks: Tasks) => {
 
 const run = async () => {
   logger.cluster.info("starting cluster...");
+
+  if (config.otel.enabled) {
+    sdk.start();
+  }
 
   const tasks = await loadConfig();
 
