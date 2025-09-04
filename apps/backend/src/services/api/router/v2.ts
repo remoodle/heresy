@@ -13,7 +13,7 @@ import type {
 } from "@remoodle/types";
 
 import { config } from "../../../config";
-import { db } from "../../../library/db";
+import { db, wrapper } from "../../../library/db";
 import { QueueName, JobName } from "../../../core/queues";
 import { Moodle } from "../../../library/moodle";
 import { logger } from "../../../library/logger";
@@ -732,7 +732,7 @@ const userRoutes = new Hono<{
     }
 
     try {
-      await db.wrapper.deleteUser(userId);
+      await wrapper.deleteUser(userId);
     } catch (error) {
       throw new HTTPException(500, {
         message: `Failed to delete user from the database ${error}`,

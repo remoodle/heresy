@@ -4,7 +4,12 @@ import { config } from "../config";
 const redis = createRedis(config.redis.uri);
 const mongo = createMongo(config.mongo.uri);
 
-const wrapper = {
+export const db = {
+  ...redis,
+  ...mongo,
+};
+
+export const wrapper = {
   getActiveUsers: async () => {
     const users = await db.user
       .find({ moodleId: { $exists: true }, health: { $gt: 0 } })
@@ -25,10 +30,4 @@ const wrapper = {
     await db.grade.deleteMany({ userId });
     await db.event.deleteMany({ userId });
   },
-};
-
-export const db = {
-  ...redis,
-  ...mongo,
-  wrapper,
 };

@@ -2,7 +2,7 @@ import { FlowProducer } from "bullmq";
 import type { FlowChildJob, FlowJob, Job } from "bullmq";
 import { Telegram, getValues, partition, objectEntries } from "@remoodle/utils";
 import { config } from "../../config";
-import { db } from "../../library/db";
+import { db, wrapper } from "../../library/db";
 import { logger } from "../../library/logger";
 import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
@@ -33,7 +33,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
+      const users = userId ? [{ userId }] : await wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId },
@@ -87,7 +87,7 @@ export const processors: Record<QueueName, Processor> = {
     process: async (job) => {
       const { userId } = job.data;
 
-      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
+      const users = userId ? [{ userId }] : await wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId },
@@ -184,7 +184,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const { lifo } = job.opts;
 
-      const users = userId ? [{ userId }] : await db.wrapper.getActiveUsers();
+      const users = userId ? [{ userId }] : await wrapper.getActiveUsers();
 
       logger.cluster.info(
         { userId, classification, trackDiff },
