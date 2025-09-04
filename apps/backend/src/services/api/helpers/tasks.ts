@@ -1,5 +1,5 @@
 import { FlowProducer } from "bullmq";
-import { QueueName, JobName } from "../../../core/queues";
+import { QueueName, JobName, queues } from "../../../core/queues";
 import { db } from "../../../library/db";
 
 export const syncUserData = async (userId: string) => {
@@ -23,12 +23,12 @@ export const syncUserData = async (userId: string) => {
         data: { userId, trackDiff: false },
         opts: { lifo: true },
       },
-      {
-        name: JobName.EVENTS_UPDATE,
-        queueName: QueueName.EVENTS,
-        data: { userId },
-        opts: { lifo: true },
-      },
     ],
   });
+
+  await queues[QueueName.EVENTS].add(
+    JobName.EVENTS_UPDATE,
+    { userId },
+    { lifo: true },
+  );
 };
