@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.0...remoodle/backend-v2.6.1) (2025-09-04)
+
+
+### Bug Fixes
+
+* replace hardcoded otel service name ([3cb5cb7](https://github.com/remoodle/remoodle/commit/3cb5cb7702cc0ba627baf2c83c0d5609b73754f6))
+
 ## [2.6.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.5.1...remoodle/backend-v2.6.0) (2025-09-04)
 
 
