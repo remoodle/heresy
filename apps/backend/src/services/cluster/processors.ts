@@ -193,6 +193,7 @@ export const processors: Record<QueueName, Processor> = {
 
       const courses = await db.course
         .find({
+          disabled: { $ne: true },
           userId: { $in: users.map((user) => user.userId) },
           ...(classification && { classification }),
         })

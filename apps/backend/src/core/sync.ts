@@ -15,13 +15,20 @@ const handleTokenError = async (error: { message: string }, user: IUser) => {
   }
 };
 
-const handleNotInGroupError = async (
+const COURSE_ERRORS = ["error/notingroup", "Course or activity not accessible"];
+
+const handleCourseError = async (
   error: { message: string },
   user: IUser,
   moodleCourseId: number,
 ) => {
-  if (error.message.includes("error/notingroup")) {
-    await wrapper.deleteUserMoodleCourses(user._id, [moodleCourseId]);
+  if (
+    COURSE_ERRORS.some((courseError) => courseError.includes(error.message))
+  ) {
+    await db.course.updateOne(
+      { userId: user._id, "data.id": moodleCourseId },
+      { $set: { disabled: true } },
+    );
   }
 };
 
@@ -175,7 +182,7 @@ export const syncCourseGrades = async (
 
   if (error) {
     await handleTokenError(error, user);
-    await handleNotInGroupError(error, user, courseId);
+    await handleCourseError(error, user, courseId);
     throw new Error(`Failed to get grades for ${courseId}: ${error.message}`);
   }
 

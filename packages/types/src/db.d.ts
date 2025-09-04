@@ -12,6 +12,7 @@ export type ICourse = {
   data: MoodleCourse;
   classification: MoodleCourseClassification;
   moodleId: number;
+  disabled: boolean;
 };
 
 export type IGrade = {
