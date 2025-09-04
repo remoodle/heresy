@@ -1,5 +1,33 @@
 # Changelog
 
+## [2.6.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.5.1...remoodle/backend-v2.6.0) (2025-09-04)
+
+
+### Features
+
+* add bullmq-otel telemetry ([f9bd75f](https://github.com/remoodle/remoodle/commit/f9bd75f719c95a311a3d7ec1b9fc85c0d3f51c55))
+* add otel instrumentation ([76e2e4b](https://github.com/remoodle/remoodle/commit/76e2e4b81bfa72822051ac604fc10f261423edf9))
+
+
+### Bug Fixes
+
+* change return type ([d89771f](https://github.com/remoodle/remoodle/commit/d89771f85e695420f104b1bc63b54c3aeeeab807))
+* ignore failed event syncs ([38b87d5](https://github.com/remoodle/remoodle/commit/38b87d50dfb057925d873001b9cbb219c49595de))
+* return disabled course logic ([0347a92](https://github.com/remoodle/remoodle/commit/0347a92dd8b28453b953c6e3e1a30f73b408c26c))
+
+
+### Miscellaneous Chores
+
+* change wording ([5bd0cf7](https://github.com/remoodle/remoodle/commit/5bd0cf7ec716e0d30594d6fb7fd3d1055c147891))
+
+
+### Code Refactoring
+
+* change wrapper imports ([62207b2](https://github.com/remoodle/remoodle/commit/62207b2cb5950be23baf194819990933ed0cbdcb))
+* export wrapper through db ([b41f53e](https://github.com/remoodle/remoodle/commit/b41f53e8994465824ac833958f9ed5c48ae74a4b))
+* rename queue processor finder function ([bf4c496](https://github.com/remoodle/remoodle/commit/bf4c4962192df8da1fce81c9452b4f075dcc06b1))
+* replace disabled with disabledAt ([2a4ea22](https://github.com/remoodle/remoodle/commit/2a4ea22bff74a084837a4278e16861ebce8c9aee))
+
 ## [2.5.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.5.0...remoodle/backend-v2.5.1) (2025-09-03)
 
 
