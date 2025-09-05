@@ -9,7 +9,7 @@ export const posthogContextKey: InjectionKey<PostHog> =
 
 export function createPosthog(app: App, router: Router) {
   posthog.init("phc_cfpLe4cOVjX1vTJLFU2Xdf63XmT0kqEfRBpYxYmEVoi", {
-    api_host: "https://remoodle.app/ingest",
+    api_host: "https://us.i.posthog.com",
     capture_pageview: false,
     loaded: function (ph) {
       if (!IS_PROD) {
