@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.11.4](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.11.3...remoodle/frontend-v1.11.4) (2025-09-05)
+
+
+### Bug Fixes
+
+* change posthog host ([3b07538](https://github.com/remoodle/remoodle/commit/3b07538024d5e7249f6f290efe2cb37f9f17bda7))
+* **deps:** update all non-major dependencies ([#518](https://github.com/remoodle/remoodle/issues/518)) ([f009e4c](https://github.com/remoodle/remoodle/commit/f009e4cfa55b93c35fcd7a1ffd0d055f39ec9b80))
+
+
+### Miscellaneous Chores
+
+* upgrade node ([81e0a8e](https://github.com/remoodle/remoodle/commit/81e0a8e92b85b4c77768f19f111b917dff7c64f7))
+
 ## [1.11.3](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.11.2...remoodle/frontend-v1.11.3) (2025-09-04)
 
 
