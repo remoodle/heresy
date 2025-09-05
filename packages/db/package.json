@@ -19,7 +19,7 @@
     "@remoodle/eslint-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^22.18.1",
+    "@types/node": "^24.3.1",
     "@types/uuid": "^10.0.0",
     "eslint": "^9.34.0",
     "typescript": "~5.9.2"

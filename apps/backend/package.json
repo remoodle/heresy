@@ -49,7 +49,7 @@
     "@remoodle/types": "workspace:*",
     "@total-typescript/ts-reset": "^0.6.1",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^22.18.1",
+    "@types/node": "^24.3.1",
     "eslint": "^9.34.0",
     "npm-run-all2": "^8.0.4",
     "tsup": "^8.5.0",
