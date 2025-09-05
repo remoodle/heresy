@@ -29,7 +29,7 @@
     "linkify-html": "^4.3.2",
     "lucide-vue-next": "^0.542.0",
     "pinia": "^3.0.3",
-    "posthog-js": "^1.261.6",
+    "posthog-js": "^1.261.7",
     "reka-ui": "^2.5.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
