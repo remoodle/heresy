@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.6](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.5...remoodle/telegram-bot-v2.2.6) (2025-09-05)
+
+
+### Miscellaneous Chores
+
+* upgrade node ([47cc5f5](https://github.com/remoodle/remoodle/commit/47cc5f5c46e92b0af1c2e03eb0aa7dead6848af6))
+
 ## [2.2.5](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.4...remoodle/telegram-bot-v2.2.5) (2025-09-05)
 
 
