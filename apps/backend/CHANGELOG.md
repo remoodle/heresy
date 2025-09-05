@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.2...remoodle/backend-v2.6.3) (2025-09-05)
+
+
+### Miscellaneous Chores
+
+* upgrade node ([81e0a8e](https://github.com/remoodle/remoodle/commit/81e0a8e92b85b4c77768f19f111b917dff7c64f7))
+
 ## [2.6.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.1...remoodle/backend-v2.6.2) (2025-09-04)
 
 
