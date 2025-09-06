@@ -66,6 +66,11 @@ export const processors: Record<QueueName, Processor> = {
             },
           },
         ],
+        opts: {
+          deduplication: {
+            id: user.userId,
+          },
+        },
       }));
 
       const trees = await flowProducer.addBulk(flows);
