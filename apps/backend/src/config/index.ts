@@ -9,7 +9,7 @@ export const env = cleanEnv(process.env, {
 
   TELEGRAM_BOT_TOKEN: str(),
 
-  MOODLE_URL: str({ default: "https://moodle.astanait.edu.kz" }),
+  MOODLE_URL: str({ default: "" }),
 
   MONGO_URI: str({ default: "mongodb://localhost:27017/remoodle-dev" }),
   REDIS_URI: str({ default: "redis://localhost:6379" }),
