@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.2.7](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.6...remoodle/telegram-bot-v2.2.7) (2025-09-06)
+
+
+### Bug Fixes
+
+* move aitu specific into into university adapter ([edabc31](https://github.com/remoodle/remoodle/commit/edabc31e04040dd168387ff9f64be4b239535718))
+
+
+### Miscellaneous Chores
+
+* remove webapp mentions ([771993c](https://github.com/remoodle/remoodle/commit/771993c6173928436a4d7a30de325d77c0ebd557))
+
 ## [2.2.6](https://github.com/remoodle/remoodle/compare/remoodle/telegram-bot-v2.2.5...remoodle/telegram-bot-v2.2.6) (2025-09-05)
 
 
