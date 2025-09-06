@@ -125,8 +125,21 @@ const calculateTotalGrades = (grades: MoodleGrade[]): GradeBlock[] => {
   return blocks;
 };
 
+const DOCS = "https://ext.remoodle.app/docs";
+const PRIVACY_POLICY = "https://ext.remoodle.app/privacy-policy";
+const CREATORS = "https://ext.remoodle.app/creators";
+
+const additionalInfo = `💬 <b>Community Chat:</b> @remoodle
+
+🫰 <b>Help us:</b> &lt;3 @donateremoodle
+
+💁‍♂️ <b>More:</b> <a href="${DOCS}">Docs</a> | <a href="${PRIVACY_POLICY}">Privacy Policy</a> | <a href="${CREATORS}">Creators</a>
+`;
+
 export const aitu: UniversityConfig = {
   name: "Astana IT University",
+
+  additionalInfo,
 
   deadlinesDaysLimit: {
     default: 21,

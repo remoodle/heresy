@@ -7,6 +7,7 @@ import type {
 
 export type UniversityConfig = {
   name: string;
+  additionalInfo?: string;
   deadlinesDaysLimit: {
     default: number;
     short: number;

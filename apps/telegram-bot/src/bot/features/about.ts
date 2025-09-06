@@ -10,10 +10,6 @@ const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-const DOCS = "https://ext.remoodle.app/docs";
-const PRIVACY_POLICY = "https://ext.remoodle.app/privacy-policy";
-const CREATORS = "https://ext.remoodle.app/creators";
-
 const REPO = "https://github.com/remoodle/remoodle";
 
 const ABOUT_MESSAGE = `
@@ -21,11 +17,8 @@ const ABOUT_MESSAGE = `
 <b>Bot Version:</b> ${config.version}
 <b>Source Code:</b> <a href="${REPO}">${REPO}</a>
 
-💬 <b>Community Chat:</b> @remoodle
-
-🫰 <b>Help us:</b> &lt;3 @donateremoodle
-
-💁‍♂️ <b>More:</b> <a href="${DOCS}">Docs</a> | <a href="${PRIVACY_POLICY}">Privacy Policy</a> | <a href="${CREATORS}">Creators</a>`;
+${uni.additionalInfo ? `${uni.additionalInfo}\n` : ""}
+`;
 
 const ABOUT_MESSAGE_OPTIONS = {
   parse_mode: "HTML" as const,
