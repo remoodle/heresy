@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.6.5](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.4...remoodle/backend-v2.6.5) (2025-09-06)
+
+
+### Bug Fixes
+
+* dedupe reminder tasks ([5178cef](https://github.com/remoodle/remoodle/commit/5178cefe73de2e2632554b51d49bb236a7cb99d0))
+
 ## [2.6.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.3...remoodle/backend-v2.6.4) (2025-09-05)
 
 
