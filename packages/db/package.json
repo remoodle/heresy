@@ -13,7 +13,7 @@
   "dependencies": {
     "ioredis": "^5.7.0",
     "mongoose": "^8.18.0",
-    "uuid": "^12.0.0"
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
