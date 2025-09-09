@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.6.6](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.5...remoodle/backend-v2.6.6) (2025-09-09)
+
+
+### Miscellaneous Chores
+
+* remove default moodle lms ([a5a3bfb](https://github.com/remoodle/remoodle/commit/a5a3bfb79e40044e71160dd9ff2b35561fd5da2a))
+* **trunk:** release remoodle/backend 2.6.6 ([#527](https://github.com/remoodle/remoodle/issues/527)) ([e8effde](https://github.com/remoodle/remoodle/commit/e8effdeff0b392ea3abe671ab01555bf7b8a0cde))
+
 ## [2.6.6](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.5...remoodle/backend-v2.6.6) (2025-09-06)
 
 
