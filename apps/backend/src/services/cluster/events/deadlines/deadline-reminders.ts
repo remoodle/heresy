@@ -13,21 +13,28 @@ export type CourseDeadlineReminders = {
 };
 
 const convertThresholdToMs = (value: string): number => {
-  const [amount, unit] = value.split(" ");
-  const num = parseInt(amount, 10);
+  const match = value.match(/^(\d+)([a-zA-Z]+)$/);
 
-  switch (unit.toLowerCase()) {
-    case "minute":
-    case "minutes":
+  if (!match) {
+    throw new Error(
+      `Invalid time format: ${value}. Expected format like "3h", "6h", "1d"`,
+    );
+  }
+
+  const num = parseInt(match[1], 10);
+  const unit = match[2].toLowerCase();
+
+  switch (unit) {
+    case "m":
       return num * 60 * 1000;
-    case "hour":
-    case "hours":
+    case "h":
       return num * 60 * 60 * 1000;
-    case "day":
-    case "days":
+    case "d":
       return num * 24 * 60 * 60 * 1000;
     default:
-      throw new Error(`Unsupported time unit: ${unit}`);
+      throw new Error(
+        `Unsupported time unit: ${unit}. Supported units: m, h, d`,
+      );
   }
 };
 
@@ -41,16 +48,16 @@ const convertMsToThreshold = (ms: number): string => {
 
   if (ms >= 24 * 60 * 60 * 1000) {
     const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    return `${days} ${days === 1 ? "day" : "days"}`;
+    return `${days}d`;
   }
 
   if (ms >= 60 * 60 * 1000) {
     const hours = Math.floor(ms / (60 * 60 * 1000));
-    return `${hours} ${hours === 1 ? "hour" : "hours"}`;
+    return `${hours}h`;
   }
 
   const minutes = Math.floor(ms / (60 * 1000));
-  return `${minutes} ${minutes === 1 ? "minute" : "minutes"}`;
+  return `${minutes}m`;
 };
 
 const convertThresholds = (thresholds: string[]): number[] => {

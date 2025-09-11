@@ -47,15 +47,15 @@ describe("deadlines notifications", () => {
             event_id: 515515,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12 hours",
+            threshold: "12h",
           },
         ],
       },
     ];
 
-    expect(
-      trackDeadlineReminders(events, ["6 hours", "12 hours", "24 hours"]),
-    ).toStrictEqual(diff);
+    expect(trackDeadlineReminders(events, ["6h", "12h", "24h"])).toStrictEqual(
+      diff,
+    );
   });
 
   test("not started thresholds", () => {
@@ -76,7 +76,7 @@ describe("deadlines notifications", () => {
 
     const diff: CourseDeadlineReminders[] = [];
 
-    expect(trackDeadlineReminders(events, ["6 hours"])).toStrictEqual(diff);
+    expect(trackDeadlineReminders(events, ["6h"])).toStrictEqual(diff);
   });
 
   test("checked thresholds", () => {
@@ -91,14 +91,14 @@ describe("deadlines notifications", () => {
           },
         },
         reminders: {
-          "12 hours": true,
+          "12h": true,
         },
       },
     ]);
 
     const diff: CourseDeadlineReminders[] = [];
 
-    expect(trackDeadlineReminders(events, ["12 hours"])).toStrictEqual(diff);
+    expect(trackDeadlineReminders(events, ["12h"])).toStrictEqual(diff);
   });
 
   test("formatDeadlineReminders", () => {
@@ -111,13 +111,13 @@ describe("deadlines notifications", () => {
             event_id: 1,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12 hours",
+            threshold: "12h",
           },
           {
             event_id: 2,
             event_name: "Assignment 2 is due",
             event_timestart: 1726426740,
-            threshold: "12 hours",
+            threshold: "12h",
           },
         ],
       },
@@ -129,7 +129,7 @@ describe("deadlines notifications", () => {
             event_id: 1,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12 hours",
+            threshold: "12h",
           },
         ],
       },

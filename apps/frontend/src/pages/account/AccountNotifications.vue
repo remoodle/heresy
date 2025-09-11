@@ -102,16 +102,7 @@ const notificationGroups = computed(() => {
   return groups;
 });
 
-const AVAILABLE_THRESHOLDS = [
-  "1 hour",
-  "3 hours",
-  "6 hours",
-  "12 hours",
-  "1 day",
-  "2 days",
-  "3 days",
-  "4 days",
-];
+const AVAILABLE_THRESHOLDS = ["1h", "3h", "6h", "12h", "1d", "2d", "3d", "4d"];
 
 await Promise.all([suspense(), userStore.suspense()]);
 </script>

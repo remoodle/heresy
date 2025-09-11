@@ -3,11 +3,11 @@ import { v7 as uuidv7 } from "uuid";
 import type { IUser, NotificationSettings } from "@remoodle/types";
 
 export const DEFAULT_THRESHOLDS = [
-  "3 hours",
-  "6 hours",
-  "1 day",
-  // "2 days",
-  // "3 days",
+  "3h",
+  "6h",
+  "1d",
+  // "2d",
+  // "3d",
 ];
 
 const notificationSettingsSchema = new Schema<NotificationSettings>(
