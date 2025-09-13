@@ -1,4 +1,4 @@
-import type { IEvent } from "@remoodle/types";
+import type { IEvent, IReminder } from "@remoodle/types";
 import { getTimeLeft } from "@remoodle/utils";
 
 export type CourseDeadlineReminders = {
@@ -60,81 +60,118 @@ const convertMsToThreshold = (ms: number): string => {
   return `${minutes}m`;
 };
 
-const convertThresholds = (thresholds: string[]): number[] => {
+const getSortedThresholds = (thresholds: string[]): number[] => {
   return thresholds.map(convertThresholdToMs).sort((a, b) => a - b);
 };
 
-export const calculateRemainingThreshold = (
-  dueDate: number,
-  thresholds: string[],
-): string | null => {
-  const thresholdsMs = convertThresholds(thresholds);
-
-  const now = Date.now();
-  const remainingMs = dueDate - now;
-
-  if (remainingMs <= 0) {
-    return null;
-  }
-
-  for (let i = 0; i < thresholdsMs.length; i++) {
-    if (remainingMs <= thresholdsMs[i]) {
-      return convertMsToThreshold(thresholdsMs[i]);
-    }
-  }
-
-  return null;
+type EventReminder = {
+  userId: string;
+  eventId: string;
+  triggeredAt: Date;
+  threshold: string;
 };
 
 export const trackDeadlineReminders = (
-  events: IEvent[],
   thresholds: string[],
-): CourseDeadlineReminders[] => {
-  const deadlineReminders: CourseDeadlineReminders[] = [];
+  events: IEvent[],
+  existingReminders: IReminder[],
+) => {
+  const reminders: EventReminder[] = [];
 
-  for (const { data: event, reminders } of events) {
-    const { id, name, timestart, course } = event;
+  const thresholdsMsAsc = getSortedThresholds(thresholds);
 
-    const dueDate = timestart * 1000; // Convert to milliseconds
+  const nowMs = Date.now();
 
-    const threshold = calculateRemainingThreshold(dueDate, thresholds);
+  for (const event of events) {
+    const dueMs = event.data.timestart * 1000;
+    const remainingMs = dueMs - nowMs;
 
-    if (!threshold) {
+    if (!Number.isFinite(dueMs) || remainingMs <= 0) {
       continue;
     }
 
-    if (reminders && reminders[threshold]) {
-      continue;
-    }
+    const eventReminders = existingReminders.filter((reminder) => {
+      return reminder.eventId === event._id;
+    });
 
-    const existingCourseReminder = deadlineReminders.find(
-      (item) => item.course_id === course.id,
-    );
+    for (const thresholdMs of thresholdsMsAsc) {
+      if (thresholdMs >= remainingMs) {
+        const thresholdDateMs = dueMs - thresholdMs;
 
-    if (!existingCourseReminder) {
-      deadlineReminders.push({
-        course_id: course.id,
-        course_name: course.fullname,
-        reminders: [
-          {
-            event_id: id,
-            event_name: name,
-            event_timestart: timestart,
-            threshold,
-          },
-        ],
-      });
-    } else {
-      existingCourseReminder.reminders.push({
-        event_id: id,
-        event_name: name,
-        event_timestart: timestart,
-        threshold,
-      });
+        const hasReminderAfterThreshold = eventReminders.some((reminder) => {
+          return reminder.triggeredAt.getTime() >= thresholdDateMs;
+        });
+
+        if (!hasReminderAfterThreshold) {
+          reminders.push({
+            userId: event.userId,
+            eventId: event._id,
+            triggeredAt: new Date(),
+            threshold: convertMsToThreshold(thresholdMs),
+          });
+        }
+
+        break;
+      }
     }
   }
 
-  return deadlineReminders;
+  return reminders;
+};
+
+export const getCourseDeadlineReminders = (
+  events: IEvent[],
+  reminders: EventReminder[],
+): CourseDeadlineReminders[] => {
+  const eventsById = new Map<string, IEvent>(
+    events.map((event) => {
+      return [event._id, event];
+    }),
+  );
+
+  const courseMap = new Map<
+    number,
+    {
+      course_id: number;
+      course_name: string;
+      reminders: {
+        event_id: number;
+        event_name: string;
+        event_timestart: number;
+        threshold: string;
+      }[];
+    }
+  >();
+
+  for (const reminder of reminders) {
+    const event = eventsById.get(reminder.eventId);
+
+    if (!event) {
+      continue;
+    }
+
+    const courseId = event.data.course.id;
+    const courseName = event.data.course.fullname;
+
+    if (!courseMap.has(courseId)) {
+      courseMap.set(courseId, {
+        course_id: courseId,
+        course_name: courseName,
+        reminders: [],
+      });
+    }
+
+    courseMap.get(courseId)!.reminders.push({
+      event_id: event.data.id,
+      event_name: event.data.name,
+      event_timestart: event.data.timestart,
+      threshold: reminder.threshold,
+    });
+  }
+
+  return Array.from(courseMap.values()).filter((course) => {
+    return course.reminders.length > 0;
+  });
 };
 
 export const formatDeadlineReminders = (

@@ -13,6 +13,7 @@ import {
 import {
   formatDeadlineReminders,
   trackDeadlineReminders,
+  getCourseDeadlineReminders,
 } from "./events/deadlines/deadline-reminders";
 import {
   formatCourseChanges,
@@ -361,34 +362,27 @@ export const processors: Record<QueueName, Processor> = {
         return "no events";
       }
 
-      const deadlineReminders = trackDeadlineReminders(
-        events,
+      const existingReminders = await db.reminder.find({ userId });
+
+      const reminders = trackDeadlineReminders(
         user.settings.deadlineReminders.thresholds,
+        events,
+        existingReminders,
       );
 
-      if (!deadlineReminders.length) {
+      if (!reminders.length) {
         return "no deadline reminders";
       }
 
-      const reminders = deadlineReminders.flatMap((course) => course.reminders);
+      const newReminders = reminders.map((reminder) => ({
+        userId: reminder.userId,
+        eventId: reminder.eventId,
+        triggeredAt: reminder.triggeredAt,
+      }));
 
-      for (const { event_id, threshold } of reminders) {
-        const event = events.find(({ data }) => data.id === event_id);
+      await db.reminder.insertMany(newReminders);
 
-        if (!event) {
-          continue;
-        }
-
-        const updatedReminders = { ...(event.reminders || {}) };
-
-        updatedReminders[threshold] = true;
-
-        await db.event.findOneAndUpdate(
-          { userId, "data.id": event.data.id },
-          { $set: { reminders: updatedReminders } },
-          { upsert: true },
-        );
-      }
+      const deadlineReminders = getCourseDeadlineReminders(events, reminders);
 
       if (
         user.telegramId &&

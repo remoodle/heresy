@@ -26,7 +26,13 @@ export type IEvent = {
   _id: string;
   userId: string;
   data: MoodleEvent;
-  reminders: Record<string, boolean> | null;
+};
+
+export type IReminder = {
+  _id: string;
+  userId: string;
+  eventId: string;
+  triggeredAt: Date;
 };
 
 export type NotificationSettings = {

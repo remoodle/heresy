@@ -1,6 +1,7 @@
 import course from "./models/Course";
 import event from "./models/Event";
 import grade from "./models/Grade";
+import reminder from "./models/Reminder";
 import user from "./models/User";
 import { createMongoDBConnection } from "./connection";
 
@@ -11,6 +12,7 @@ export const createMongo = (mongoURI: string) => {
     course,
     event,
     grade,
+    reminder,
     user,
   };
 };
