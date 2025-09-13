@@ -12,14 +12,14 @@
   },
   "dependencies": {
     "dayjs": "^1.11.18",
-    "hono": "^4.9.6"
+    "hono": "^4.9.7"
   },
   "devDependencies": {
     "@remoodle/eslint-config": "workspace:*",
     "@remoodle/tsconfig": "workspace:*",
     "@remoodle/types": "workspace:*",
-    "@types/node": "^24.3.1",
-    "eslint": "^9.34.0",
+    "@types/node": "^24.3.3",
+    "eslint": "^9.35.0",
     "typescript": "~5.9.2"
   }
 }

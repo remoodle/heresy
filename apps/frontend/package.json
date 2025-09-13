@@ -17,7 +17,7 @@
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",
     "@remoodle/utils": "workspace:*",
-    "@tanstack/vue-query": "^5.86.0",
+    "@tanstack/vue-query": "^5.87.4",
     "@tanstack/vue-table": "^8.21.3",
     "@vueuse/core": "^13.9.0",
     "@vueuse/router": "^13.9.0",
@@ -27,9 +27,9 @@
     "filesize": "^11.0.2",
     "linkify": "^0.2.1",
     "linkify-html": "^4.3.2",
-    "lucide-vue-next": "^0.542.0",
+    "lucide-vue-next": "^0.544.0",
     "pinia": "^3.0.3",
-    "posthog-js": "^1.261.7",
+    "posthog-js": "^1.265.1",
     "reka-ui": "^2.5.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.13",
@@ -38,7 +38,7 @@
     "vue-boring-avatars": "^1.4.0",
     "vue-dompurify-html": "^5.3.0",
     "vue-router": "^4.5.1",
-    "zod": "^4.1.5"
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@iconify/vue": "^5.0.0",
@@ -49,21 +49,21 @@
     "@tailwindcss/typography": "^0.5.16",
     "@tailwindcss/vite": "^4.1.13",
     "@tsconfig/node24": "^24.0.1",
-    "@types/node": "^24.3.1",
+    "@types/node": "^24.3.3",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.8.1",
-    "eslint": "^9.34.0",
-    "eslint-plugin-oxlint": "^1.14.0",
+    "eslint": "^9.35.0",
+    "eslint-plugin-oxlint": "^1.15.0",
     "eslint-plugin-vue": "^10.4.0",
     "npm-run-all2": "^8.0.4",
-    "oxlint": "^1.14.0",
+    "oxlint": "^1.15.0",
     "stale-dep": "^0.8.3",
     "typescript": "~5.9.2",
-    "vite": "^7.1.4",
-    "vite-plugin-vue-devtools": "^8.0.1",
+    "vite": "^7.1.5",
+    "vite-plugin-vue-devtools": "^8.0.2",
     "vitest": "^3.2.4",
-    "vue-tsc": "^3.0.6"
+    "vue-tsc": "^3.0.7"
   }
 }
