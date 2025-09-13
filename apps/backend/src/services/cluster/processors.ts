@@ -350,7 +350,7 @@ export const processors: Record<QueueName, Processor> = {
       const user = await db.user.findOne({ _id: userId });
 
       if (!user) {
-        throw new Error(`User ${user} not found `);
+        throw new Error(`User ${userId} not found`);
       }
 
       const events = await db.event

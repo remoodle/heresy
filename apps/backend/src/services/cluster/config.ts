@@ -6,7 +6,7 @@ import { config } from "../../config";
 type Task = {
   name: JobName;
   repeat?: Omit<RepeatOptions, "key">;
-  opts?: WorkerOptions;
+  opts?: Partial<WorkerOptions>;
 };
 
 export type Tasks = Task[];
