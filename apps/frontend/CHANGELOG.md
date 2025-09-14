@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.12.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.12.0...remoodle/frontend-v1.12.1) (2025-09-14)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#524](https://github.com/remoodle/remoodle/issues/524)) ([9f8d8b5](https://github.com/remoodle/remoodle/commit/9f8d8b587a7b6c7149f149d2f31ff073bd6e27ca))
+
 ## [1.12.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.11.4...remoodle/frontend-v1.12.0) (2025-09-14)
 
 
