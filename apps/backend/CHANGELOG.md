@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.7.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.2...remoodle/backend-v2.7.3) (2025-09-14)
+
+
+### Bug Fixes
+
+* align remaining data in tests ([8f508bb](https://github.com/remoodle/remoodle/commit/8f508bbfa7619d2d449f22bb456717ec9c6e7a7c))
+
 ## [2.7.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.1...remoodle/backend-v2.7.2) (2025-09-14)
 
 
