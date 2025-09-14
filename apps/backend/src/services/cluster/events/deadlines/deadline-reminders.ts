@@ -6,10 +6,6 @@ import {
   formatDate,
 } from "@remoodle/utils";
 
-const getSortedThresholds = (thresholds: string[]): number[] => {
-  return [...thresholds.map(durationToMs)].sort((a, b) => a - b);
-};
-
 export const trackDeadlineReminders = (
   thresholds: string[],
   events: IEvent[],
@@ -21,9 +17,9 @@ export const trackDeadlineReminders = (
     triggeredAt: Date;
   }[] = [];
 
-  const thresholdsMsAsc = getSortedThresholds(thresholds);
-
   const nowMs = Date.now();
+
+  const thresholdsMs = [...thresholds.map(durationToMs)].sort((a, b) => a - b);
 
   for (const event of events) {
     const dueMs = event.data.timestart * 1000;
@@ -37,7 +33,7 @@ export const trackDeadlineReminders = (
       return reminder.eventId === event._id;
     });
 
-    for (const thresholdMs of thresholdsMsAsc) {
+    for (const thresholdMs of thresholdsMs) {
       if (thresholdMs >= remainingMs) {
         const thresholdDateMs = dueMs - thresholdMs;
 
