@@ -1,5 +1,5 @@
 {
-  "apps/frontend": "1.11.4",
+  "apps/frontend": "1.12.0",
   "apps/frontend+FILLER": "0.0.0",
   "apps/backend": "2.6.5",
   "apps/backend+FILLER": "0.0.0",
