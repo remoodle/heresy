@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.7.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.0...remoodle/backend-v2.7.1) (2025-09-14)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#524](https://github.com/remoodle/remoodle/issues/524)) ([9f8d8b5](https://github.com/remoodle/remoodle/commit/9f8d8b587a7b6c7149f149d2f31ff073bd6e27ca))
+
+
+### Code Refactoring
+
+* resolve dates mess ([e0548d9](https://github.com/remoodle/remoodle/commit/e0548d957fb2599216f8f5d5e8e49478d0ace698))
+
 ## [2.7.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.5...remoodle/backend-v2.7.0) (2025-09-14)
 
 
