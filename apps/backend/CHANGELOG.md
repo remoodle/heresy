@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.7.2](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.1...remoodle/backend-v2.7.2) (2025-09-14)
+
+
+### Bug Fixes
+
+* align deadline reminder naming and processing order ([2fc14f6](https://github.com/remoodle/remoodle/commit/2fc14f697eb2bf7a8eb85fbfdaa5f45f1f85db8c))
+
+
+### Code Refactoring
+
+* replace threshold with remaining time ([fee296a](https://github.com/remoodle/remoodle/commit/fee296aac370e49f8c852a2b7c8adb020a364345))
+* simplify deadline tracking ([7ed4b99](https://github.com/remoodle/remoodle/commit/7ed4b99330b1ca67d2441ad3820b9970330751b9))
+
 ## [2.7.1](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.0...remoodle/backend-v2.7.1) (2025-09-14)
 
 
