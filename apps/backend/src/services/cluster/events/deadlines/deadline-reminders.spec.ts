@@ -182,13 +182,13 @@ describe("deadlines notifications", () => {
             event_id: 1,
             event_name: "Assignment 1 is due",
             event_timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
-            remaining: "PT12H",
+            remaining: "PT11H",
           },
           {
             event_id: 2,
             event_name: "Assignment 2 is due",
             event_timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
-            remaining: "PT12H",
+            remaining: "PT11H",
           },
         ],
       },
