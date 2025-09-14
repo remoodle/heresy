@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.7.0](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.5...remoodle/backend-v2.7.0) (2025-09-14)
+
+
+### Features
+
+* change threshold format ([5e30c3c](https://github.com/remoodle/remoodle/commit/5e30c3c83e383907a48ad7a3318623f297c0356a))
+
+
+### Bug Fixes
+
+* minor issues ([5bc12ab](https://github.com/remoodle/remoodle/commit/5bc12abe3082dd73ae7ea133b5aac8da348fa72d))
+
+
+### Miscellaneous Chores
+
+* remove default moodle lms ([a5a3bfb](https://github.com/remoodle/remoodle/commit/a5a3bfb79e40044e71160dd9ff2b35561fd5da2a))
+* **trunk:** release remoodle/backend 2.6.6 ([#527](https://github.com/remoodle/remoodle/issues/527)) ([e8effde](https://github.com/remoodle/remoodle/commit/e8effdeff0b392ea3abe671ab01555bf7b8a0cde))
+
+
+### Code Refactoring
+
+* update deadline reminders logic ([1681186](https://github.com/remoodle/remoodle/commit/168118675be575c911bf2ba78a7711bb5f3dd28f))
+* use ISO8601 duration format for thresholds ([6537b5c](https://github.com/remoodle/remoodle/commit/6537b5c9c76cc246a9159c433c351324a4d21c9d))
+
 ## [2.6.6](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.6.5...remoodle/backend-v2.6.6) (2025-09-06)
 
 
