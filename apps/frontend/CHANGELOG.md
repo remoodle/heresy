@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.12.0](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.11.4...remoodle/frontend-v1.12.0) (2025-09-14)
+
+
+### Features
+
+* change threshold format ([5e30c3c](https://github.com/remoodle/remoodle/commit/5e30c3c83e383907a48ad7a3318623f297c0356a))
+
+
+### Code Refactoring
+
+* use ISO8601 duration format for thresholds ([6537b5c](https://github.com/remoodle/remoodle/commit/6537b5c9c76cc246a9159c433c351324a4d21c9d))
+
 ## [1.11.4](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.11.3...remoodle/frontend-v1.11.4) (2025-09-05)
 
 
