@@ -4,7 +4,7 @@ import type {
   MoodleCourse,
   MoodleGrade,
 } from "@remoodle/types";
-import { formatTimestamp } from "@remoodle/utils";
+import { formatDate } from "@remoodle/utils";
 
 export type AssignmentFormatOptions = {
   maxIntroLength?: number;
@@ -24,8 +24,8 @@ export const formatAssignmentDetails = (
 
   // Add dates if available
   if (assignment.duedate && assignment.allowsubmissionsfromdate) {
-    text += `*Opened:* ${formatTimestamp(assignment.allowsubmissionsfromdate * 1000, { year: "numeric" })}\n`;
-    text += `*Due:* ${formatTimestamp(assignment.duedate * 1000, { year: "numeric" })};\n`;
+    text += `*Opened:* ${formatDate(assignment.allowsubmissionsfromdate * 1000)}\n`;
+    text += `*Due:* ${formatDate(assignment.duedate * 1000)};\n`;
   }
 
   // Add grade if available and requested

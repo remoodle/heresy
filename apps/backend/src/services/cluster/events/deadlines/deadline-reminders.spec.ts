@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { fromPartial } from "@total-typescript/shoehorn";
 import type { IEvent, IReminder } from "@remoodle/types";
 import type { CourseDeadlineReminders } from "./deadline-reminders";
@@ -8,9 +8,14 @@ import {
   getCourseDeadlineReminders,
 } from "./deadline-reminders";
 
-describe("deadlines notifications", () => {
-  vi.setSystemTime(new Date("2024-09-15T12:24:00"));
+beforeEach(() => {
+  vi.stubEnv("TZ", "Asia/Almaty");
 
+  // Sun Sep 15 2024 12:00:00 GMT+0500 (GMT+05:00)
+  vi.setSystemTime(new Date("2024-09-15T12:00:00"));
+});
+
+describe("deadlines notifications", () => {
   test("trackDeadlineReminders", () => {
     const events: IEvent[] = fromPartial([
       {
@@ -19,7 +24,7 @@ describe("deadlines notifications", () => {
         data: {
           id: 515515,
           name: "Assignment 1 is due",
-          timestart: 1726426740,
+          timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
           course: {
             id: 4911,
             fullname: "Research Methods and Tools | Omirgaliyev Ruslan",
@@ -32,7 +37,7 @@ describe("deadlines notifications", () => {
         data: {
           id: 515578,
           name: "practice 1 is due",
-          timestart: 1726167600,
+          timestart: 1726167600, // Fri Sep 13 2024 00:00:00 GMT+0500 (GMT+05:00)
           course: {
             id: 4963,
             fullname: "Computer Networks | Akerke Auelbayeva",
@@ -41,6 +46,12 @@ describe("deadlines notifications", () => {
       },
     ]);
 
+    const reminders = trackDeadlineReminders(
+      ["PT6H", "PT12H", "P1D"],
+      events,
+      [],
+    );
+
     const expected: CourseDeadlineReminders[] = [
       {
         course_id: 4911,
@@ -49,24 +60,19 @@ describe("deadlines notifications", () => {
           {
             event_id: 515515,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740,
+            event_timestart: 1726423200,
             threshold: "PT12H",
           },
         ],
       },
     ];
 
-    const reminders = trackDeadlineReminders(
-      ["PT6H", "PT12H", "P1D"],
-      events,
-      [],
-    );
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual(expected);
   });
 
-  test("trackDeadlineReminders with ISO durations", () => {
+  test("trackDeadlineReminders with lower thresholds", () => {
     const events: IEvent[] = fromPartial([
       {
         _id: "event-1",
@@ -74,7 +80,7 @@ describe("deadlines notifications", () => {
         data: {
           id: 515515,
           name: "Assignment 1 is due",
-          timestart: 1726426740,
+          timestart: 1726387200, // Sun Sep 15 2024 13:00:00 GMT+0500 (GMT+05:00)
           course: {
             id: 4911,
             fullname: "Research Methods and Tools | Omirgaliyev Ruslan",
@@ -83,6 +89,8 @@ describe("deadlines notifications", () => {
       },
     ]);
 
+    const reminders = trackDeadlineReminders(["PT1H"], events, []);
+
     const expected: CourseDeadlineReminders[] = [
       {
         course_id: 4911,
@@ -91,19 +99,13 @@ describe("deadlines notifications", () => {
           {
             event_id: 515515,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740,
-            threshold: "PT12H",
+            event_timestart: 1726387200,
+            threshold: "PT1H",
           },
         ],
       },
     ];
 
-    // ISO equivalents for 6h, 12h, 24h
-    const reminders = trackDeadlineReminders(
-      ["PT6H", "PT12H", "P1D"],
-      events,
-      [],
-    );
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual(expected);
@@ -127,6 +129,7 @@ describe("deadlines notifications", () => {
     ]);
 
     const reminders = trackDeadlineReminders(["PT6H"], events, []);
+
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual([]);
@@ -163,6 +166,7 @@ describe("deadlines notifications", () => {
       events,
       existingReminders,
     );
+
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual([]);
@@ -177,13 +181,13 @@ describe("deadlines notifications", () => {
           {
             event_id: 1,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740,
+            event_timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
             threshold: "PT12H",
           },
           {
             event_id: 2,
             event_name: "Assignment 2 is due",
-            event_timestart: 1726426740,
+            event_timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
             threshold: "PT12H",
           },
         ],
@@ -195,23 +199,22 @@ describe("deadlines notifications", () => {
           {
             event_id: 1,
             event_name: "Assignment 1 is due",
-            event_timestart: 1726426740,
+            event_timestart: 1726423200, // Sun Sep 15 2024 23:00:00 GMT+0500 (GMT+05:00)
             threshold: "PT12H",
           },
         ],
       },
     ];
 
-    expect(formatDeadlineReminders(diffs, () => "06:35:00"))
-      .toMatchInlineSnapshot(`
+    expect(formatDeadlineReminders(diffs)).toMatchInlineSnapshot(`
       "🔔 Upcoming deadlines 🔔
 
       🗓 Research Methods and Tools | Omirgaliyev Ruslan
-        • Assignment 1 is due: <b>06:35:00</b>, Sun, Sep 15, 2024, 23:59
-        • Assignment 2 is due: <b>06:35:00</b>, Sun, Sep 15, 2024, 23:59
+        • Assignment 1 is due: <b>11:00:00</b>, Sun, Sep 15, 2024, 23:00
+        • Assignment 2 is due: <b>11:00:00</b>, Sun, Sep 15, 2024, 23:00
 
       🗓 Writing | Barak Omaba
-        • Assignment 1 is due: <b>06:35:00</b>, Sun, Sep 15, 2024, 23:59
+        • Assignment 1 is due: <b>11:00:00</b>, Sun, Sep 15, 2024, 23:00
 
       "
     `);

@@ -1,5 +1,10 @@
 import type { IEvent, IReminder } from "@remoodle/types";
-import { getTimeLeft, durationToMs, toISO8601Duration } from "@remoodle/utils";
+import {
+  getTimeLeft,
+  durationToMs,
+  toISO8601Duration,
+  formatDate,
+} from "@remoodle/utils";
 
 export type CourseDeadlineReminders = {
   course_id: number;
@@ -16,7 +21,7 @@ const getSortedThresholds = (thresholds: string[]): number[] => {
   return thresholds.map(durationToMs).sort((a, b) => a - b);
 };
 
-type EventReminder = {
+export type EventReminder = {
   userId: string;
   eventId: string;
   triggeredAt: Date;
@@ -128,7 +133,6 @@ export const getCourseDeadlineReminders = (
 
 export const formatDeadlineReminders = (
   data: CourseDeadlineReminders[],
-  formatter = (timestart: number) => getTimeLeft(timestart),
 ): string => {
   let message = "🔔 Upcoming deadlines 🔔\n\n";
 
@@ -138,17 +142,7 @@ export const formatDeadlineReminders = (
     for (const { event_name, event_timestart } of diff.reminders) {
       const timestamp = event_timestart * 1000;
 
-      const formattedDate = new Date(timestamp).toLocaleString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-        timeZone: "Asia/Almaty",
-      });
-      message += `  • ${event_name}: <b>${formatter(timestamp)}</b>, ${formattedDate}\n`;
+      message += `  • ${event_name}: <b>${getTimeLeft(timestamp)}</b>, ${formatDate(timestamp)}\n`;
     }
     message += "\n";
   }

@@ -1,5 +1,5 @@
 import type { MoodleEvent } from "@remoodle/types";
-import { formatTimestamp, getTimeLeft } from "@remoodle/utils";
+import { formatDate, getTimeLeft } from "@remoodle/utils";
 
 export interface DeadlineFormatOptions {
   getCourseName?: (event: MoodleEvent) => string;
@@ -26,7 +26,7 @@ export const formatDeadlineItem = (
   const icon = getFireIcon(hoursLeft, fireThresholdHours);
   const courseName = getCourseName(deadline);
   const deadlineName = getDeadlineName(deadline);
-  const date = formatTimestamp(timestartMs);
+  const date = formatDate(timestartMs);
   const timeLeft = getTimeLeft(timestartMs);
 
   return `${icon}  <b>${deadlineName}</b>  |  ${courseName}  |  Date → ${date}  |  Time left → <b>${timeLeft}</b>`;

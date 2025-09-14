@@ -6,52 +6,42 @@ dayjs.extend(duration);
 export const getTimeLeft = (date: number) => {
   const currentTime = dayjs();
   const deadlineTime = dayjs(date);
-  const timeDiff = deadlineTime.diff(currentTime);
 
-  const duration = dayjs.duration(timeDiff);
+  const duration = dayjs.duration(deadlineTime.diff(currentTime));
 
   const months = duration.months();
   const days = duration.days();
-  const hours = duration.hours();
-  const minutes = duration.minutes();
-  const seconds = duration.seconds();
+  const hours = String(duration.hours()).padStart(2, "0");
+  const minutes = String(duration.minutes()).padStart(2, "0");
+  const seconds = String(duration.seconds()).padStart(2, "0");
 
-  const formattedHours = String(hours).padStart(2, "0");
-  const formattedMinutes = String(minutes).padStart(2, "0");
-  const formattedSeconds = String(seconds).padStart(2, "0");
-
-  const timeComponents = [];
+  const parts = [];
 
   if (months > 0) {
-    timeComponents.push(`${months} ${months === 1 ? "month" : "months"}`);
+    parts.push(`${months} ${months === 1 ? "month" : "months"}`);
   }
 
-  if (months > 0 || days > 0) {
-    timeComponents.push(`${days} ${days === 1 ? "day" : "days"}`);
+  if (days > 0) {
+    parts.push(`${days} ${days === 1 ? "day" : "days"}`);
   }
 
-  timeComponents.push(
-    `${formattedHours}:${formattedMinutes}:${formattedSeconds}`,
-  );
+  parts.push(`${hours}:${minutes}:${seconds}`);
 
-  return timeComponents.join(", ");
+  return parts.join(", ");
 };
 
-export const formatTimestamp = (
-  timestamp: number,
-  options?: Intl.DateTimeFormatOptions,
-) => {
-  return new Date(timestamp)
-    .toLocaleString("en-US", {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Almaty",
-      ...options,
-    })
-    .replace("24:00", "00:00");
+export const formatDate = (timestamp: number) => {
+  const date = new Date(timestamp);
+
+  return date.toLocaleString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 };
 
 export const durationToMs = (value: string): number => {
