@@ -64,7 +64,7 @@ export type CourseDeadlineReminders = {
     event_id: number;
     event_name: string;
     event_timestart: number;
-    threshold: string;
+    remaining: string;
   }[];
 };
 
@@ -78,19 +78,7 @@ export const getCourseDeadlineReminders = (
     }),
   );
 
-  const courseMap = new Map<
-    number,
-    {
-      course_id: number;
-      course_name: string;
-      reminders: {
-        event_id: number;
-        event_name: string;
-        event_timestart: number;
-        threshold: string;
-      }[];
-    }
-  >();
+  const courseMap = new Map<number, CourseDeadlineReminders>();
 
   for (const reminder of reminders) {
     const event = eventsById.get(reminder.eventId);
@@ -114,7 +102,7 @@ export const getCourseDeadlineReminders = (
       event_id: event.data.id,
       event_name: event.data.name,
       event_timestart: event.data.timestart,
-      threshold: toISO8601Duration(
+      remaining: toISO8601Duration(
         event.data.timestart * 1000 - reminder.triggeredAt.getTime(),
       ),
     });
