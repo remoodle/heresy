@@ -2,13 +2,7 @@ import { Schema, model } from "mongoose";
 import { v7 as uuidv7 } from "uuid";
 import type { IUser, NotificationSettings } from "@remoodle/types";
 
-export const DEFAULT_THRESHOLDS = [
-  "3h",
-  "6h",
-  "1d",
-  // "2d",
-  // "3d",
-];
+export const DEFAULT_THRESHOLDS = ["PT3H", "PT6H", "P1D"];
 
 const notificationSettingsSchema = new Schema<NotificationSettings>(
   {

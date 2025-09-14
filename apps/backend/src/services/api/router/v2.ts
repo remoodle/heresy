@@ -621,7 +621,14 @@ const userRoutes = new Hono<{
               "courseChanges::telegram": z.number(),
             }),
             deadlineReminders: z.object({
-              thresholds: z.array(z.string()),
+              thresholds: z.array(
+                z
+                  .string()
+                  .regex(
+                    /^P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?$/i,
+                    "Thresholds must be ISO 8601 durations (e.g., PT6H, P1D, PT30M)",
+                  ),
+              ),
             }),
           })
           .optional(),

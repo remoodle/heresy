@@ -1,5 +1,5 @@
 import type { IEvent, IReminder } from "@remoodle/types";
-import { getTimeLeft } from "@remoodle/utils";
+import { getTimeLeft, durationToMs, toISO8601Duration } from "@remoodle/utils";
 
 export type CourseDeadlineReminders = {
   course_id: number;
@@ -12,56 +12,8 @@ export type CourseDeadlineReminders = {
   }[];
 };
 
-const convertThresholdToMs = (value: string): number => {
-  const match = value.match(/^(\d+)([a-zA-Z]+)$/);
-
-  if (!match) {
-    throw new Error(
-      `Invalid time format: ${value}. Expected format like "3h", "6h", "1d"`,
-    );
-  }
-
-  const num = parseInt(match[1], 10);
-  const unit = match[2].toLowerCase();
-
-  switch (unit) {
-    case "m":
-      return num * 60 * 1000;
-    case "h":
-      return num * 60 * 60 * 1000;
-    case "d":
-      return num * 24 * 60 * 60 * 1000;
-    default:
-      throw new Error(
-        `Unsupported time unit: ${unit}. Supported units: m, h, d`,
-      );
-  }
-};
-
-const convertMsToThreshold = (ms: number): string => {
-  if (ms < 0) {
-    throw new Error("Duration cannot be negative");
-  }
-  if (!Number.isInteger(ms)) {
-    throw new Error("Duration must be a whole number of milliseconds");
-  }
-
-  if (ms >= 24 * 60 * 60 * 1000) {
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-    return `${days}d`;
-  }
-
-  if (ms >= 60 * 60 * 1000) {
-    const hours = Math.floor(ms / (60 * 60 * 1000));
-    return `${hours}h`;
-  }
-
-  const minutes = Math.floor(ms / (60 * 1000));
-  return `${minutes}m`;
-};
-
 const getSortedThresholds = (thresholds: string[]): number[] => {
-  return thresholds.map(convertThresholdToMs).sort((a, b) => a - b);
+  return thresholds.map(durationToMs).sort((a, b) => a - b);
 };
 
 type EventReminder = {
@@ -107,7 +59,7 @@ export const trackDeadlineReminders = (
             userId: event.userId,
             eventId: event._id,
             triggeredAt: new Date(),
-            threshold: convertMsToThreshold(thresholdMs),
+            threshold: toISO8601Duration(thresholdMs),
           });
         }
 

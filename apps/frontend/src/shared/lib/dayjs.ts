@@ -7,6 +7,7 @@ import quarterOfYear from "dayjs/plugin/quarterOfYear";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import isoWeek from "dayjs/plugin/isoWeek";
 import utc from "dayjs/plugin/utc";
+import duration from "dayjs/plugin/duration";
 import "dayjs/locale/en";
 
 dayjs.extend(relativeTime);
@@ -17,6 +18,7 @@ dayjs.extend(quarterOfYear);
 dayjs.extend(localizedFormat);
 dayjs.extend(isoWeek);
 dayjs.extend(utc);
+dayjs.extend(duration);
 
 type TDate = string | number | Date | Dayjs;
 

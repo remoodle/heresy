@@ -50,13 +50,60 @@ describe("deadlines notifications", () => {
             event_id: 515515,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12h",
+            threshold: "PT12H",
           },
         ],
       },
     ];
 
-    const reminders = trackDeadlineReminders(["6h", "12h", "24h"], events, []);
+    const reminders = trackDeadlineReminders(
+      ["PT6H", "PT12H", "P1D"],
+      events,
+      [],
+    );
+    const diffs = getCourseDeadlineReminders(events, reminders);
+
+    expect(diffs).toStrictEqual(expected);
+  });
+
+  test("trackDeadlineReminders with ISO durations", () => {
+    const events: IEvent[] = fromPartial([
+      {
+        _id: "event-1",
+        userId: "user-1",
+        data: {
+          id: 515515,
+          name: "Assignment 1 is due",
+          timestart: 1726426740,
+          course: {
+            id: 4911,
+            fullname: "Research Methods and Tools | Omirgaliyev Ruslan",
+          },
+        },
+      },
+    ]);
+
+    const expected: CourseDeadlineReminders[] = [
+      {
+        course_id: 4911,
+        course_name: "Research Methods and Tools | Omirgaliyev Ruslan",
+        reminders: [
+          {
+            event_id: 515515,
+            event_name: "Assignment 1 is due",
+            event_timestart: 1726426740,
+            threshold: "PT12H",
+          },
+        ],
+      },
+    ];
+
+    // ISO equivalents for 6h, 12h, 24h
+    const reminders = trackDeadlineReminders(
+      ["PT6H", "PT12H", "P1D"],
+      events,
+      [],
+    );
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual(expected);
@@ -79,7 +126,7 @@ describe("deadlines notifications", () => {
       },
     ]);
 
-    const reminders = trackDeadlineReminders(["6h"], events, []);
+    const reminders = trackDeadlineReminders(["PT6H"], events, []);
     const diffs = getCourseDeadlineReminders(events, reminders);
 
     expect(diffs).toStrictEqual([]);
@@ -112,7 +159,7 @@ describe("deadlines notifications", () => {
     ]);
 
     const reminders = trackDeadlineReminders(
-      ["12h"],
+      ["PT12H"],
       events,
       existingReminders,
     );
@@ -131,13 +178,13 @@ describe("deadlines notifications", () => {
             event_id: 1,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12h",
+            threshold: "PT12H",
           },
           {
             event_id: 2,
             event_name: "Assignment 2 is due",
             event_timestart: 1726426740,
-            threshold: "12h",
+            threshold: "PT12H",
           },
         ],
       },
@@ -149,7 +196,7 @@ describe("deadlines notifications", () => {
             event_id: 1,
             event_name: "Assignment 1 is due",
             event_timestart: 1726426740,
-            threshold: "12h",
+            threshold: "PT12H",
           },
         ],
       },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, toRaw, watch, watchEffect } from "vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
-import { objectEntries } from "@remoodle/utils";
+import { objectEntries, humanizeDuration } from "@remoodle/utils";
 import type { UserSettings } from "@remoodle/types";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Separator } from "@/shared/ui/separator";
@@ -102,7 +102,16 @@ const notificationGroups = computed(() => {
   return groups;
 });
 
-const AVAILABLE_THRESHOLDS = ["1h", "3h", "6h", "12h", "1d", "2d", "3d", "4d"];
+const AVAILABLE_ISO_THRESHOLDS = [
+  "PT1H",
+  "PT3H",
+  "PT6H",
+  "PT12H",
+  "P1D",
+  "P2D",
+  "P3D",
+  "P4D",
+] as const;
 
 await Promise.all([suspense(), userStore.suspense()]);
 </script>
@@ -175,7 +184,10 @@ await Promise.all([suspense(), userStore.suspense()]);
       <div
         class="grid grid-cols-2 gap-x-3 gap-y-4 md:grid-cols-4 md:gap-x-6 md:gap-y-4"
       >
-        <template v-for="threshold in AVAILABLE_THRESHOLDS" :key="threshold">
+        <template
+          v-for="threshold in AVAILABLE_ISO_THRESHOLDS"
+          :key="threshold"
+        >
           <div class="flex flex-col gap-4">
             <div class="flex items-center space-x-2">
               <Checkbox
@@ -203,7 +215,7 @@ await Promise.all([suspense(), userStore.suspense()]);
                 :for="threshold"
                 class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                {{ threshold }}
+                {{ humanizeDuration(threshold) }}
               </label>
             </div>
           </div>

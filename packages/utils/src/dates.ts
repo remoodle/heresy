@@ -53,3 +53,15 @@ export const formatTimestamp = (
     })
     .replace("24:00", "00:00");
 };
+
+export const durationToMs = (value: string): number => {
+  return dayjs.duration(value).asMilliseconds();
+};
+
+export const toISO8601Duration = (ms: number): string => {
+  return dayjs.duration(ms, "milliseconds").toISOString();
+};
+
+export const humanizeDuration = (value: string): string => {
+  return dayjs.duration(value).humanize();
+};
