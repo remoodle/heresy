@@ -4,7 +4,7 @@ import type { IEvent, IReminder } from "@remoodle/types";
 import type { CourseDeadlineReminders } from "./deadline-reminders";
 import {
   trackDeadlineReminders,
-  formatDeadlineReminders,
+  formatCourseDeadlineReminders,
   getCourseDeadlineReminders,
 } from "./deadline-reminders";
 
@@ -172,7 +172,7 @@ describe("deadlines notifications", () => {
     expect(diffs).toStrictEqual([]);
   });
 
-  test("formatDeadlineReminders", () => {
+  test("formatCourseDeadlineReminders", () => {
     const diffs: CourseDeadlineReminders[] = [
       {
         course_id: 515515,
@@ -206,7 +206,7 @@ describe("deadlines notifications", () => {
       },
     ];
 
-    expect(formatDeadlineReminders(diffs)).toMatchInlineSnapshot(`
+    expect(formatCourseDeadlineReminders(diffs)).toMatchInlineSnapshot(`
       "🔔 Upcoming deadlines 🔔
 
       🗓 Research Methods and Tools | Omirgaliyev Ruslan

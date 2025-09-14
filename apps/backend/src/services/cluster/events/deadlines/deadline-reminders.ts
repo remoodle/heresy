@@ -6,26 +6,8 @@ import {
   formatDate,
 } from "@remoodle/utils";
 
-export type CourseDeadlineReminders = {
-  course_id: number;
-  course_name: string;
-  reminders: {
-    event_id: number;
-    event_name: string;
-    event_timestart: number;
-    threshold: string;
-  }[];
-};
-
 const getSortedThresholds = (thresholds: string[]): number[] => {
-  return thresholds.map(durationToMs).sort((a, b) => a - b);
-};
-
-export type EventReminder = {
-  userId: string;
-  eventId: string;
-  triggeredAt: Date;
-  threshold: string;
+  return [...thresholds.map(durationToMs)].sort((a, b) => a - b);
 };
 
 export const trackDeadlineReminders = (
@@ -33,7 +15,11 @@ export const trackDeadlineReminders = (
   events: IEvent[],
   existingReminders: IReminder[],
 ) => {
-  const reminders: EventReminder[] = [];
+  const reminders: {
+    userId: string;
+    eventId: string;
+    triggeredAt: Date;
+  }[] = [];
 
   const thresholdsMsAsc = getSortedThresholds(thresholds);
 
@@ -64,7 +50,6 @@ export const trackDeadlineReminders = (
             userId: event.userId,
             eventId: event._id,
             triggeredAt: new Date(),
-            threshold: toISO8601Duration(thresholdMs),
           });
         }
 
@@ -76,9 +61,20 @@ export const trackDeadlineReminders = (
   return reminders;
 };
 
+export type CourseDeadlineReminders = {
+  course_id: number;
+  course_name: string;
+  reminders: {
+    event_id: number;
+    event_name: string;
+    event_timestart: number;
+    threshold: string;
+  }[];
+};
+
 export const getCourseDeadlineReminders = (
   events: IEvent[],
-  reminders: EventReminder[],
+  reminders: Pick<IReminder, "eventId" | "triggeredAt">[],
 ): CourseDeadlineReminders[] => {
   const eventsById = new Map<string, IEvent>(
     events.map((event) => {
@@ -122,16 +118,18 @@ export const getCourseDeadlineReminders = (
       event_id: event.data.id,
       event_name: event.data.name,
       event_timestart: event.data.timestart,
-      threshold: reminder.threshold,
+      threshold: toISO8601Duration(
+        event.data.timestart * 1000 - reminder.triggeredAt.getTime(),
+      ),
     });
   }
 
-  return Array.from(courseMap.values()).filter((course) => {
-    return course.reminders.length > 0;
-  });
+  const courseDeadlineReminders = Array.from(courseMap.values());
+
+  return courseDeadlineReminders.filter((course) => !!course.reminders.length);
 };
 
-export const formatDeadlineReminders = (
+export const formatCourseDeadlineReminders = (
   data: CourseDeadlineReminders[],
 ): string => {
   let message = "🔔 Upcoming deadlines 🔔\n\n";

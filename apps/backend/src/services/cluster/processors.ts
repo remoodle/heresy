@@ -11,7 +11,7 @@ import {
   trackCourseGradeChanges,
 } from "./events/grades/grade-changes";
 import {
-  formatDeadlineReminders,
+  formatCourseDeadlineReminders,
   trackDeadlineReminders,
   getCourseDeadlineReminders,
 } from "./events/deadlines/deadline-reminders";
@@ -374,21 +374,18 @@ export const processors: Record<QueueName, Processor> = {
         return "no deadline reminders";
       }
 
-      const newReminders = reminders.map((reminder) => ({
-        userId: reminder.userId,
-        eventId: reminder.eventId,
-        triggeredAt: reminder.triggeredAt,
-      }));
-
-      await db.reminder.insertMany(newReminders);
-
-      const deadlineReminders = getCourseDeadlineReminders(events, reminders);
-
       if (
         user.telegramId &&
         user.settings.notifications["deadlineReminders::telegram"] !== 0
       ) {
-        const message = formatDeadlineReminders(deadlineReminders);
+        const newReminders = await db.reminder.insertMany(reminders);
+
+        const deadlineReminders = getCourseDeadlineReminders(
+          events,
+          newReminders,
+        );
+
+        const message = formatCourseDeadlineReminders(deadlineReminders);
 
         await queues[QueueName.TELEGRAM].add(
           JobName.TELEGRAM_SEND_MESSAGE,
@@ -406,7 +403,7 @@ export const processors: Record<QueueName, Processor> = {
         );
       }
 
-      return deadlineReminders;
+      return reminders;
     },
   },
   [QueueName.TELEGRAM]: {
