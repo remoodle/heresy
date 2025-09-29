@@ -292,7 +292,7 @@ export class Moodle {
         null,
       ];
     } catch (err: MoodleAPIError | any) {
-      if (err?.cdde === "servicerequireslogin") {
+      if (err?.code === "servicerequireslogin") {
         // attempting reauth using Moodle OIDC and authCookies
         try {
           await this.authByCookies();

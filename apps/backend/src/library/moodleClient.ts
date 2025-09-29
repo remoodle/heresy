@@ -53,7 +53,7 @@ export class MoodleClient extends _MoodleClient {
 		const json: any = await response.json();
     const jsonFixed = (json ? json[0] : {});
     if (jsonFixed.exception) {
-			throw new MoodleAPIError( jsonFixed.message, { code: jsonFixed.errorcode } );
+			throw new MoodleAPIError( jsonFixed.message, { code: jsonFixed.exception.errorcode } );
 		}
 		return jsonFixed?.data || {};
 	}
