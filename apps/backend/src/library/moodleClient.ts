@@ -1,6 +1,16 @@
 import { MoodleClient as _MoodleClient } from "moodle-api";
 import type { FunctionDefinition } from "moodle-api";
 
+export class MoodleAPIError extends Error {
+    code: string;
+
+    constructor(message: string, { code }: { code: string }) {
+        super(message);
+
+        this.code = code
+    }
+}
+
 export class MoodleClient extends _MoodleClient {
   protected sessionKey: string;
 
@@ -43,7 +53,7 @@ export class MoodleClient extends _MoodleClient {
 		const json: any = await response.json();
     const jsonFixed = (json ? json[0] : {});
     if (jsonFixed.exception) {
-			throw new Error(jsonFixed.message);
+			throw new MoodleAPIError( jsonFixed.message, { code: jsonFixed.errorcode } );
 		}
 		return jsonFixed?.data || {};
 	}

@@ -39,7 +39,12 @@ export const syncEvents = async (userId: string) => {
     throw new Error("User not found");
   }
 
-  const client = new Moodle(user.moodleToken);
+  const client = new Moodle({
+    moodleUserId: user.moodleId,
+    moodleAuthCookies: user.moodleAuthCookies,
+    moodleSessionCookie: user.moodleSessionCookie,
+    moodleSessionKey: user.moodleSessionKey,
+  });
 
   const [response, error] = await client.call(
     "core_calendar_get_action_events_by_timesort",
@@ -89,7 +94,12 @@ export const syncCourses = async (
 
   const userMoodleId = user.moodleId;
 
-  const client = new Moodle(user.moodleToken);
+  const client = new Moodle({
+    moodleUserId: user.moodleId,
+    moodleAuthCookies: user.moodleAuthCookies,
+    moodleSessionCookie: user.moodleSessionCookie,
+    moodleSessionKey: user.moodleSessionKey,
+  });
 
   // Get existing courses before sync for change tracking
   const existingCourses = trackDiff
@@ -173,7 +183,12 @@ export const syncCourseGrades = async (
     throw new Error("User not found");
   }
 
-  const client = new Moodle(user.moodleToken);
+  const client = new Moodle({
+    moodleUserId: user.moodleId,
+    moodleAuthCookies: user.moodleAuthCookies,
+    moodleSessionCookie: user.moodleSessionCookie,
+    moodleSessionKey: user.moodleSessionKey,
+  });
 
   const [response, error] = await client.call(
     "gradereport_user_get_grade_items",

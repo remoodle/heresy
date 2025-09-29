@@ -1,4 +1,5 @@
-import { MoodleClient } from "./moodleClient";  // TODO: remove, use "moodle-api" directly
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { MoodleClient, MoodleAPIError } from "./moodleClient";
 import type { FunctionDefinition } from "moodle-api";
 import { z } from "zod";
 import { config } from "../config";
@@ -6,9 +7,11 @@ import axios, { type AxiosInstance } from "axios";
 import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load as loadHtml, type CheerioAPI } from "cheerio";
+import { db } from "./db";
 
 interface Options {
-  authCookies?: MoodleAuthCookie[];
+  moodleUserId?: number,
+  moodleAuthCookies?: MoodleAuthCookie[];
   moodleSessionCookie?: string;
   moodleSessionKey?: string;
 }
@@ -29,14 +32,16 @@ interface MoodleStudentInfo {
 }
 
 export class Moodle {
-  protected client?: MoodleClient;
-  protected authCookies?: MoodleAuthCookie[];
   protected httpClient?: AxiosInstance;
+  protected moodleClient?: MoodleClient;
+  protected moodleUserId?: number;
+  protected moodleAuthCookies?: MoodleAuthCookie[];
   protected moodleSessionCookie?: string;
   protected moodleSessionKey?: string;
 
   constructor(options: Options = {}) {
-    this.authCookies = options.authCookies;
+    this.moodleUserId = options.moodleUserId;
+    this.moodleAuthCookies = options.moodleAuthCookies;
     this.moodleSessionCookie = options.moodleSessionCookie;
     this.moodleSessionKey = options.moodleSessionKey;
   }
@@ -68,10 +73,6 @@ export class Moodle {
   }
 
   private async _getFormAndData(url: string) {
-    if (!this.authCookies) {
-      throw new Error("No auth cookies provided");
-    }
-
     const { httpClient } = this._createHttpSession();
 
     const respSrc = await httpClient.get(url);
@@ -82,7 +83,7 @@ export class Moodle {
     const redirectUrl = new URL(respSrc.headers.location, respSrc.config.url ?? url).toString();
     console.log(`Redirect from ${url} to ${redirectUrl}`);
 
-    httpClient.defaults.headers.Cookie = this.authCookies.map(c => `${encodeURIComponent(c.name)}=${encodeURIComponent(c.value)}`).join("; ");
+    httpClient.defaults.headers.Cookie = this.moodleAuthCookies!.map(c => `${encodeURIComponent(c.name)}=${encodeURIComponent(c.value)}`).join("; ");
 
     const resp = await httpClient.get(redirectUrl);
     console.log(`GET ${url} -> ${resp.status}: ${resp.data}`);
@@ -117,16 +118,14 @@ export class Moodle {
       const name = $(el).attr("name")!;
       const $options = $(el).find("option");
       const $selected = $options.filter("[selected]").first();
-      const value = $selected.length
+      moodlePostData[name] = $selected.length
         ? ($selected.attr("value") ?? "")
         : ($options.first().attr("value") ?? "");
-      moodlePostData[name] = value;
     });
 
     $form.find("textarea[name]").each((_: any, el: any) => {
       const name = $(el).attr("name")!;
-      const value = $(el).text() ?? "";
-      moodlePostData[name] = value;
+      moodlePostData[name] = $(el).text() ?? "";
     });
 
     return { httpClient, moodlePostUrl, moodlePostData };
@@ -162,6 +161,10 @@ export class Moodle {
   }
 
   async authByCookies() {
+    if (!this.moodleAuthCookies) {
+      throw new Error("No auth cookies provided");
+    }
+
     const { httpClient, moodlePostUrl, moodlePostData } = await this._getFormAndData(`${config.moodle.url}/auth/oidc/`);
 
     this.httpClient = httpClient;
@@ -184,14 +187,11 @@ export class Moodle {
 
     const pageJsonData = this._parseMoodlePageConfigFromHtml(resp2.data);
 
-    const userId = pageJsonData?.userId as number | any;
-    const moodleSessionKey = pageJsonData?.sesskey as string | any;
+    const userId = pageJsonData.userId as number;
+    const moodleSessionKey = pageJsonData.sesskey as string;
 
-    if (typeof userId !== 'number' || userId === 0) {
+    if (userId === 0) {
       throw new Error("Authentication failed, userId is invalid");
-    }
-    if (typeof moodleSessionKey !== 'string' || moodleSessionKey.length === 0) {
-      throw new Error("Authentication failed, sesskey is invalid");
     }
 
     const setCookieHeaders = resp.headers["set-cookie"];
@@ -210,6 +210,7 @@ export class Moodle {
     const moodleSessionCookie = moodleSessionCookieRaw.split("=")[1];
 
     console.log(`Authenticated as userId=${userId}, sesskey=${moodleSessionKey}, MoodleSession=${moodleSessionCookie}`);
+    this.moodleUserId = userId;
     this.moodleSessionCookie = moodleSessionCookie;
     this.moodleSessionKey = moodleSessionKey;
 
@@ -236,16 +237,12 @@ export class Moodle {
 
     const $ = loadHtml(resp.data);
     const fullname = $("h1").first().text().trim();
-    const usernameRef = $("a[href^='mailto']").attr("href");
-    if (!usernameRef) {
-      throw new Error("No mailto link found on profile page");
-    };
-
-    const username = decodeURIComponent(usernameRef).replace(/^mailto:/i, "");
+    const username = decodeURIComponent($("a[href^='mailto']").attr("href")!)
+      .replace(/^mailto:/i, "");
 
     const pageJsonData = this._parseMoodlePageConfigFromHtml($);
 
-    const userId = pageJsonData?.userId as number | any;
+    const userId = pageJsonData.userId as number;
 
     return { fullname, username, userId, };
   }
@@ -260,14 +257,18 @@ export class Moodle {
         F extends keyof FunctionDefinition ? FunctionDefinition[F][1] : unknown,
         null,
       ]
-    | [null, { message: string }]
+    | [null, { message: string, code: string | null }]
   > {
-    if (!this.client) {
+    if (!this.moodleClient) {
+      if (!this.moodleUserId) {
+        throw new Error("No Moodle user ID available, please authenticate first");
+      }
+
       if (!this.moodleSessionCookie || !this.moodleSessionKey) {
         throw new Error("No Moodle client or session available, please authenticate first");
       }
 
-      this.client = new MoodleClient(
+      this.moodleClient = new MoodleClient(
         config.moodle.url,
         this.moodleSessionCookie,
         this.moodleSessionKey,
@@ -275,7 +276,7 @@ export class Moodle {
     }
 
     try {
-      const res = await this.client.call(
+      const res = await this.moodleClient.call(
         func,
         ...(params as F extends keyof FunctionDefinition
           ? Record<never, never> extends FunctionDefinition[F][0]
@@ -290,8 +291,41 @@ export class Moodle {
           : unknown,
         null,
       ];
-    } catch (err: any) {
-      return [null, { message: err.message }];
+    } catch (err: MoodleAPIError | any) {
+      if (err?.cdde === "servicerequireslogin") {
+        // attempting reauth using Moodle OIDC and authCookies
+        try {
+          await this.authByCookies();
+        } catch (reauthErr: any) {
+          return [null, { message: (reauthErr as Error).message, code: null }];
+        }
+
+        // TODO: log reauth success and MoodleSession change
+
+        try {
+          await db.user.updateOne(
+            { moodleId: this.moodleUserId },
+            {
+              $set: {
+                moodleSessionCookie: this.moodleSessionCookie,
+                moodleSessionKey: this.moodleSessionKey,
+              },
+            },
+          );
+        } catch (dbErr: any) {
+          // TODO: log db update error
+        }
+
+        this.moodleClient = new MoodleClient(
+          config.moodle.url,
+          this.moodleSessionCookie!,
+          this.moodleSessionKey!,
+        );
+
+        return await this.call(func, ...params);
+      }
+
+      return [null, { message: err.message, code: err?.code }];
     }
   }
 }
