@@ -50,7 +50,13 @@ const userSchema = new Schema<IUser>(
       },
     },
     moodleId: { type: Number, required: true, unique: true },
-    moodleToken: { type: String, required: true, unique: true },
+    /**
+     * @deprecated Use `moodleSessionCookie` and `moodleSessionKey` instead.
+     */
+    moodleToken: { type: String },
+    moodleAuthCookies: { type: Array, of: Object },  // TODO: use shared MoodleAuthCookie
+    moodleSessionCookie: { type: String, required: true },
+    moodleSessionKey: { type: String, required: true },
     health: { type: Number, default: 7 },
     telegramId: { type: Number },
     password: { type: String },

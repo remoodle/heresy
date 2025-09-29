@@ -34,8 +34,155 @@ const authRoutes = new Hono<{
   };
 }>()
   .use("*", authMiddleware(["Telegram"], false))
+  // .post(
+  //   "/token",
+  //   rateLimiter({
+  //     ...defaultRules,
+  //     windowMs: 1 * 60 * 60 * 1000, // 1 hour
+  //     limit: 10,
+  //   }),
+  //   zValidator(
+  //     "json",
+  //     z.object({
+  //       moodleToken: z.string(),
+  //       handle: z.string().optional(),
+  //       password: z.string().optional(),
+  //     }),
+  //   ),
+  //   async (ctx) => {
+  //     const { handle, moodleToken, password } = ctx.req.valid("json");
+  //
+  //     const client = new Moodle(moodleToken);
+  //     const [student, error] = await client.call(
+  //       "core_webservice_get_site_info",
+  //     );
+  //     if (error) {
+  //       throw new HTTPException(500, { message: error.message });
+  //     }
+  //
+  //     const telegramId = ctx.get("telegramId");
+  //
+  //     const currentUser = await db.user.findOne({ telegramId });
+  //
+  //     const currentStudentUser = await db.user.findOne({ moodleToken });
+  //
+  //     let syncedUserId: string | undefined;
+  //     let shouldSync: boolean = false;
+  //
+  //     if (currentUser || currentStudentUser) {
+  //       const userId = currentUser?._id ?? currentStudentUser?._id;
+  //
+  //       await db.user.updateOne(
+  //         { _id: userId },
+  //         {
+  //           $set: {
+  //             name: student.fullname,
+  //             username: student.username,
+  //             moodleId: student.userid,
+  //             moodleToken,
+  //             telegramId,
+  //             health: 7,
+  //           },
+  //         },
+  //       );
+  //
+  //       if (currentUser && !currentStudentUser) {
+  //         logger.api.info({
+  //           msg: "student account changed",
+  //           userId,
+  //           currentUser,
+  //           currentStudentUser,
+  //         });
+  //
+  //         await db.course.updateMany(
+  //           { moodleId: currentUser.moodleId },
+  //           { $set: { classification: "past" } },
+  //         );
+  //
+  //         shouldSync = true;
+  //       }
+  //
+  //       syncedUserId = userId;
+  //     }
+  //
+  //     if (!currentStudentUser && !currentUser) {
+  //       try {
+  //         const user = (await db.user.create({
+  //           name: student.fullname,
+  //           username: student.username,
+  //           handle: handle,
+  //           moodleId: student.userid,
+  //           moodleToken,
+  //           ...(telegramId && { telegramId }),
+  //           ...(password && { password: hashPassword(password) }),
+  //         })) as IUser;
+  //
+  //         const { _id: userId } = user;
+  //
+  //         syncedUserId = userId;
+  //         shouldSync = true;
+  //
+  //         try {
+  //           increaseUserCounter();
+  //
+  //           await createAlert({
+  //             event: "user.sync",
+  //             data: { userId, telegramId, student },
+  //           });
+  //         } catch (error: any) {
+  //           logger.api.error(error);
+  //         }
+  //       } catch (error: any) {
+  //         throw new HTTPException(500, {
+  //           message: "Failed to create user" + error,
+  //         });
+  //       }
+  //     }
+  //
+  //     if (shouldSync && syncedUserId) {
+  //       try {
+  //         await syncUserData(syncedUserId);
+  //       } catch (error: any) {
+  //         throw new HTTPException(500, {
+  //           message: "Failed to sync data: " + error.message,
+  //         });
+  //       }
+  //     }
+  //
+  //     const user: IUser | null = await db.user.findOne({
+  //       _id: syncedUserId,
+  //     });
+  //
+  //     if (!user) {
+  //       throw new HTTPException(404, {
+  //         message: "User not found",
+  //       });
+  //     }
+  //
+  //     try {
+  //       const { accessToken, refreshToken } = issueTokens(
+  //         user._id,
+  //         user.moodleId,
+  //       );
+  //
+  //       // TODO: Sanitize this properly
+  //       user.password = "***";
+  //       user.moodleToken = "***";
+  //
+  //       return ctx.json({
+  //         user,
+  //         accessToken,
+  //         refreshToken,
+  //       });
+  //     } catch (error: any) {
+  //       throw new HTTPException(500, {
+  //         message: error.message,
+  //       });
+  //     }
+  //   },
+  // )
   .post(
-    "/token",
+    "/cookies",
     rateLimiter({
       ...defaultRules,
       windowMs: 1 * 60 * 60 * 1000, // 1 hour
@@ -44,27 +191,44 @@ const authRoutes = new Hono<{
     zValidator(
       "json",
       z.object({
-        moodleToken: z.string(),
-        handle: z.string().optional(),
-        password: z.string().optional(),
+        moodleAuthCookies: (z
+          .array(
+            z.object({
+              name: z.string(),
+              value: z.string(),
+            })
+          )
+          .min(1)
+          .refine(
+            (arr) => {
+              const names = arr.map(c => c.name.trim().toLowerCase());
+              return new Set(names).size === names.length;
+            },
+            { message: "Duplicate cookie names are not allowed" },
+          )
+        ),
+        telegramOtp: z.string(),
       }),
     ),
     async (ctx) => {
-      const { handle, moodleToken, password } = ctx.req.valid("json");
+      const { moodleAuthCookies, telegramOtp } = ctx.req.valid("json");
 
-      const client = new Moodle(moodleToken);
-      const [student, error] = await client.call(
-        "core_webservice_get_site_info",
-      );
-      if (error) {
-        throw new HTTPException(500, { message: error.message });
+      const telegramId = await db.telegramToken.get(telegramOtp);
+
+      if (!telegramId) {
+        throw new HTTPException(400, { message: "Invalid or expired token" });
       }
 
-      const telegramId = ctx.get("telegramId");
+      const moodleClient = new Moodle({authCookies: moodleAuthCookies});
+      const { userId: moodleUserId, moodleSessionCookie, moodleSessionKey } = await moodleClient.authByCookies();
+
+      await db.telegramToken.remove(telegramOtp);
+
+      const student = await moodleClient.getStudentInfo();
 
       const currentUser = await db.user.findOne({ telegramId });
 
-      const currentStudentUser = await db.user.findOne({ moodleToken });
+      const currentStudentUser = await db.user.findOne({ moodleUserId });
 
       let syncedUserId: string | undefined;
       let shouldSync: boolean = false;
@@ -78,8 +242,10 @@ const authRoutes = new Hono<{
             $set: {
               name: student.fullname,
               username: student.username,
-              moodleId: student.userid,
-              moodleToken,
+              moodleId: student.userId,
+              moodleAuthCookies,
+              moodleSessionCookie,
+              moodleSessionKey,
               telegramId,
               health: 7,
             },
@@ -110,11 +276,11 @@ const authRoutes = new Hono<{
           const user = (await db.user.create({
             name: student.fullname,
             username: student.username,
-            handle: handle,
-            moodleId: student.userid,
-            moodleToken,
+            moodleId: student.userId,
+            moodleAuthCookies,
+            moodleSessionCookie,
+            moodleSessionKey,
             ...(telegramId && { telegramId }),
-            ...(password && { password: hashPassword(password) }),
           })) as IUser;
 
           const { _id: userId } = user;
@@ -345,7 +511,10 @@ const userRoutes = new Hono<{
           });
         }
 
-        const client = new Moodle(user.moodleToken);
+        const client = new Moodle({
+          moodleSessionCookie: user.moodleSessionCookie,
+          moodleSessionKey: user.moodleSessionKey,
+        });
 
         const [response, error] = await client.call(
           "core_calendar_get_action_events_by_timesort",
@@ -388,6 +557,7 @@ const userRoutes = new Hono<{
         userId,
         ...(status && { classification: status }),
       });
+      console.log(`User ${userId} has ${courses.length} courses in DB with status ${status}`);
 
       if (!courses.length) {
         const user = await db.user.findById(userId);
@@ -398,11 +568,14 @@ const userRoutes = new Hono<{
           });
         }
 
-        const client = new Moodle(user.moodleToken);
+        const client = new Moodle({
+          moodleSessionCookie: user.moodleSessionCookie,
+          moodleSessionKey: user.moodleSessionKey,
+        });
 
         const [response, error] = await client.call(
           "core_course_get_enrolled_courses_by_timeline_classification",
-          { classification: status ?? null },
+          { classification: status ?? "all" },  // NOTE: select specific classification from https://github.com/moodle/moodle/blob/a828ba12c1796bb6f22a705ad61202be5b26fab2/public/course/externallib.php#L4019-L4040
         );
 
         if (error) {
@@ -490,7 +663,10 @@ const userRoutes = new Hono<{
           });
         }
 
-        const client = new Moodle(user.moodleToken);
+        const client = new Moodle({
+          moodleSessionCookie: user.moodleSessionCookie,
+          moodleSessionKey: user.moodleSessionKey,
+        });
         const [data, error] = await client.call("core_course_get_contents", {
           courseid: parseInt(courseId),
         });
@@ -523,7 +699,10 @@ const userRoutes = new Hono<{
       });
     }
 
-    const client = new Moodle(user.moodleToken);
+    const client = new Moodle({
+      moodleSessionCookie: user.moodleSessionCookie,
+      moodleSessionKey: user.moodleSessionKey,
+    });
 
     const [response, error] = await client.call("mod_assign_get_assignments", {
       courseids: [parseInt(courseId)],
@@ -559,7 +738,10 @@ const userRoutes = new Hono<{
         });
       }
 
-      const client = new Moodle(user.moodleToken);
+      const client = new Moodle({
+        moodleSessionCookie: user.moodleSessionCookie,
+        moodleSessionKey: user.moodleSessionKey,
+      });
 
       const [response, error] = await client.call(
         "gradereport_user_get_grade_items",

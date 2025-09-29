@@ -6,7 +6,7 @@ import type { Context, SessionData } from "./context";
 import { errorHandler } from "./handlers/error";
 import { session } from "./middleware/session";
 import { updateLogger } from "./middleware/update-logger";
-import { welcomeFeature, handleToken } from "./features/welcome";
+import { welcomeFeature } from "./features/welcome";
 import { deadlinesFeature } from "./features/deadlines";
 import { coursesFeature } from "./features/courses";
 import { settingsFeature } from "./features/settings";
@@ -51,14 +51,12 @@ export function createBot(token: string) {
   protectedBot.use(settingsFeature);
 
   bot.use((ctx, next) => {
-    if (ctx.session.auth?.step === "awaiting_token") {
-      return handleToken(ctx);
-    }
+    // if (ctx.session.auth?.step === "awaiting_token") {
+    //   return handleToken(ctx);
+    // }
 
     return next();
   });
 
   return bot;
 }
-
-export type Bot = ReturnType<typeof createBot>;

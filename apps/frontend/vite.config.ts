@@ -31,5 +31,8 @@ export default defineConfig((config) => {
     define: {
       __BUILD_INFO__: JSON.stringify(buildInfo),
     },
+    server: {
+      host: true,
+    }
   };
 });

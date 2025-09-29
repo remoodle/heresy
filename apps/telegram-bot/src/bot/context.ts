@@ -4,7 +4,7 @@ import type { Logger } from "../library/logger";
 
 export interface SessionData {
   auth?: {
-    step: "awaiting_token";
+    step: "awaiting_cookies";
   };
 }
 

@@ -1,5 +1,4 @@
 import type {
-  MoodleAssignment,
   MoodleCourse,
   MoodleCourseClassification,
   MoodleEvent,
@@ -54,7 +53,13 @@ export type IUser = {
   moodleId: number;
   username: string;
   handle: string;
-  moodleToken: string;
+  /**
+   * @deprecated Use `moodleSessionCookie` and `moodleSessionKey` instead.
+   */
+  moodleToken?: string;
+  moodleAuthCookies: Array[object];  // TODO: use shared MoodleAuthCookie
+  moodleSessionCookie: string;
+  moodleSessionKey: string;
   health: number;
   email?: string;
   telegramId?: number;
