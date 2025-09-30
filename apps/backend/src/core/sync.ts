@@ -1,7 +1,7 @@
 import type {
   IUser,
   MoodleCourse,
-  MoodleCourseClassification,
+  MoodleCourseClassification, MoodleGrade,
 } from "@remoodle/types";
 import { Moodle } from "../library/moodle";
 import { db, wrapper } from "../library/db";
@@ -216,35 +216,30 @@ export const syncCourseGrades = async (
     moodleSessionKey: user.moodleSessionKey,
   });
 
-  const [response, error] = await client.call(
-    "gradereport_user_get_grade_items",
-    {
-      userid: user.moodleId,
-      courseid: courseId,
-    },
-  );
+  let response: MoodleGrade[];
 
-  if (error) {
+  try {
+    response = await client.getGrades({ courseId });
+  } catch (error: any) {
     await handleTokenError(error, user);
     await handleCourseError(error, user, courseId);
     throw new Error(`Failed to get grades for ${courseId}: ${error.message}`);
   }
 
-  const normalizedGrades = response.usergrades[0].gradeitems.filter(
-    (grade) => grade.itemtype !== "course",
-  );
-
   const currentGrades = await db.grade.find({
     userId,
     courseId,
     "data.id": {
-      $in: normalizedGrades.map((grade) => grade.id),
+      $in: response.map((grade) => grade.id),
     },
   });
 
-  for (const grade of normalizedGrades) {
+  for (const grade of response) {
     await db.grade.findOneAndUpdate(
-      { userId, "data.id": grade.id },
+      {
+        userId,
+        "data.id": grade.id,
+      },
       {
         userId,
         courseId,
@@ -262,7 +257,7 @@ export const syncCourseGrades = async (
     userId,
     courseId,
     "data.id": {
-      $in: response.usergrades[0].gradeitems.map((grade) => grade.id),
+      $in: response.map((grade) => grade.id),
     },
   });
 

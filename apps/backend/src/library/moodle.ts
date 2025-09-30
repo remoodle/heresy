@@ -8,6 +8,8 @@ import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load as loadHtml, type CheerioAPI } from "cheerio";
 import { db } from "./db";
+import { type MoodleGrade } from "@remoodle/types";
+import { murmurhash3_32 } from "./murmurhash3_32";
 
 interface Options {
   moodleUserId?: number,
@@ -30,6 +32,45 @@ interface MoodleStudentInfo {
   username: string,  // email
   userId: number,
 }
+
+interface GradeBaseData {
+  itemtype: string;
+  itemmodule: string | null;
+  idnumber?: string;
+}
+
+const gradeNamesToBaseData: Record<string, GradeBaseData> = {
+  "Register Midterm": {
+    itemtype: "manual",
+    itemmodule: null,
+    idnumber: "register_midterm",
+  },
+  "Register Endterm": {
+    itemtype: "manual",
+    itemmodule: null,
+    idnumber: "register_endterm",
+  },
+  "Register Term": {
+    itemtype: "manual",
+    itemmodule: null,
+    idnumber: "register_term",
+  },
+  "Register Final": {
+    itemtype: "manual",
+    itemmodule: null,
+    idnumber: "register_final",
+  },
+  "Attendance": {
+    itemtype: "mod",
+    itemmodule: "attendance",
+    idnumber: "register_attendance",
+  }
+};
+
+const defaultGradeBaseData: GradeBaseData = {
+  itemtype: "mod",
+  itemmodule: "assign",
+};
 
 export class Moodle {
   protected httpClient?: AxiosInstance;
@@ -217,6 +258,13 @@ export class Moodle {
     return { userId, moodleSessionCookie, moodleSessionKey };
   }
 
+  private _getHttpClient(): AxiosInstance {
+    if (!this.httpClient) {
+      this.httpClient = this._createHttpSession().httpClient;
+    }
+    return this.httpClient;
+  }
+
   private setMoodleCookies(httpClient: AxiosInstance) {
     if (!this.moodleSessionCookie) {
       throw new Error("No MoodleSession cookie available");
@@ -226,11 +274,7 @@ export class Moodle {
   }
 
   async getStudentInfo(): Promise<MoodleStudentInfo> {
-    if (!this.httpClient) {
-      this.httpClient = this._createHttpSession().httpClient;
-    }
-    const httpClient = this.httpClient;
-
+    const httpClient = this._getHttpClient();
     this.setMoodleCookies(httpClient);
 
     const resp = await httpClient.get(`${config.moodle.url}/user/profile.php`);
@@ -245,6 +289,60 @@ export class Moodle {
     const userId = pageJsonData.userId as number;
 
     return { fullname, username, userId, };
+  }
+
+  private _calculateGradeIdHash(baseGrade: GradeBaseData & { name: string }): number {
+    return murmurhash3_32(`${baseGrade.name}|${baseGrade.itemtype}|${baseGrade.itemmodule ?? ""}|${baseGrade.idnumber ?? ""}`, 1337);
+  }
+
+  async getGrades({ courseId }: { courseId: number | string }): Promise<MoodleGrade[]> {
+    if (!this.moodleUserId) {
+      throw new Error("No Moodle user ID available, please authenticate first");
+    }
+
+    const httpClient = this._getHttpClient();
+    this.setMoodleCookies(httpClient);
+
+    const resp = await httpClient.get(`${config.moodle.url}/course/user.php?mode=grade&id=${courseId}&user=${this.moodleUserId}`);
+
+    const $ = loadHtml(resp.data);
+
+    const $gradeEls = $($("table.generaltable tr.cat_936[data-hidden='false']").toArray().slice(0, 8).slice(0, -1));
+
+    const grades: MoodleGrade[] = $gradeEls.map((_, el) => {
+      const $gradeEl = $(el);
+
+      const $nameAndIdEl = $(".gradeitemheader", $gradeEl).first();
+      const name = $nameAndIdEl.attr("title")!.trim();
+      const foundIdStr = $nameAndIdEl.attr("href")?.split("id=", 2)?.[1];
+
+      const baseGradeData = {
+        name,
+        ...(gradeNamesToBaseData[name] ?? defaultGradeBaseData),
+      };
+      const gradeId = foundIdStr ? parseInt(foundIdStr, 10) : this._calculateGradeIdHash(baseGradeData);
+
+      const gradeValueFormatted = $("td.column-grade", $gradeEl).first().text().trim().replace("-", "0.00");
+      const gradeValueRaw = parseFloat(gradeValueFormatted);
+      const gradeValueRange = $("td.column-range", $gradeEl).first().text().trim().split("–", 2);
+      const gradeValueMin = parseFloat(gradeValueRange[0]);
+      const gradeValueMax = parseFloat(gradeValueRange[1]);
+
+      return {
+        id: gradeId,
+        itemname: name,
+        itemtype: baseGradeData.itemtype,
+        itemmodule: baseGradeData.itemmodule ?? undefined,
+        // iteminstance: -1,  // TODO: review usage with assignments rewriting
+        graderaw: gradeValueRaw,
+        gradeformatted: gradeValueFormatted,
+        grademin: gradeValueMin,
+        grademax: gradeValueMax,
+        // cmid: -1,  // TODO: review usage with assignments rewriting
+      };
+    }).get();
+
+    return grades;
   }
 
   async call<F extends keyof FunctionDefinition | (string & {})>(
@@ -294,6 +392,7 @@ export class Moodle {
     } catch (err: MoodleAPIError | any) {
       if (err?.code === "servicerequireslogin") {
         // attempting reauth using Moodle OIDC and authCookies
+        // TODO: use user.health
         try {
           await this.authByCookies();
         } catch (reauthErr: any) {

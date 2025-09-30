@@ -186,6 +186,9 @@ const authRoutes = new Hono<{
 
         // TODO: Sanitize this properly
         user.password = "***";
+        user.moodleAuthCookies = [];
+        user.moodleSessionCookie = "***";
+        user.moodleSessionKey = "***";
 
         return ctx.json({ user, accessToken, refreshToken });
       } catch (error: any) {
@@ -251,6 +254,9 @@ const authRoutes = new Hono<{
 
         // TODO: Sanitize this properly
         user.password = "***";
+        user.moodleAuthCookies = [];
+        user.moodleSessionCookie = "***";
+        user.moodleSessionKey = "***";
 
         return ctx.json({ user, accessToken, refreshToken });
       } catch (error: any) {
@@ -300,6 +306,9 @@ const authRoutes = new Hono<{
 
       // TODO: Sanitize this properly
       user.password = "***";
+      user.moodleAuthCookies = [];
+      user.moodleSessionCookie = "***";
+      user.moodleSessionKey = "***";
 
       return ctx.json({ user, accessToken, refreshToken });
     },
@@ -526,41 +535,42 @@ const userRoutes = new Hono<{
       return ctx.json({ ...course.data });
     },
   )
-  .get("/course/:courseId/assignments", async (ctx) => {
-    const courseId = ctx.req.param("courseId");
-
-    const userId = ctx.get("userId");
-
-    const user = await db.user.findById(userId);
-
-    if (!user) {
-      throw new HTTPException(404, {
-        message: "User not found",
-      });
-    }
-
-    const client = new Moodle({
-      moodleUserId: user.moodleId,
-      moodleAuthCookies: user.moodleAuthCookies,
-      moodleSessionCookie: user.moodleSessionCookie,
-      moodleSessionKey: user.moodleSessionKey,
-    });
-
-    const [response, error] = await client.call("mod_assign_get_assignments", {
-      courseids: [parseInt(courseId)],
-      capabilities: ["mod/assign:submit"],
-    });
-
-    if (error) {
-      throw new HTTPException(500, { message: error.message });
-    }
-
-    return ctx.json(
-      response.courses
-        .map((course) => course.assignments)
-        .flatMap((a) => a) as MoodleAssignment[],
-    );
-  })
+  // TODO: rewrite assignments fetching
+  // .get("/course/:courseId/assignments", async (ctx) => {
+  //   const courseId = ctx.req.param("courseId");
+  //
+  //   const userId = ctx.get("userId");
+  //
+  //   const user = await db.user.findById(userId);
+  //
+  //   if (!user) {
+  //     throw new HTTPException(404, {
+  //       message: "User not found",
+  //     });
+  //   }
+  //
+  //   const client = new Moodle({
+  //     moodleUserId: user.moodleId,
+  //     moodleAuthCookies: user.moodleAuthCookies,
+  //     moodleSessionCookie: user.moodleSessionCookie,
+  //     moodleSessionKey: user.moodleSessionKey,
+  //   });
+  //
+  //   const [response, error] = await client.call("mod_assign_get_assignments", {
+  //     courseids: [parseInt(courseId)],
+  //     capabilities: ["mod/assign:submit"],
+  //   });
+  //
+  //   if (error) {
+  //     throw new HTTPException(500, { message: error.message });
+  //   }
+  //
+  //   return ctx.json(
+  //     response.courses
+  //       .map((course) => course.assignments)
+  //       .flatMap((a) => a) as MoodleAssignment[],
+  //   );
+  // })
   .get("/course/:courseId/grades", async (ctx) => {
     const courseId = ctx.req.param("courseId");
 
@@ -587,19 +597,15 @@ const userRoutes = new Hono<{
         moodleSessionKey: user.moodleSessionKey,
       });
 
-      const [response, error] = await client.call(
-        "gradereport_user_get_grade_items",
-        {
-          userid: user.moodleId,
-          courseid: parseInt(courseId),
-        },
-      );
+      let response: MoodleGrade[];
 
-      if (error) {
+      try {
+        response = await client.getGrades({ courseId });
+      } catch (error: any) {
         throw new HTTPException(500, { message: error.message });
       }
 
-      return ctx.json(response.usergrades[0].gradeitems as MoodleGrade[]);
+      return ctx.json(response);
     }
 
     return ctx.json(grades.map((grade) => grade.data));

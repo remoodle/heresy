@@ -200,31 +200,33 @@ export type MoodleEvent = {
 };
 
 export type MoodleGrade = {
+  // commented fields are deprecated, and can't be filled by the UI web service
+
   id: number;
   itemname: string;
   itemtype: string;
   itemmodule?: string;
   iteminstance?: number;
-  itemnumber?: number;
-  idnumber: string;
-  categoryid?: number;
-  outcomeid: any;
-  scaleid: any;
-  locked: any;
+  // itemnumber?: number;
+  // idnumber: string;
+  // categoryid?: number;
+  // outcomeid: any;
+  // scaleid: any;
+  // locked: any;
   graderaw?: number;
-  gradedatesubmitted?: number;
-  gradedategraded?: number;
-  gradehiddenbydate: boolean;
-  gradeneedsupdate: boolean;
-  gradeishidden: boolean;
-  gradeislocked: any;
-  gradeisoverridden: any;
+  // gradedatesubmitted?: number;
+  // gradedategraded?: number;
+  // gradehiddenbydate: boolean;
+  // gradeneedsupdate: boolean;
+  // gradeishidden: boolean;
+  // gradeislocked: any;
+  // gradeisoverridden: any;
   gradeformatted: string;
   grademin: number;
   grademax: number;
-  rangeformatted: string;
-  percentageformatted: string;
-  feedback: string;
-  feedbackformat: number;
+  // rangeformatted: string;
+  // percentageformatted: string;
+  // feedback: string;
+  // feedbackformat: number;
   cmid?: number;
 };

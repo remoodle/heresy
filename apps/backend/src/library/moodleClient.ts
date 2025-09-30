@@ -2,20 +2,20 @@ import { MoodleClient as _MoodleClient } from "moodle-api";
 import type { FunctionDefinition } from "moodle-api";
 
 export class MoodleAPIError extends Error {
-    code: string;
+  code: string;
 
-    constructor(message: string, { code }: { code: string }) {
-        super(message);
+  constructor(message: string, { code }: { code: string }) {
+    super(message);
 
-        this.code = code
+    this.code = code;
     }
 }
 
 export class MoodleClient extends _MoodleClient {
   protected sessionKey: string;
 
-  constructor(base_url: string | URL, token: string, sessionKey: string) {
-    super(base_url, token);
+  constructor(base_url: string | URL, sessionCookie: string, sessionKey: string) {
+    super(base_url, sessionCookie);
 
     this.sessionKey = sessionKey;
   }
