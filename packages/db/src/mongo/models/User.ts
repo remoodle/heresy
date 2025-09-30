@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 import { v7 as uuidv7 } from "uuid";
-import type { IUser, NotificationSettings } from "@remoodle/types";
+import type { IUserMoodleAuthCookie, IUser, NotificationSettings } from "@remoodle/types";
 
 export const DEFAULT_THRESHOLDS = ["PT3H", "PT6H", "P1D"];
 
@@ -36,6 +36,13 @@ const deadlineRemindersSchema = new Schema(
   { _id: false },
 );
 
+const UserMoodleAuthCookieSchema = new Schema<IUserMoodleAuthCookie>(
+  {
+    name: { type: String, required: true },
+    value: { type: String, required: true },
+  }
+);
+
 const userSchema = new Schema<IUser>(
   {
     _id: { type: String, default: uuidv7 },
@@ -54,7 +61,7 @@ const userSchema = new Schema<IUser>(
      * @deprecated Use `moodleSessionCookie` and `moodleSessionKey` instead.
      */
     moodleToken: { type: String },
-    moodleAuthCookies: { type: Array, of: Object },  // TODO: use shared MoodleAuthCookie
+    moodleAuthCookies: [ UserMoodleAuthCookieSchema ],
     moodleSessionCookie: { type: String, required: true },
     moodleSessionKey: { type: String, required: true },
     health: { type: Number, default: 7 },

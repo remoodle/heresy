@@ -6,12 +6,38 @@ import type {
 import { Moodle } from "../library/moodle";
 import { db, wrapper } from "../library/db";
 
+// TODO: rewrite handleTokenError to a more generic middleware-like function, that will be used in Moodle instance
 const handleTokenError = async (error: { message: string }, user: IUser) => {
   if (error.message.includes("Invalid token")) {
     await db.user.updateOne(
       { _id: user._id },
       { $set: { health: user.health - 1 } },
     );
+  }
+};
+
+export const syncCookies = async (userId: string) => {
+  console.log(`Syncing cookies for user ${userId}`);
+  const user = await db.user.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const client = new Moodle({
+    moodleUserId: user.moodleId,
+    moodleAuthCookies: user.moodleAuthCookies,
+    moodleSessionCookie: user.moodleSessionCookie,
+    moodleSessionKey: user.moodleSessionKey,
+  });
+
+  const [response, error] = await client.call("core_session_touch", {});
+
+  if (error) {
+    await handleTokenError(error, user);
+    throw new Error(`Failed to extend user moodle session: ${error.message}`);
+  } else if (!response) {
+    throw new Error("Failed to extend user moodle session: unsuccessful response");
   }
 };
 

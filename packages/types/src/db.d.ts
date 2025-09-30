@@ -47,6 +47,11 @@ export type UserSettings = {
   };
 };
 
+export type IUserMoodleAuthCookie = {
+  name: string;
+  value: string;
+}
+
 export type IUser = {
   _id: string;
   name: string;
@@ -57,7 +62,7 @@ export type IUser = {
    * @deprecated Use `moodleSessionCookie` and `moodleSessionKey` instead.
    */
   moodleToken?: string;
-  moodleAuthCookies: Array[object];  // TODO: use shared MoodleAuthCookie
+  moodleAuthCookies: IUserMoodleAuthCookie[];
   moodleSessionCookie: string;
   moodleSessionKey: string;
   health: number;

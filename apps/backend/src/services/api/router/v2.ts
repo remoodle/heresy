@@ -429,9 +429,7 @@ const userRoutes = new Hono<{
 
       return ctx.json(
         courses.map((course) => {
-          return {
-            ...course.data,
-          };
+          return { ...course.data };
         }),
       );
     },

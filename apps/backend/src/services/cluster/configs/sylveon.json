@@ -1,5 +1,17 @@
 [
   {
+    "name": "cookies::schedule-sync",
+    "repeat": {
+      "every": 600000
+    }
+  },
+  {
+    "name": "cookies::update",
+    "opts": {
+      "concurrency": 10
+    }
+  },
+  {
     "name": "courses::schedule-sync",
     "repeat": {
       "pattern": "0 0 0 */1 * *"

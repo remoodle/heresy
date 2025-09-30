@@ -4,6 +4,9 @@ import { db } from "../library/db";
 import { bullOtel } from "./telemetry";
 
 export enum JobName {
+  COOKIES_SCHEDULE_SYNC = "cookies::schedule-sync",
+  COOKIES_UPDATE = "cookies::update",
+
   COURSES_SCHEDULE_SYNC = "courses::schedule-sync",
   COURSES_UPDATE = "courses::update",
 
@@ -20,6 +23,9 @@ export enum JobName {
 }
 
 export enum QueueName {
+  COOKIES_SYNC = "cookies sync",
+  COOKIES = "cookies update",
+
   EVENTS_SYNC = "events sync",
   EVENTS = "events update",
 

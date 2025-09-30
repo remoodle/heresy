@@ -4,7 +4,7 @@ import { Telegram, getValues, partition, objectEntries } from "@remoodle/utils";
 import { config } from "../../config";
 import { db, wrapper } from "../../library/db";
 import { logger } from "../../library/logger";
-import { syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
+import { syncCookies, syncEvents, syncCourses, syncCourseGrades } from "../../core/sync";
 import { queues, QueueName, JobName } from "../../core/queues";
 import {
   formatGradeChanges,
@@ -29,6 +29,50 @@ export type Processor = {
 };
 
 export const processors: Record<QueueName, Processor> = {
+  [QueueName.COOKIES_SYNC]: {
+    jobName: JobName.COOKIES_SCHEDULE_SYNC,
+    process: async (job) => {
+      console.log(`Processing job ${job.id} of type ${job.name}`);
+      const { userId } = job.data;
+
+      const users = userId ? [{ userId }] : await wrapper.getActiveUsers();
+
+      logger.cluster.info(
+        { userId },
+        `scheduling users cookies sync for ${users.length} users`,
+      );
+
+      const jobs = users.map((payload) => ({
+        name: JobName.COOKIES_UPDATE,
+        data: { userId: payload.userId },
+        opts: {
+          attempts: 2,
+          backoff: {
+            type: "exponential",
+            delay: 1000,
+          },
+          deduplication: {
+            id: payload.userId,
+          },
+        },
+      }));
+
+      const bulk = await queues[QueueName.COOKIES].addBulk(jobs);
+
+      return bulk.length;
+    },
+  },
+  [QueueName.COOKIES]: {
+    jobName: JobName.COOKIES_UPDATE,
+    process: async (job) => {
+      console.log(`Processing job ${job.id} of type ${job.name}`);
+      const { userId } = job.data;
+
+      logger.cluster.info({ userId }, `syncing users cookies`);
+
+      await syncCookies(userId);
+    },
+  },
   [QueueName.EVENTS_SYNC]: {
     jobName: JobName.EVENTS_SCHEDULE_SYNC,
     process: async (job) => {
