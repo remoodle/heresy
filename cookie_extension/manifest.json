@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "ReMoodle's Cookie Scoop",
+  "version": "1.0.0",
+  "description": "Extract, export and upload to ReMoodle MicrosoftOnline's cookies.",
+  "permissions": [
+    "webRequest",
+    "storage",
+    "scripting",
+    "tabs",
+    "notifications"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_title": "Remoodle's Cookie Scoop"
+  },
+  "background": {
+    "service_worker": "bg.js"
+  }
+}

@@ -200,10 +200,7 @@ export class Moodle {
       throw new Error("Could not find trailing semicolon");
     }
 
-    const jsonData: any = JSON.parse(scriptText.slice(start, end));
-    console.log(`Extracted JSON data: ${JSON.stringify(jsonData)}`);
-
-    return jsonData;
+    return JSON.parse(scriptText.slice(start, end));
   }
 
   async authByCookies() {
@@ -313,7 +310,6 @@ export class Moodle {
     const $ = loadHtml(resp.data);
 
     const $gradeEls = $($("table.generaltable tr[data-hidden='false']").toArray().slice(1).slice(0, -1).slice(0, -1));
-    console.log(`Found ${$gradeEls.length} grade elements`);
 
     const grades: MoodleGrade[] = $gradeEls.map((_, el) => {
       const $gradeEl = $(el);
