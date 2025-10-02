@@ -1,7 +1,8 @@
 import type {
   IUser,
   MoodleCourse,
-  MoodleCourseClassification, MoodleGrade,
+  MoodleCourseClassification,
+  MoodleGrade,
 } from "@remoodle/types";
 import { Moodle } from "../library/moodle";
 import { db, wrapper } from "../library/db";

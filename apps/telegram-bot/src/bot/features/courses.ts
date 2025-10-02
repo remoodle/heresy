@@ -93,7 +93,8 @@ feature.callbackQuery(
     const message = uni.getGradesMessage(grades, course);
 
     const keyboard = new InlineKeyboard()
-      .text("Assignments", courseAssignmentsCallback.pack({ courseId }))
+      // TODO: assignments are disabled for now
+      // .text("Assignments", courseAssignmentsCallback.pack({ courseId }))
       .row()
       .text("Back ←", coursesListCallback.pack({}));
 

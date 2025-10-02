@@ -8,7 +8,7 @@ import { wrapper } from "axios-cookiejar-support";
 import { CookieJar } from "tough-cookie";
 import { load as loadHtml, type CheerioAPI } from "cheerio";
 import { db } from "./db";
-import { type MoodleGrade } from "@remoodle/types";
+import type { MoodleGrade } from "@remoodle/types";
 import { murmurhash3_32 } from "./murmurhash3_32";
 
 interface Options {
@@ -32,6 +32,11 @@ interface MoodleStudentInfo {
   username: string,  // email
   userId: number,
 }
+
+const ignoreGradeNames = new Set([
+  "Register(not to edit)",
+  "Register(not to edit) total",
+]);
 
 interface GradeBaseData {
   itemtype: string;
@@ -307,13 +312,23 @@ export class Moodle {
 
     const $ = loadHtml(resp.data);
 
-    const $gradeEls = $($("table.generaltable tr.cat_936[data-hidden='false']").toArray().slice(0, 8).slice(0, -1));
+    const $gradeEls = $($("table.generaltable tr[data-hidden='false']").toArray().slice(1).slice(0, -1).slice(0, -1));
+    console.log(`Found ${$gradeEls.length} grade elements`);
 
     const grades: MoodleGrade[] = $gradeEls.map((_, el) => {
       const $gradeEl = $(el);
+      if ($gradeEl.hasClass("spacer")) {
+        return null;
+      }
 
       const $nameAndIdEl = $(".gradeitemheader", $gradeEl).first();
-      const name = $nameAndIdEl.attr("title")!.trim();
+      if (!$nameAndIdEl.length) {
+        return null;
+      }
+      const name = $nameAndIdEl.text().trim();
+      if (ignoreGradeNames.has(name)) {
+        return null;
+      }
       const foundIdStr = $nameAndIdEl.attr("href")?.split("id=", 2)?.[1];
 
       const baseGradeData = {
@@ -322,8 +337,8 @@ export class Moodle {
       };
       const gradeId = foundIdStr ? parseInt(foundIdStr, 10) : this._calculateGradeIdHash(baseGradeData);
 
-      const gradeValueFormatted = $("td.column-grade", $gradeEl).first().text().trim().replace("-", "0.00");
-      const gradeValueRaw = parseFloat(gradeValueFormatted);
+      const gradeValueFormatted = $("td.column-grade", $gradeEl).first().text().trim();
+      const gradeValueRaw = parseFloat(gradeValueFormatted) ?? null;
       const gradeValueRange = $("td.column-range", $gradeEl).first().text().trim().split("–", 2);
       const gradeValueMin = parseFloat(gradeValueRange[0]);
       const gradeValueMax = parseFloat(gradeValueRange[1]);
@@ -342,7 +357,7 @@ export class Moodle {
       };
     }).get();
 
-    return grades;
+    return grades.filter((g): g is MoodleGrade => g !== null);
   }
 
   async call<F extends keyof FunctionDefinition | (string & {})>(
