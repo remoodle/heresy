@@ -438,7 +438,7 @@ const userRoutes = new Hono<{
 
       return ctx.json(
         courses.map((course) => {
-          return { ...course.data };
+          return course.data;
         }),
       );
     },
@@ -532,7 +532,7 @@ const userRoutes = new Hono<{
         });
       }
 
-      return ctx.json({ ...course.data });
+      return ctx.json(course.data);
     },
   )
   // TODO: rewrite assignments fetching
