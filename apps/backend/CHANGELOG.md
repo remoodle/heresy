@@ -1,5 +1,14 @@
 # Changelog
 
+## [2.7.4](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.3...remoodle/backend-v2.7.4) (2025-10-06)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#541](https://github.com/remoodle/remoodle/issues/541)) ([a25b182](https://github.com/remoodle/remoodle/commit/a25b182a62bfea8693ea1fe54cfe7546b20c52f2))
+* **deps:** update dependency pino to v10 ([#549](https://github.com/remoodle/remoodle/issues/549)) ([d9530d1](https://github.com/remoodle/remoodle/commit/d9530d18e1b281d050a59df376ff981f41de7ae1))
+* **deps:** update dependency pino-http to v11 ([#550](https://github.com/remoodle/remoodle/issues/550)) ([61a1217](https://github.com/remoodle/remoodle/commit/61a12179d2efafa1882313cea9417cdb4a51f92b))
+
 ## [2.7.3](https://github.com/remoodle/remoodle/compare/remoodle/backend-v2.7.2...remoodle/backend-v2.7.3) (2025-09-14)
 
 
