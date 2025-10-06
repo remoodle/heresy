@@ -8,6 +8,19 @@
 * **deps:** update all non-major dependencies ([#541](https://github.com/remoodle/remoodle/issues/541)) ([a25b182](https://github.com/remoodle/remoodle/commit/a25b182a62bfea8693ea1fe54cfe7546b20c52f2))
 * **deps:** update all non-major dependencies ([#554](https://github.com/remoodle/remoodle/issues/554)) ([2a0c774](https://github.com/remoodle/remoodle/commit/2a0c774fcdab4a4285c366c81dcf9d929acbcaf7))
 
+
+### Miscellaneous Chores
+
+* **trunk:** release  remoodle/frontend (deploy-as: release-1.12.2) ([#556](https://github.com/remoodle/remoodle/issues/556)) ([b10f57a](https://github.com/remoodle/remoodle/commit/b10f57a6e8af4ea8ce6d23fdc6d3157b1f7fb15c))
+
+## [1.12.2](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.12.1...remoodle/frontend-v1.12.2) (2025-10-06)
+
+
+### Bug Fixes
+
+* **deps:** update all non-major dependencies ([#541](https://github.com/remoodle/remoodle/issues/541)) ([a25b182](https://github.com/remoodle/remoodle/commit/a25b182a62bfea8693ea1fe54cfe7546b20c52f2))
+* **deps:** update all non-major dependencies ([#554](https://github.com/remoodle/remoodle/issues/554)) ([2a0c774](https://github.com/remoodle/remoodle/commit/2a0c774fcdab4a4285c366c81dcf9d929acbcaf7))
+
 ## [1.12.1](https://github.com/remoodle/remoodle/compare/remoodle/frontend-v1.12.0...remoodle/frontend-v1.12.1) (2025-09-14)
 
 
