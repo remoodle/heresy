@@ -2,7 +2,9 @@ name: "[backend] Publish Docker image"
 
 on:
   push:
-    branches: [trunk]
+    branches:
+      - "trunk"
+      - "aitu-hack"
     paths:
       - "apps/backend/**"
     tags:
