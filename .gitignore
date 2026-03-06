@@ -12,3 +12,5 @@ node_modules
 data/
 *.log
 .idea/
+
+.github/scripts/schedule-parser/vendor/*

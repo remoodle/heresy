@@ -1,19 +1,12 @@
 name: Parse Schedules and Upload to R2
 
 on:
-  # Run on schedule (daily at 6 AM UTC)
-  schedule:
-    - cron: "0 6 * * *"
-
-  # Run on push to main branch when schedule files change
-  push:
-    branches: [main]
-    paths:
-      - "external/schedule/**"
-      - ".github/scripts/schedule-parser/**"
-
-  # Allow manual trigger
   workflow_dispatch:
+    inputs:
+      duToken:
+        required: true
+        description: "DU auth bearer token"
+        type: string
 
 jobs:
   parse-and-upload:
@@ -23,16 +16,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
         with:
-          python-version: "3.11"
-          cache: "pip"
+          php-version: "8.3"
+          extensions: iconv, json, zlib
+          tools: composer
 
-      - name: Install Python dependencies
+      - name: Install PHP dependencies
         run: |
           cd .github/scripts/schedule-parser
-          pip install -r requirements-minimal.txt
+          composer install
 
       - name: Create output directory
         run: mkdir -p ./output
@@ -40,10 +34,7 @@ jobs:
       - name: Parse schedule files
         run: |
           cd .github/scripts/schedule-parser
-          python parse.py
-        env:
-          SCHEDULE_INPUT_DIR: ${{ github.workspace }}/external/schedule
-          SCHEDULE_OUTPUT_DIR: ${{ github.workspace }}/output
+          php command.php ${{ inputs.duToken }} ${{ github.workspace }}/external/schedule ${{ github.workspace }}/output
 
       - name: List generated files
         run: |

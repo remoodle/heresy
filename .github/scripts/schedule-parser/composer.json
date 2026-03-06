@@ -1,0 +1,8 @@
+{
+    "require": {
+        "symfony/var-dumper": "^7.1",
+        "guzzlehttp/guzzle": "^7.10",
+        "smalot/pdfparser": "^2.12"
+    },
+    "autoload": {}
+}
