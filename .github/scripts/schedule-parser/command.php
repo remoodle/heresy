@@ -104,4 +104,4 @@ foreach ($groupScheduleRaw as $groupName => $schedule) {
     }
 }
 
-file_put_contents($argv[3] . '/output.json', json_encode($formattedSchedule, JSON_PRETTY_PRINT));
+file_put_contents($argv[3], json_encode($formattedSchedule, JSON_PRETTY_PRINT));

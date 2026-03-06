@@ -34,7 +34,7 @@ jobs:
       - name: Parse schedule files
         run: |
           cd .github/scripts/schedule-parser
-          php command.php ${{ inputs.duToken }} ${{ github.workspace }}/external/schedule ${{ github.workspace }}/output
+          php command.php ${{ inputs.duToken }} ${{ github.workspace }}/external/schedule ${{ github.workspace }}/output/main.json
 
       - name: List generated files
         run: |
