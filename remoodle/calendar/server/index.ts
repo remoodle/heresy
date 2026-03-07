@@ -6,8 +6,10 @@ const app = new Hono<{ Bindings: Env }>();
 
 app.use("*", cors());
 
+const FILE_NAME = "main.json";
+
 app.get("/api/groups", async (c) => {
-  const schedule = await c.env.SCHEDULE_BUCKET.get("main.json");
+  const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
 
   const group = c.req.query("group");
 
@@ -22,6 +24,17 @@ app.get("/api/groups", async (c) => {
   }
 
   return c.json(Object.keys(scheduleData));
+});
+
+
+app.put("/api/schedule", async (c) => {
+  const body = await c.req.text();
+
+  await c.env.SCHEDULE_BUCKET.put(FILE_NAME, body, {
+    httpMetadata: { contentType: "application/json" },
+  });
+
+  return c.json({ ok: true });
 });
 
 export default app;

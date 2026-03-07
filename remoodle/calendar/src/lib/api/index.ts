@@ -1,6 +1,6 @@
 import type { ScheduleItem } from "@/lib/types";
 
-const API_URL = import.meta.env.DEV ? "https://calendar.remoodle.app/api" : "/api";
+const API_URL = "/api";
 
 export const getGroups = async (): Promise<string[]> => {
   const response = await fetch(`${API_URL}/groups`);

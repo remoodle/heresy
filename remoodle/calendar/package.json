@@ -14,7 +14,8 @@
     "lint": "run-s lint:*",
     "format": "prettier --write src/",
     "deploy": "pnpm run build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "cf-typegen": "wrangler types",
+    "sync-dev": "curl -X PUT http://localhost:5173/api/schedule -H 'Content-Type: application/json' --data-binary @data/main.json"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.0",
