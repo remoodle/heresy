@@ -1,0 +1,50 @@
+name: "[schedule-parser v1] Parse Schedule and Upload to R2"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  parse-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: |
+          cd src/tools/schedule-parser/v1
+          pip install -r requirements-minimal.txt
+
+      - name: Create output directory
+        run: mkdir -p ./output
+
+      - name: Parse schedule files
+        run: |
+          cd src/tools/schedule-parser/v1
+          python parse.py
+        env:
+          SCHEDULE_INPUT_DIR: ${{ github.workspace }}/external/aitu/schedule
+          SCHEDULE_OUTPUT_DIR: ${{ github.workspace }}/output
+
+      - name: List generated files
+        run: |
+          echo "Generated files:"
+          ls -la ./output/ || echo "No output files found"
+
+      - name: Setup rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
+      - name: Upload to R2 bucket
+        run: |
+          echo "Uploading parsed schedule files to R2..."
+
+          rclone sync ./output remoodle:schedule -v
