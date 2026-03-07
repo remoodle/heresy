@@ -3,7 +3,7 @@ import type { ScheduleFilter } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 
 const props = defineProps<{
-  group: string;
+  value: string;
   courses: string[];
 }>();
 

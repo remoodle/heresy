@@ -91,7 +91,7 @@ foreach ($groupScheduleRaw as $groupName => $schedule) {
             continue;
         }
 
-        $formattedSchedule[$groupName][] = [
+        $lessonObj = [
             'id' => uniqid(),
             'start' => "$weekDay " . $timeStart,
             'end' => "$weekDay " . $timeFinish,
@@ -101,7 +101,27 @@ foreach ($groupScheduleRaw as $groupName => $schedule) {
             'teacher' => $lesson['tutor'],
             'type' => $lesson['lesson_type'],
         ];
+        $formattedSchedule[$groupName][] = $lessonObj;
     }
 }
 
-file_put_contents($argv[3], json_encode($formattedSchedule, JSON_PRETTY_PRINT));
+$lessonsByLocation = [];
+$lessonsByTeacher = [];
+foreach ($formattedSchedule as $groupLessons) {
+    foreach ($groupLessons as $lesson) {
+        if (!$lesson['isOnline']) {
+            $lessonsByLocation[$lesson['location']][] = $lesson;
+        }
+        if (!str_contains($lesson['teacher'], 'learn.astanait.edu.kz')) {
+            $lessonsByTeacher[$lesson['teacher']][] = $lesson;
+        }
+    }
+}
+
+$output = [
+    'lessonsByGroupname' => $formattedSchedule,
+    'lessonsByLocation' => $lessonsByLocation,
+    'lessonsByTeacher' => $lessonsByTeacher,
+];
+
+file_put_contents($argv[3], json_encode($output, JSON_PRETTY_PRINT));

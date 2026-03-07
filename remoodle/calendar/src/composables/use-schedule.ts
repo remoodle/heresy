@@ -2,14 +2,65 @@ import { computed } from "vue";
 import type { CalendarEvent } from "@schedule-x/calendar";
 import type { ScheduleFilter, ScheduleItem } from "@/lib/types";
 import { dayjs } from "@/lib/dayjs";
-import { useGroupsQuery, useGroupScheduleQuery } from "@/lib/api";
+import {
+  useGroupsQuery,
+  useGroupScheduleQuery,
+  useLocationsQuery,
+  useLocationScheduleQuery,
+  useTeachersQuery,
+  useTeacherScheduleQuery,
+} from "@/lib/api";
 
-export function useSchedule(group: () => string, filters: () => Record<string, ScheduleFilter>) {
-  const currentGroup = computed(() => group());
+export type SearchMode = "group" | "location" | "teacher";
+
+export function useSchedule(
+  searchMode: () => SearchMode,
+  value: () => string,
+  filters: () => Record<string, ScheduleFilter>,
+) {
+  const currentMode = computed(() => searchMode());
+  const currentValue = computed(() => value());
   const currentFilters = computed(() => filters());
 
   const { data: allGroups } = useGroupsQuery();
-  const { data: schedule } = useGroupScheduleQuery(() => currentGroup.value);
+  const { data: allLocations } = useLocationsQuery();
+  const { data: allTeachers } = useTeachersQuery();
+
+  const { data: groupScheduleData } = useGroupScheduleQuery(() =>
+    currentMode.value === "group" ? currentValue.value : "",
+  );
+  const { data: locationScheduleData } = useLocationScheduleQuery(() =>
+    currentMode.value === "location" ? currentValue.value : "",
+  );
+  const { data: teacherScheduleData } = useTeacherScheduleQuery(() =>
+    currentMode.value === "teacher" ? currentValue.value : "",
+  );
+
+  const schedule = computed(() => {
+    switch (currentMode.value) {
+      case "group":
+        return groupScheduleData.value;
+      case "location":
+        return locationScheduleData.value;
+      case "teacher":
+        return teacherScheduleData.value;
+      default:
+        return undefined;
+    }
+  });
+
+  const allOptions = computed(() => {
+    switch (currentMode.value) {
+      case "group":
+        return allGroups.value ?? [];
+      case "location":
+        return allLocations.value ?? [];
+      case "teacher":
+        return allTeachers.value ?? [];
+      default:
+        return [];
+    }
+  });
 
   const getTargetDateByDay = (day: string): Date => {
     const [dayName, time] = day.split(" ");
@@ -44,7 +95,12 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
       return new Date();
     }
 
-    return targetDate.hour(Number(hours)).minute(Number(minutes)).second(0).millisecond(0).toDate();
+    return targetDate
+      .hour(Number(hours))
+      .minute(Number(minutes))
+      .second(0)
+      .millisecond(0)
+      .toDate();
   };
 
   const convertToDateTime = (date: Date): string => {
@@ -64,65 +120,68 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
   };
 
   const groupSchedule = computed((): CalendarEvent[] => {
-    if (!currentGroup.value || !schedule.value) {
+    if (!currentValue.value || !schedule.value) {
       return [];
     }
 
-    const userGroupFilters = currentFilters.value?.[currentGroup.value];
-    const currentGroupSchedule: ScheduleItem[] = schedule.value || [];
+    const userFilters = currentFilters.value?.[currentValue.value];
+    const currentSchedule: ScheduleItem[] = schedule.value || [];
 
-    if (!currentGroupSchedule || currentGroupSchedule.length === 0) {
+    if (!currentSchedule || currentSchedule.length === 0) {
       return [];
     }
 
-    const filteredSchedule = currentGroupSchedule.filter((item: ScheduleItem) => {
-      if (!userGroupFilters) {
+    const filteredSchedule = currentSchedule.filter((item: ScheduleItem) => {
+      if (!userFilters) {
         return true;
       }
 
-      if (userGroupFilters.excludedCourses.length > 0) {
-        if (userGroupFilters.excludedCourses.includes(item.courseName)) {
+      if (userFilters.excludedCourses.length > 0) {
+        if (userFilters.excludedCourses.includes(item.courseName)) {
           return false;
         }
       }
 
       if (
-        !userGroupFilters.eventTypes.learn &&
-        !userGroupFilters.eventTypes.lecture &&
-        !userGroupFilters.eventTypes.practice
+        !userFilters.eventTypes.learn &&
+        !userFilters.eventTypes.lecture &&
+        !userFilters.eventTypes.practice
       ) {
         return true;
       }
 
-      if (!userGroupFilters.eventTypes.learn) {
+      if (!userFilters.eventTypes.learn) {
         if (item.teacher.startsWith("https://learn")) {
           return false;
         }
       }
 
-      if (!userGroupFilters.eventTypes.lecture) {
+      if (!userFilters.eventTypes.lecture) {
         if (item.type === "lecture") {
           return false;
         }
       }
 
-      if (!userGroupFilters.eventTypes.practice) {
+      if (!userFilters.eventTypes.practice) {
         if (item.type === "practice") {
           return false;
         }
       }
 
-      if (!userGroupFilters.eventFormats.offline && !userGroupFilters.eventFormats.online) {
+      if (
+        !userFilters.eventFormats.offline &&
+        !userFilters.eventFormats.online
+      ) {
         return true;
       }
 
-      if (!userGroupFilters.eventFormats.offline) {
+      if (!userFilters.eventFormats.offline) {
         if (item.location !== "online") {
           return false;
         }
       }
 
-      if (!userGroupFilters.eventFormats.online) {
+      if (!userFilters.eventFormats.online) {
         if (item.location === "online") {
           return false;
         }
@@ -147,7 +206,7 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
 
       const newEvent = {
         id: item.id,
-        title: item.courseName.length > 30 ? item.courseName.slice(0, 26) + "..." : item.courseName,
+        title: item.courseName,
         description: `${item.teacher.startsWith("https://learn") ? "learn.astanait.edu.kz" : item.teacher}  |  ${item.location.toUpperCase()}  |  ${item.type}\n`,
       };
 
@@ -175,27 +234,27 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
     return resultSchedule;
   });
 
-  const groupCourses = computed(() => {
-    if (!currentGroup.value) {
+  const valueCourses = computed(() => {
+    if (!currentValue.value) {
       return [];
     }
 
-    const groupSchedule = schedule.value;
+    const scheduleData = schedule.value;
 
-    if (!groupSchedule) {
+    if (!scheduleData) {
       return [];
     }
 
-    const uniqueCourses = new Set(groupSchedule.map((item) => item.courseName));
+    const uniqueCourses = new Set(scheduleData.map((item) => item.courseName));
 
     return Array.from(uniqueCourses);
   });
 
   return {
     groupSchedule,
-    allGroups,
+    allOptions,
     getTargetDateByDay,
     convertToDateTime,
-    groupCourses,
+    valueCourses: valueCourses,
   };
 }

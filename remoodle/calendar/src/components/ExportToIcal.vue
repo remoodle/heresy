@@ -20,12 +20,13 @@ import { dayjs, type Dayjs } from "@/lib/dayjs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const props = defineProps<{
-  group: string;
+  value: string;
+  searchMode: "group" | "location" | "teacher";
   filters: ScheduleFilter | undefined;
   events: CalendarEvent[];
 }>();
 
-const value = ref(today(getLocalTimeZone()).add({ days: 14 })) as Ref<DateValue>;
+const endDate = ref(today(getLocalTimeZone()).add({ days: 14 })) as Ref<DateValue>;
 
 const open = ref<boolean>(false);
 
@@ -66,7 +67,7 @@ const formatDate = (date: Dayjs): string => {
 const getIcsString = () => {
   const icalContent = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ReMoodle//Calendar Export//EN"];
 
-  const end = dayjs(value.value.toDate(getLocalTimeZone()));
+  const end = dayjs(endDate.value.toDate(getLocalTimeZone()));
 
   if (!end) {
     return "";
@@ -104,7 +105,14 @@ const getICalFile = (): void => {
 
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = "myCalendar.ics";
+  const modeLabel =
+    props.searchMode === "group"
+      ? "group"
+      : props.searchMode === "location"
+        ? "location"
+        : "teacher";
+  const safeValue = props.value.replace(/[^a-zA-Z0-9-_.]/g, "_");
+  link.download = `schedule-${modeLabel}-${safeValue}.ics`;
   link.click();
   URL.revokeObjectURL(link.href);
 };
@@ -126,7 +134,7 @@ const getICalFile = (): void => {
 
       <div class="mt-2">
         <h1 class="flex items-center font-bold">
-          {{ group }}
+          {{ props.value }}
         </h1>
       </div>
 
@@ -177,11 +185,11 @@ const getICalFile = (): void => {
             <PopoverTrigger as-child>
               <Button variant="outline" class="w-[280px] justify-start text-left font-normal">
                 <CalendarIcon class="mr-2 h-4 w-4" />
-                {{ value ? df.format(value.toDate(getLocalTimeZone())) : "Pick an end date" }}
+                {{ endDate ? df.format(endDate.toDate(getLocalTimeZone())) : "Pick an end date" }}
               </Button>
             </PopoverTrigger>
             <PopoverContent class="w-auto p-0">
-              <Calendar v-model="value" initial-focus />
+              <Calendar v-model="endDate" initial-focus />
             </PopoverContent>
           </Popover>
         </div>

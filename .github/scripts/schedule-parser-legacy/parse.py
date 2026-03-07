@@ -306,6 +306,32 @@ def create_main_json_format(schedules):
     
     return main_format
 
+
+def build_lessons_by_location(main_format):
+    """Build lessons grouped by location, skipping online lessons"""
+    result = {}
+    for group_lessons in main_format.values():
+        for lesson in group_lessons:
+            if not lesson.get('isOnline', False):
+                location = lesson.get('location', 'TBD')
+                if location not in result:
+                    result[location] = []
+                result[location].append(lesson)
+    return result
+
+
+def build_lessons_by_teacher(main_format):
+    """Build lessons grouped by teacher, skipping if teacher contains learn.astanait.edu.kz"""
+    result = {}
+    for group_lessons in main_format.values():
+        for lesson in group_lessons:
+            teacher = lesson.get('teacher', '')
+            if 'learn.astanait.edu.kz' not in teacher:
+                if teacher not in result:
+                    result[teacher] = []
+                result[teacher].append(lesson)
+    return result
+
 parser = openparse.DocumentParser(
     table_args={
         "parsing_algorithm": "pymupdf",
@@ -393,9 +419,14 @@ for file in pdf_files:
     
 
 if all_schedules:
-    main_format = create_main_json_format(all_schedules)
+    lessons_by_groupname = create_main_json_format(all_schedules)
+    output = {
+        "lessonsByGroupname": lessons_by_groupname,
+        "lessonsByLocation": build_lessons_by_location(lessons_by_groupname),
+        "lessonsByTeacher": build_lessons_by_teacher(lessons_by_groupname),
+    }
     output_file_main = os.path.join(output_folder, "main.json")
     with open(output_file_main, 'w', encoding='utf-8') as f:
-        json.dump(main_format, f, indent=2, ensure_ascii=False)
+        json.dump(output, f, indent=2, ensure_ascii=False)
     
     print(f"📁 Combined main format saved to: {output_file_main}")

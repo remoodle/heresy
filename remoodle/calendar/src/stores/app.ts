@@ -25,7 +25,12 @@ export const useAppStore = defineStore("app", () => {
     return storedTheme.value;
   });
 
-  const group = useLocalStorage(getStorageKey("group"), "");
+  const searchMode = useLocalStorage<"group" | "location" | "teacher">(
+    getStorageKey("searchMode"),
+    "group",
+  );
+
+  const value = useLocalStorage(getStorageKey("group"), "");
 
   const filters = useLocalStorage<Record<string, ScheduleFilter>>(
     getStorageKey("scheduleFilters"),
@@ -33,8 +38,8 @@ export const useAppStore = defineStore("app", () => {
   );
 
   watchEffect(() => {
-    if (group.value && !filters.value[group.value]) {
-      filters.value[group.value] = {
+    if (value.value && !filters.value[value.value]) {
+      filters.value[value.value] = {
         eventTypes: {
           lecture: true,
           practice: true,
@@ -53,6 +58,7 @@ export const useAppStore = defineStore("app", () => {
     theme,
     toggleTheme,
     filters,
-    group,
+    searchMode,
+    value,
   };
 });

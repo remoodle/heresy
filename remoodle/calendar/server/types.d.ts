@@ -12,5 +12,7 @@ type GroupScheduleItem = {
 type GroupSchedule = GroupScheduleItem[];
 
 export type ScheduleData = {
-  [group: string]: GroupSchedule;
+  lessonsByGroupname: { [group: string]: GroupSchedule };
+  lessonsByLocation: { [location: string]: GroupSchedule };
+  lessonsByTeacher: { [teacher: string]: GroupSchedule };
 };
