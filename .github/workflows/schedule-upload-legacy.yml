@@ -1,11 +1,6 @@
 name: Parse Schedules and Upload to R2 (legacy)
 
 on:
-  # Run on schedule (daily at 6 AM UTC)
-  schedule:
-    - cron: "0 6 * * *"
-
-  # Allow manual trigger
   workflow_dispatch:
 
 jobs:
