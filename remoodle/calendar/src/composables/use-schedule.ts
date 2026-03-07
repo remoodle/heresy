@@ -2,24 +2,14 @@ import { computed } from "vue";
 import type { CalendarEvent } from "@schedule-x/calendar";
 import type { ScheduleFilter, ScheduleItem } from "@/lib/types";
 import { dayjs } from "@/lib/dayjs";
-import { useQuery } from "@tanstack/vue-query";
-import { getGroups, getGroupSchedule } from "@/lib/api";
+import { useGroupsQuery, useGroupScheduleQuery } from "@/lib/api";
 
 export function useSchedule(group: () => string, filters: () => Record<string, ScheduleFilter>) {
   const currentGroup = computed(() => group());
   const currentFilters = computed(() => filters());
-  const isEnabled = computed(() => !!currentGroup.value);
 
-  const { data: allGroups } = useQuery({
-    queryKey: ["groups"],
-    queryFn: getGroups,
-  });
-
-  const { data: schedule } = useQuery({
-    queryKey: ["schedule", currentGroup],
-    queryFn: () => getGroupSchedule(currentGroup.value),
-    enabled: isEnabled,
-  });
+  const { data: allGroups } = useGroupsQuery();
+  const { data: schedule } = useGroupScheduleQuery(() => currentGroup.value);
 
   const getTargetDateByDay = (day: string): Date => {
     const [dayName, time] = day.split(" ");

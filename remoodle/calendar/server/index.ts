@@ -8,7 +8,7 @@ app.use("*", cors());
 
 const FILE_NAME = "main.json";
 
-app.get("/api/groups", async (c) => {
+const route = app.get("/api/groups", async (c) => {
   const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
 
   const group = c.req.query("group");
@@ -24,10 +24,7 @@ app.get("/api/groups", async (c) => {
   }
 
   return c.json(Object.keys(scheduleData));
-});
-
-
-app.put("/api/schedule", async (c) => {
+}).put("/api/schedule", async (c) => {
   const body = await c.req.text();
 
   await c.env.SCHEDULE_BUCKET.put(FILE_NAME, body, {
@@ -36,5 +33,7 @@ app.put("/api/schedule", async (c) => {
 
   return c.json({ ok: true });
 });
+
+export type AppType = typeof route;
 
 export default app;

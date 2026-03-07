@@ -15,7 +15,7 @@
     "format": "prettier --write src/",
     "deploy": "pnpm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "sync-dev": "curl -X PUT http://localhost:5173/api/schedule -H 'Content-Type: application/json' --data-binary @data/main.json"
+    "sync-dev": "jiti scripts/sync-dev.ts"
   },
   "dependencies": {
     "@iconify/vue": "^5.0.0",
