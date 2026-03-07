@@ -10,12 +10,5 @@
     {
       "path": "./tsconfig.worker.json"
     }
-  ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "types": ["./worker-configuration.d.ts"]
-  }
+  ]
 }
