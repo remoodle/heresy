@@ -100,7 +100,10 @@ const route = app
       items = applyFilters(items, tokenRow.filters as ScheduleFilter);
     }
 
-    const ical = generateIcal(items, new Date());
+    const tokenFilters = (tokenRow.filters ?? {}) as ScheduleFilter;
+    const ical = generateIcal(items, new Date(), {
+      combineAdjacentPairs: tokenFilters.ical?.combineAdjacentPairs,
+    });
 
     return new Response(ical, {
       headers: {

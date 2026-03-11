@@ -7,13 +7,15 @@ import {
   today,
 } from "@internationalized/date";
 import { CalendarIcon, Download } from "lucide-vue-next";
-import { ref, computed, type Ref } from "vue";
+import { ref, computed, watch, type Ref } from "vue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
+  DialogScrollContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -31,8 +33,11 @@ import {
   useUpdateIcalFilters,
 } from "@/lib/api/ical";
 import { useSessionQuery } from "@/lib/api/session";
-import { dayjs, type Dayjs } from "@/lib/dayjs";
 import type { ScheduleFilter } from "@/lib/types";
+import {
+  generateCalendarEventsIcal,
+  mergeAdjacentCalendarEvents,
+} from "../../shared/ical";
 
 const props = defineProps<{
   group: string;
@@ -54,8 +59,29 @@ const { mutate: generate, isPending: generating } = useUpsertIcalToken();
 const { mutate: updateFilters, isPending: updatingFilters } =
   useUpdateIcalFilters();
 const copied = ref(false);
+const combineAdjacentPairs = ref(false);
 
 const busy = computed(() => generating.value || updatingFilters.value);
+
+const effectiveFilters = computed<ScheduleFilter | undefined>(() => {
+  if (!props.filters) return undefined;
+
+  return {
+    ...props.filters,
+    ical: {
+      ...props.filters.ical,
+      combineAdjacentPairs: combineAdjacentPairs.value,
+    },
+  };
+});
+
+watch(
+  () => props.filters?.ical?.combineAdjacentPairs,
+  (value) => {
+    combineAdjacentPairs.value = value ?? false;
+  },
+  { immediate: true },
+);
 
 async function copyUrl() {
   if (!tokenData.value?.url) return;
@@ -68,75 +94,33 @@ const df = new DateFormatter("en-US", {
   dateStyle: "long",
 });
 
-const escapeText = (text: string) => {
-  return text
-    .replace(/\\/g, "\\\\")
-    .replace(/;/g, "\\;")
-    .replace(/,/g, "\\,")
-    .replace(/\n/g, "\\n");
-};
-
-const parseDate = (dateString: string) => {
-  const [datePart, timePart] = dateString.split(" ");
-
-  if (!datePart || !timePart) {
-    return new Date();
-  }
-
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hour, minute] = timePart.split(":").map(Number);
-
-  if (!year || !month || !day || hour === undefined || minute === undefined) {
-    return new Date();
-  }
-
-  return new Date(year, month - 1, day, hour, minute);
-};
-
-const formatDate = (date: Dayjs): string => {
-  return date.format("YYYYMMDD[T]HHmmss").replace(/[-:]/g, "");
-};
-
 const getIcsString = () => {
-  const icalContent = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//ReMoodle//Calendar Export//EN",
-  ];
+  const end = value.value.toDate(getLocalTimeZone());
+  const sourceEvents = combineAdjacentPairs.value
+    ? mergeAdjacentCalendarEvents(props.events)
+    : props.events;
 
-  const end = dayjs(value.value.toDate(getLocalTimeZone()));
-
-  if (!end) {
-    return "";
-  }
-
-  props.events.forEach((event) => {
-    if (event.title && event.description && event.start) {
-      const startDate = parseDate(event.start);
-      const endDate = end;
-
-      for (
-        let current = dayjs(startDate);
-        current <= endDate;
-        current = current.add(7, "day")
-      ) {
-        icalContent.push(
-          `BEGIN:VEVENT`,
-          `UID:${event.id}-${current.toISOString()}`,
-          `SUMMARY:${escapeText(event.title)}`,
-          `DTSTART:${formatDate(current)}`,
-          `DTEND:${formatDate(current.add(50, "minute"))}`,
-          `DESCRIPTION:${escapeText(event.description)}`,
-          `LOCATION:Astana IT University`,
-          `END:VEVENT`,
-        );
-      }
-    }
-  });
-
-  icalContent.push("END:VCALENDAR");
-
-  return icalContent.join("\n");
+  return generateCalendarEventsIcal(
+    sourceEvents
+      .filter(
+        (
+          event,
+        ): event is typeof event & {
+          title: string;
+          description: string;
+          start: string;
+        } => Boolean(event.title && event.description && event.start),
+      )
+      .map((event) => ({
+        id: event.id,
+        title: event.title,
+        description: event.description,
+        start: event.start,
+        end: event.end,
+        location: "Astana IT University",
+      })),
+    end,
+  );
 };
 
 const getICalFile = (): void => {
@@ -157,7 +141,7 @@ const getICalFile = (): void => {
     <DialogTrigger as-child>
       <Button size="sm" variant="outline">Export</Button>
     </DialogTrigger>
-    <DialogContent class="max-w-sm rounded-2xl">
+    <DialogScrollContent class="max-w-lg rounded-2xl">
       <DialogHeader>
         <DialogTitle class="text-left text-2xl font-bold"
           >Create iCalendar file</DialogTitle
@@ -238,6 +222,19 @@ const getICalFile = (): void => {
         </Popover>
       </div>
 
+      <label
+        class="flex cursor-pointer items-start gap-3 rounded-xl border p-4"
+      >
+        <Checkbox v-model:checked="combineAdjacentPairs" class="mt-0.5" />
+        <div class="space-y-1">
+          <p class="text-sm leading-none font-medium">Combine adjacent pairs</p>
+          <p class="text-xs text-muted-foreground">
+            Merge back-to-back slots with the same course details into one iCal
+            event.
+          </p>
+        </div>
+      </label>
+
       <template v-if="session?.data">
         <div class="flex flex-col gap-3 rounded-xl border p-4">
           <div>
@@ -280,8 +277,8 @@ const getICalFile = (): void => {
                 variant="ghost"
                 size="sm"
                 class="shrink-0 text-muted-foreground"
-                :disabled="busy"
-                @click="updateFilters({ group, filters: filters! })"
+                :disabled="busy || !effectiveFilters"
+                @click="updateFilters({ group, filters: effectiveFilters! })"
               >
                 Update filters
               </Button>
@@ -290,8 +287,8 @@ const getICalFile = (): void => {
           <template v-else>
             <Button
               variant="outline"
-              :disabled="busy"
-              @click="generate({ group, filters: filters! })"
+              :disabled="busy || !effectiveFilters"
+              @click="generate({ group, filters: effectiveFilters! })"
             >
               Generate link
             </Button>
@@ -308,6 +305,6 @@ const getICalFile = (): void => {
           Download .ics
         </Button>
       </DialogFooter>
-    </DialogContent>
+    </DialogScrollContent>
   </Dialog>
 </template>

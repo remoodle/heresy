@@ -13,6 +13,9 @@ export type ScheduleFilter = {
   eventTypes: ScheduleEventTypes;
   eventFormats: ScheduleEventFormats;
   excludedCourses: string[];
+  ical?: {
+    combineAdjacentPairs?: boolean;
+  };
 };
 
 export type ScheduleItem = {

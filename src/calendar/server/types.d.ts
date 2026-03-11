@@ -20,6 +20,9 @@ export type ScheduleFilter = {
     offline: boolean;
   };
   excludedCourses: string[];
+  ical?: {
+    combineAdjacentPairs?: boolean;
+  };
 };
 
 type GroupSchedule = GroupScheduleItem[];

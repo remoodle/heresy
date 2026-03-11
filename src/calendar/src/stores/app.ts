@@ -45,6 +45,13 @@ export const useAppStore = defineStore("app", () => {
           offline: true,
         },
         excludedCourses: [],
+        ical: {
+          combineAdjacentPairs: false,
+        },
+      };
+    } else if (group.value) {
+      filters.value[group.value]!.ical ??= {
+        combineAdjacentPairs: false,
       };
     }
   });
