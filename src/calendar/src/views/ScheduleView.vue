@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/vue";
 import { storeToRefs } from "pinia";
 import { watchEffect } from "vue";
+import { useRouter } from "vue-router";
 import AuthDialog from "@/components/AuthDialog.vue";
 import ExportToIcal from "@/components/ExportToIcal.vue";
 import GroupSelect from "@/components/GroupSelect.vue";
@@ -27,6 +28,7 @@ import { authClient } from "@/lib/auth-client";
 import { useAppStore } from "@/stores/app";
 
 const appStore = useAppStore();
+const router = useRouter();
 const { group, filters } = storeToRefs(appStore);
 
 const { groupSchedule, allGroups, groupCourses } = useSchedule(
@@ -59,6 +61,12 @@ function isCourseIncluded(course: string): boolean {
     !!filters.value[group.value] &&
     !filters.value[group.value]!.excludedCourses.includes(course)
   );
+}
+
+async function signOut() {
+  await authClient.signOut();
+  clearSession();
+  await router.replace("/");
 }
 </script>
 
@@ -220,7 +228,7 @@ function isCourseIncluded(course: string): boolean {
               variant="ghost"
               size="sm"
               class="text-muted-foreground"
-              @click="authClient.signOut().then(clearSession)"
+              @click="signOut"
             >
               Sign out
             </Button>
