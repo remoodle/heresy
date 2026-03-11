@@ -20,6 +20,18 @@ export function createAuth(env: Ctx) {
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     basePath: "/api/auth",
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            if (!user.email?.endsWith("@astanait.edu.kz")) {
+              throw new Error("Only @astanait.edu.kz accounts are allowed");
+            }
+            return { data: user };
+          },
+        },
+      },
+    },
     socialProviders: {
       github: {
         clientId: env.GITHUB_CLIENT_ID,
@@ -28,6 +40,7 @@ export function createAuth(env: Ctx) {
       microsoft: {
         clientId: env.MICROSOFT_CLIENT_ID,
         clientSecret: env.MICROSOFT_CLIENT_SECRET,
+        tenantId: "common",
       },
     },
   });
