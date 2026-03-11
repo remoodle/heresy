@@ -9,7 +9,7 @@ onMounted(async () => {
   } catch {
     // ignore — session may still be set
   }
-  window.location.replace("/");
+  window.location.replace("/schedule");
 });
 </script>
 

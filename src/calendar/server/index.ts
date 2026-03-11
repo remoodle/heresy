@@ -41,6 +41,11 @@ function applyFilters(items: ScheduleData[string], f: ScheduleFilter) {
 
 const route = app
   .get("/api/groups", async (c) => {
+    const session = await getSession(c.env, c.req.raw.headers);
+    if (!session) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
     const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
     const group = c.req.query("group");
 

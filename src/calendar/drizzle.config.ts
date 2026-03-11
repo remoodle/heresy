@@ -25,6 +25,7 @@ const getCredentials = () => {
     }
   }
 
+  // return prod;
   return isProd() ? prod : dev
 }
 

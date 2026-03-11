@@ -1,11 +1,17 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import type { Ctx } from "./ctx";
 import { createDb } from "./db";
 import * as schema from "./db/schema";
 
-export function createAuth(env: Ctx) {
+export function createAuth(env: Env) {
   const db = createDb(env.DB);
+  const microsoftProvider = {
+    clientId: env.MICROSOFT_CLIENT_ID,
+    tenantId: "common",
+    ...(env.MICROSOFT_CLIENT_SECRET
+      ? { clientSecret: env.MICROSOFT_CLIENT_SECRET }
+      : {}),
+  };
 
   return betterAuth({
     database: drizzleAdapter(db, {
@@ -37,11 +43,7 @@ export function createAuth(env: Ctx) {
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET,
       },
-      microsoft: {
-        clientId: env.MICROSOFT_CLIENT_ID,
-        clientSecret: env.MICROSOFT_CLIENT_SECRET,
-        tenantId: "common",
-      },
+      microsoft: microsoftProvider,
     },
   });
 }
