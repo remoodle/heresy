@@ -31,7 +31,7 @@
     },
   ],
   "vars": {
-    "BETTER_AUTH_URL": "https://calendar.<your-domain>.workers.dev",
+    "BETTER_AUTH_URL": "https://calendar.remoodle.app",
   },
   /**
    * Smart Placement
