@@ -83,6 +83,18 @@ watch(
   { immediate: true },
 );
 
+watch(combineAdjacentPairs, (value, previous) => {
+  if (value === previous) return;
+  if (!tokenData.value?.url || !effectiveFilters.value || updatingFilters.value) {
+    return;
+  }
+
+  updateFilters({
+    group: props.group,
+    filters: effectiveFilters.value,
+  });
+});
+
 async function copyUrl() {
   if (!tokenData.value?.url) return;
   await navigator.clipboard.writeText(tokenData.value.url);

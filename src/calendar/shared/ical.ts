@@ -176,6 +176,16 @@ function createCalendarHeader(prodId: string, name: string) {
     "METHOD:PUBLISH",
     `X-WR-CALNAME:${escapeText(name)}`,
     `X-WR-TIMEZONE:${CALENDAR_TIME_ZONE}`,
+    "BEGIN:VTIMEZONE",
+    `TZID:${CALENDAR_TIME_ZONE}`,
+    `X-LIC-LOCATION:${CALENDAR_TIME_ZONE}`,
+    "BEGIN:STANDARD",
+    "TZOFFSETFROM:+0500",
+    "TZOFFSETTO:+0500",
+    "TZNAME:+05",
+    "DTSTART:19700101T000000",
+    "END:STANDARD",
+    "END:VTIMEZONE",
   ];
 }
 
