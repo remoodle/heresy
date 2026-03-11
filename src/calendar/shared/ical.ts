@@ -503,6 +503,7 @@ export function generateScheduleIcal(
 
 export function generateCalendarEventsIcal(
   events: IcalCalendarEvent[],
+  rangeStart: Date,
   endDate: Date,
 ) {
   const lines = createCalendarHeader(
@@ -511,19 +512,20 @@ export function generateCalendarEventsIcal(
   );
 
   for (const event of events) {
-    const startDate = parseCalendarEventDateTime(event.start);
+    const eventStart = parseCalendarEventDateTime(event.start);
     const parsedEnd = event.end ? parseCalendarEventDateTime(event.end) : null;
     const end =
       parsedEnd && !Number.isNaN(parsedEnd.getTime())
         ? parsedEnd
-        : new Date(startDate.getTime() + 50 * 60 * 1000);
-    const durationMs = Math.max(end.getTime() - startDate.getTime(), 60_000);
+        : new Date(eventStart.getTime() + 50 * 60 * 1000);
+    const durationMs = Math.max(end.getTime() - eventStart.getTime(), 60_000);
+    const current = new Date(eventStart);
 
-    for (
-      let current = new Date(startDate);
-      current <= endDate;
-      current.setDate(current.getDate() + 7)
-    ) {
+    while (current < rangeStart) {
+      current.setDate(current.getDate() + 7);
+    }
+
+    for (; current <= endDate; current.setDate(current.getDate() + 7)) {
       const currentEnd = new Date(current.getTime() + durationMs);
       lines.push(
         ...createCalendarEventLines({

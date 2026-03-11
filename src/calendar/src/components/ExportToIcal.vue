@@ -4,6 +4,7 @@ import {
   type DateValue,
   DateFormatter,
   getLocalTimeZone,
+  parseDate,
   today,
 } from "@internationalized/date";
 import { CalendarIcon, Download } from "lucide-vue-next";
@@ -56,6 +57,7 @@ const props = defineProps<{
   events: CalendarEvent[];
 }>();
 
+const startValue = ref(today(getLocalTimeZone())) as Ref<DateValue>;
 const value = ref(
   today(getLocalTimeZone()).add({ days: 14 }),
 ) as Ref<DateValue>;
@@ -74,6 +76,10 @@ const combineAdjacentPairs = ref(false);
 
 const busy = computed(() => generating.value || updatingFilters.value);
 
+function toStoredDate(value: DateValue) {
+  return value.toString();
+}
+
 const effectiveFilters = computed<ScheduleFilter | undefined>(() => {
   if (!props.filters) return undefined;
 
@@ -82,45 +88,75 @@ const effectiveFilters = computed<ScheduleFilter | undefined>(() => {
     ical: {
       ...props.filters.ical,
       combineAdjacentPairs: combineAdjacentPairs.value,
+      startDate: toStoredDate(startValue.value),
+      endDate: toStoredDate(value.value),
     },
   };
 });
 
 watch(
-  () => tokenData.value?.filters?.ical?.combineAdjacentPairs,
-  (value) => {
-    if (value !== undefined) {
-      combineAdjacentPairs.value = value;
+  () => tokenData.value?.filters?.ical,
+  (ical) => {
+    if (!ical) return;
+
+    if (ical.combineAdjacentPairs !== undefined) {
+      combineAdjacentPairs.value = ical.combineAdjacentPairs;
+    }
+
+    if (ical.startDate) {
+      startValue.value = parseDate(ical.startDate);
+    }
+
+    if (ical.endDate) {
+      value.value = parseDate(ical.endDate);
     }
   },
   { immediate: true },
 );
 
 watch(
-  () => props.filters?.ical?.combineAdjacentPairs,
-  (value) => {
-    if (tokenData.value?.filters?.ical?.combineAdjacentPairs === undefined) {
-      combineAdjacentPairs.value = value ?? false;
+  () => props.filters?.ical,
+  (ical) => {
+    if (tokenData.value?.filters?.ical) return;
+
+    combineAdjacentPairs.value = ical?.combineAdjacentPairs ?? false;
+
+    if (ical?.startDate) {
+      startValue.value = parseDate(ical.startDate);
+    }
+
+    if (ical?.endDate) {
+      value.value = parseDate(ical.endDate);
     }
   },
   { immediate: true },
 );
 
-watch(combineAdjacentPairs, (value, previous) => {
-  if (value === previous) return;
-  if (
-    !tokenData.value?.url ||
-    !effectiveFilters.value ||
-    updatingFilters.value
-  ) {
-    return;
-  }
+watch(
+  [combineAdjacentPairs, startValue, value],
+  ([nextCombine, nextStart, nextEnd], [prevCombine, prevStart, prevEnd]) => {
+    if (
+      nextCombine === prevCombine &&
+      toStoredDate(nextStart) === toStoredDate(prevStart) &&
+      toStoredDate(nextEnd) === toStoredDate(prevEnd)
+    ) {
+      return;
+    }
 
-  updateFilters({
-    group: props.group,
-    filters: effectiveFilters.value,
-  });
-});
+    if (
+      !tokenData.value?.url ||
+      !effectiveFilters.value ||
+      updatingFilters.value
+    ) {
+      return;
+    }
+
+    updateFilters({
+      group: props.group,
+      filters: effectiveFilters.value,
+    });
+  },
+);
 
 async function copyUrl() {
   if (!tokenData.value?.url) return;
@@ -143,6 +179,7 @@ const df = new DateFormatter("en-US", {
 });
 
 const getIcsString = () => {
+  const start = startValue.value.toDate(getLocalTimeZone());
   const end = value.value.toDate(getLocalTimeZone());
   const sourceEvents = combineAdjacentPairs.value
     ? mergeAdjacentCalendarEvents(props.events)
@@ -167,6 +204,7 @@ const getIcsString = () => {
         end: event.end,
         location: "Astana IT University",
       })),
+    start,
     end,
   );
 };
@@ -196,8 +234,8 @@ const getICalFile = (): void => {
         >
         <DialogDescription class="text-ms text-left">
           Make changes to your calendar using <strong>filters</strong> and
-          choose <strong>end date</strong> for events.
-          <strong>Start date</strong> is set for today.
+          choose <strong>end date</strong> for events. Choose the date range for
+          exported events.
         </DialogDescription>
       </DialogHeader>
 
@@ -246,6 +284,28 @@ const getICalFile = (): void => {
             >
           </div>
         </div>
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <span class="text-sm font-medium">Start Date</span>
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button
+              variant="outline"
+              class="w-full justify-start text-left font-normal"
+            >
+              <CalendarIcon class="mr-2 h-4 w-4" />
+              {{
+                startValue
+                  ? df.format(startValue.toDate(getLocalTimeZone()))
+                  : "Pick a start date"
+              }}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-auto p-0">
+            <Calendar v-model="startValue" initial-focus />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div class="flex flex-col gap-1.5">

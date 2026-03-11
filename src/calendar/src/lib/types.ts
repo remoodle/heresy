@@ -15,6 +15,8 @@ export type ScheduleFilter = {
   excludedCourses: string[];
   ical?: {
     combineAdjacentPairs?: boolean;
+    startDate?: string;
+    endDate?: string;
   };
 };
 
