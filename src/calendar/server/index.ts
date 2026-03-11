@@ -140,7 +140,12 @@ const route = app
     }
 
     const url = `${c.env.BETTER_AUTH_URL}/api/ical/${tokenRow.token}`;
-    return c.json({ token: tokenRow.token, group: tokenRow.group, url });
+    return c.json({
+      token: tokenRow.token,
+      group: tokenRow.group,
+      url,
+      filters: tokenRow.filters ?? null,
+    });
   })
   .post("/api/user/ical-token", async (c) => {
     const session = await getSession(c.env, c.req.raw.headers);

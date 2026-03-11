@@ -7,6 +7,7 @@ export type IcalTokenResponse = {
   token: string;
   group: string;
   url: string;
+  filters: ScheduleFilter | null;
 } | null;
 
 export const icalTokenQueryKey = (group: string) => ["ical-token", group];

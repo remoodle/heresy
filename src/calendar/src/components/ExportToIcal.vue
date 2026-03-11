@@ -76,9 +76,21 @@ const effectiveFilters = computed<ScheduleFilter | undefined>(() => {
 });
 
 watch(
+  () => tokenData.value?.filters?.ical?.combineAdjacentPairs,
+  (value) => {
+    if (value !== undefined) {
+      combineAdjacentPairs.value = value;
+    }
+  },
+  { immediate: true },
+);
+
+watch(
   () => props.filters?.ical?.combineAdjacentPairs,
   (value) => {
-    combineAdjacentPairs.value = value ?? false;
+    if (tokenData.value?.filters?.ical?.combineAdjacentPairs === undefined) {
+      combineAdjacentPairs.value = value ?? false;
+    }
   },
   { immediate: true },
 );
@@ -237,7 +249,7 @@ const getICalFile = (): void => {
       <label
         class="flex cursor-pointer items-start gap-3 rounded-xl border p-4"
       >
-        <Checkbox v-model:checked="combineAdjacentPairs" class="mt-0.5" />
+        <Checkbox v-model="combineAdjacentPairs" class="mt-0.5" />
         <div class="space-y-1">
           <p class="text-sm leading-none font-medium">Combine adjacent pairs</p>
           <p class="text-xs text-muted-foreground">
