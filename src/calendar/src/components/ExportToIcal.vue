@@ -8,6 +8,17 @@ import {
 } from "@internationalized/date";
 import { CalendarIcon, Download } from "lucide-vue-next";
 import { ref, computed, watch, type Ref } from "vue";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -116,6 +127,15 @@ async function copyUrl() {
   await navigator.clipboard.writeText(tokenData.value.url);
   copied.value = true;
   setTimeout(() => (copied.value = false), 2000);
+}
+
+function regenerateUrl() {
+  if (!effectiveFilters.value) return;
+
+  generate({
+    group: props.group,
+    filters: effectiveFilters.value,
+  });
 }
 
 const df = new DateFormatter("en-US", {
@@ -298,18 +318,47 @@ const getICalFile = (): void => {
               </Button>
             </div>
             <div class="flex items-center justify-between">
-              <p class="text-xs text-muted-foreground">
-                Sync your current filters to this URL.
-              </p>
-              <Button
-                variant="ghost"
-                size="sm"
-                class="shrink-0 text-muted-foreground"
-                :disabled="busy || !effectiveFilters"
-                @click="updateFilters({ group, filters: effectiveFilters! })"
-              >
-                Update filters
-              </Button>
+              <div class="flex items-center gap-2">
+                <AlertDialog>
+                  <AlertDialogTrigger as-child>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="shrink-0 text-muted-foreground"
+                      :disabled="busy || !effectiveFilters"
+                    >
+                      Regenerate URL
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle
+                        >Regenerate subscription URL?</AlertDialogTitle
+                      >
+                      <AlertDialogDescription>
+                        This will create a new subscription link for this group.
+                        Re-add the new URL in Google Calendar if you are
+                        replacing an old cached subscription.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction @click="regenerateUrl">
+                        Regenerate
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="shrink-0 text-muted-foreground"
+                  :disabled="busy || !effectiveFilters"
+                  @click="updateFilters({ group, filters: effectiveFilters! })"
+                >
+                  Update filters
+                </Button>
+              </div>
             </div>
           </template>
           <template v-else>
