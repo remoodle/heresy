@@ -7,7 +7,7 @@ import {
   today,
 } from "@internationalized/date";
 import { CalendarIcon, Download } from "lucide-vue-next";
-import { ref, type Ref } from "vue";
+import { ref, computed, type Ref } from "vue";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -25,6 +25,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  useIcalTokenQuery,
+  useUpsertIcalToken,
+  useUpdateIcalFilters,
+} from "@/lib/api/ical";
+import { useSessionQuery } from "@/lib/api/session";
 import { dayjs, type Dayjs } from "@/lib/dayjs";
 import type { ScheduleFilter } from "@/lib/types";
 
@@ -40,6 +46,24 @@ const value = ref(
 
 const open = ref<boolean>(false);
 
+const { data: session } = useSessionQuery();
+const { data: tokenData, isPending: tokenPending } = useIcalTokenQuery(
+  () => props.group,
+);
+const { mutate: generate, isPending: generating } = useUpsertIcalToken();
+const { mutate: updateFilters, isPending: updatingFilters } =
+  useUpdateIcalFilters();
+const copied = ref(false);
+
+const busy = computed(() => generating.value || updatingFilters.value);
+
+async function copyUrl() {
+  if (!tokenData.value?.url) return;
+  await navigator.clipboard.writeText(tokenData.value.url);
+  copied.value = true;
+  setTimeout(() => (copied.value = false), 2000);
+}
+
 const df = new DateFormatter("en-US", {
   dateStyle: "long",
 });
@@ -53,7 +77,6 @@ const escapeText = (text: string) => {
 };
 
 const parseDate = (dateString: string) => {
-  // e.g. 2025-09-04 21:00
   const [datePart, timePart] = dateString.split(" ");
 
   if (!datePart || !timePart) {
@@ -193,28 +216,91 @@ const getICalFile = (): void => {
         </div>
       </div>
 
-      <div class="">
-        <div class="flex gap-2">
-          <Popover>
-            <PopoverTrigger as-child>
+      <div class="flex flex-col gap-1.5">
+        <span class="text-sm font-medium">End Date</span>
+        <Popover>
+          <PopoverTrigger as-child>
+            <Button
+              variant="outline"
+              class="w-full justify-start text-left font-normal"
+            >
+              <CalendarIcon class="mr-2 h-4 w-4" />
+              {{
+                value
+                  ? df.format(value.toDate(getLocalTimeZone()))
+                  : "Pick an end date"
+              }}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent class="w-auto p-0">
+            <Calendar v-model="value" initial-focus />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      <template v-if="session?.data">
+        <div class="flex flex-col gap-3 rounded-xl border p-4">
+          <div>
+            <p class="text-sm font-medium">iCal Subscription</p>
+            <p class="mt-0.5 text-xs text-muted-foreground">
+              Paste this URL into Google Calendar, Apple Calendar, or any app
+              that supports calendar subscriptions.
+            </p>
+          </div>
+
+          <template v-if="tokenPending || busy">
+            <div
+              class="flex h-8 items-center justify-center rounded-md border border-input bg-muted"
+            >
+              <span class="text-xs text-muted-foreground">Loading...</span>
+            </div>
+          </template>
+          <template v-else-if="tokenData?.url">
+            <div class="flex gap-2">
+              <input
+                :value="tokenData.url"
+                readonly
+                class="flex h-8 min-w-0 flex-1 rounded-md border border-input bg-muted px-3 py-2 text-xs text-muted-foreground ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none"
+                @click="($event.target as HTMLInputElement).select()"
+              />
               <Button
                 variant="outline"
-                class="w-full justify-start text-left font-normal"
+                size="sm"
+                class="shrink-0"
+                @click="copyUrl"
               >
-                <CalendarIcon class="mr-2 h-4 w-4" />
-                {{
-                  value
-                    ? df.format(value.toDate(getLocalTimeZone()))
-                    : "Pick an end date"
-                }}
+                {{ copied ? "Copied!" : "Copy" }}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent class="w-auto p-0">
-              <Calendar v-model="value" initial-focus />
-            </PopoverContent>
-          </Popover>
+            </div>
+            <div class="flex items-center justify-between">
+              <p class="text-xs text-muted-foreground">
+                Sync your current filters to this URL.
+              </p>
+              <Button
+                variant="ghost"
+                size="sm"
+                class="shrink-0 text-muted-foreground"
+                :disabled="busy"
+                @click="updateFilters({ group, filters: filters! })"
+              >
+                Update filters
+              </Button>
+            </div>
+          </template>
+          <template v-else>
+            <Button
+              variant="outline"
+              :disabled="busy"
+              @click="generate({ group, filters: filters! })"
+            >
+              Generate link
+            </Button>
+            <p class="text-xs text-muted-foreground">
+              Generates a subscription URL with your current filters.
+            </p>
+          </template>
         </div>
-      </div>
+      </template>
 
       <DialogFooter>
         <Button @click="getICalFile" type="submit" class="gap-2">

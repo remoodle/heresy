@@ -16,7 +16,12 @@
     "format": "oxfmt --write src/ server/",
     "deploy": "pnpm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "sync-dev": "jiti scripts/sync-dev.ts"
+    "sync-dev": "jiti scripts/sync-dev.ts",
+    "db:generate": "drizzle-kit generate ",
+    "db:migrate:local": "drizzle-kit migrate ",
+    "db:migrate": "DRIZZLE_ENV=remote drizzle-kit migrate ",
+    "db:studio": "drizzle-kit studio ",
+    "db:studio:remote": "DRIZZLE_ENV=remote drizzle-kit studio "
   },
   "dependencies": {
     "@iconify/vue": "^5.0.0",
@@ -36,9 +41,11 @@
     "@tanstack/query-persist-client-core": "^5.91.4",
     "@tanstack/vue-query": "^5.90.5",
     "@vueuse/core": "^13.7.0",
+    "better-auth": "^1.5.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
+    "drizzle-orm": "^0.45.1",
     "hono": "^4.12.5",
     "lucide-vue-next": "^0.540.0",
     "pinia": "^3.0.3",
@@ -52,13 +59,18 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.26.1",
+    "@nerdfolio/drizzle-d1-helpers": "^0.1.5",
     "@tailwindcss/typography": "^0.5.16",
     "@tsconfig/node24": "^24.0.4",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.17.2",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/tsconfig": "^0.8.1",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9.33.0",
     "eslint-plugin-oxlint": "^1.12.0",
     "eslint-plugin-vue": "^10.4.0",
@@ -72,5 +84,10 @@
     "vue-tsc": "^3.0.6",
     "wrangler": "^4.71.0"
   },
-  "packageManager": "pnpm@10.15.0"
+  "packageManager": "pnpm@10.15.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
+  }
 }

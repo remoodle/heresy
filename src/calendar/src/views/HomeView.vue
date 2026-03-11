@@ -2,9 +2,11 @@
 import { Icon } from "@iconify/vue";
 import { storeToRefs } from "pinia";
 import { watchEffect } from "vue";
+import AuthDialog from "@/components/AuthDialog.vue";
 import ExportToIcal from "@/components/ExportToIcal.vue";
 import GroupSelect from "@/components/GroupSelect.vue";
 import Schedule from "@/components/Schedule.vue";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -15,20 +17,25 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarProvider,
+  SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useSchedule } from "@/composables/use-schedule";
+import { useSessionQuery, useClearSession } from "@/lib/api/session";
+import { authClient } from "@/lib/auth-client";
 import { useAppStore } from "@/stores/app";
 
 const appStore = useAppStore();
-
 const { group, filters } = storeToRefs(appStore);
 
 const { groupSchedule, allGroups, groupCourses } = useSchedule(
   () => group.value,
   () => filters.value,
 );
+
+const { data: session } = useSessionQuery();
+const clearSession = useClearSession();
 
 watchEffect(() => {
   if (allGroups.value && !allGroups.value.includes(group.value)) {
@@ -199,6 +206,24 @@ function isCourseIncluded(course: string): boolean {
               :group="group"
               :filters="filters[group]"
             />
+          </template>
+
+          <template v-if="!session?.data">
+            <AuthDialog>
+              <Button variant="ghost" size="sm" class="text-muted-foreground"
+                >Sign in</Button
+              >
+            </AuthDialog>
+          </template>
+          <template v-else>
+            <Button
+              variant="ghost"
+              size="sm"
+              class="text-muted-foreground"
+              @click="authClient.signOut().then(clearSession)"
+            >
+              Sign out
+            </Button>
           </template>
         </div>
       </header>

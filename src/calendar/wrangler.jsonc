@@ -6,9 +6,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "calendar",
   "compatibility_date": "2025-09-06",
+  "compatibility_flags": ["nodejs_compat"],
   "main": "server/index.ts",
   "assets": {
     "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
   },
   "observability": {
     "enabled": true,
@@ -21,6 +23,16 @@
       "preview_bucket_name": "schedule-preview",
     },
   ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "calendar-auth",
+      "database_id": "010b4586-f9d0-4654-9b0f-8b6007dda541",
+    },
+  ],
+  "vars": {
+    "BETTER_AUTH_URL": "https://calendar.<your-domain>.workers.dev",
+  },
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

@@ -9,6 +9,19 @@ type GroupScheduleItem = {
   type: "lecture" | "practice";
 };
 
+export type ScheduleFilter = {
+  eventTypes: {
+    lecture: boolean;
+    practice: boolean;
+    learn: boolean;
+  };
+  eventFormats: {
+    online: boolean;
+    offline: boolean;
+  };
+  excludedCourses: string[];
+};
+
 type GroupSchedule = GroupScheduleItem[];
 
 export type ScheduleData = {
