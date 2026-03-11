@@ -97,7 +97,11 @@ watch(
 
 watch(combineAdjacentPairs, (value, previous) => {
   if (value === previous) return;
-  if (!tokenData.value?.url || !effectiveFilters.value || updatingFilters.value) {
+  if (
+    !tokenData.value?.url ||
+    !effectiveFilters.value ||
+    updatingFilters.value
+  ) {
     return;
   }
 
