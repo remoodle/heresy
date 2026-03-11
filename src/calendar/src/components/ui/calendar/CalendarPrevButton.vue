@@ -4,10 +4,12 @@ import type { HTMLAttributes } from "vue";
 import { reactiveOmit } from "@vueuse/core";
 import { ChevronLeft } from "lucide-vue-next";
 import { CalendarPrev, useForwardProps } from "reka-ui";
-import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-const props = defineProps<CalendarPrevProps & { class?: HTMLAttributes["class"] }>();
+const props = defineProps<
+  CalendarPrevProps & { class?: HTMLAttributes["class"] }
+>();
 
 const delegatedProps = reactiveOmit(props, "class");
 

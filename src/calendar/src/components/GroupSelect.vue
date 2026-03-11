@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { ChevronsUpDown } from "lucide-vue-next";
+import { ref } from "vue";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -10,7 +10,11 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 defineProps<{
   allGroups: string[];
@@ -28,7 +32,7 @@ const open = ref(false);
         variant="outline"
         role="combobox"
         :aria-expanded="open"
-        class="min-w-full sm:min-w-48 justify-between"
+        class="min-w-full justify-between sm:min-w-48"
       >
         {{ allGroups.includes(group) ? group : "Select group" }}
         <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />

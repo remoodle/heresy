@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { ref, type Ref } from "vue";
 import type { CalendarEvent } from "@schedule-x/calendar";
-import { type DateValue, DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
-import { CalendarIcon } from "lucide-vue-next";
+import {
+  type DateValue,
+  DateFormatter,
+  getLocalTimeZone,
+  today,
+} from "@internationalized/date";
+import { CalendarIcon, Download } from "lucide-vue-next";
+import { ref, type Ref } from "vue";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -14,10 +20,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import type { ScheduleFilter } from "@/lib/types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { dayjs, type Dayjs } from "@/lib/dayjs";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import type { ScheduleFilter } from "@/lib/types";
 
 const props = defineProps<{
   group: string;
@@ -25,7 +34,9 @@ const props = defineProps<{
   events: CalendarEvent[];
 }>();
 
-const value = ref(today(getLocalTimeZone()).add({ days: 14 })) as Ref<DateValue>;
+const value = ref(
+  today(getLocalTimeZone()).add({ days: 14 }),
+) as Ref<DateValue>;
 
 const open = ref<boolean>(false);
 
@@ -64,7 +75,11 @@ const formatDate = (date: Dayjs): string => {
 };
 
 const getIcsString = () => {
-  const icalContent = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//ReMoodle//Calendar Export//EN"];
+  const icalContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//ReMoodle//Calendar Export//EN",
+  ];
 
   const end = dayjs(value.value.toDate(getLocalTimeZone()));
 
@@ -77,7 +92,11 @@ const getIcsString = () => {
       const startDate = parseDate(event.start);
       const endDate = end;
 
-      for (let current = dayjs(startDate); current <= endDate; current = current.add(7, "day")) {
+      for (
+        let current = dayjs(startDate);
+        current <= endDate;
+        current = current.add(7, "day")
+      ) {
         icalContent.push(
           `BEGIN:VEVENT`,
           `UID:${event.id}-${current.toISOString()}`,
@@ -113,14 +132,17 @@ const getICalFile = (): void => {
 <template>
   <Dialog v-model:open="open" @update:open="open = $event">
     <DialogTrigger as-child>
-      <Button class="flex-1"> Export to .ics file</Button>
+      <Button size="sm" variant="outline">Export</Button>
     </DialogTrigger>
-    <DialogContent class="rounded-2xl max-w-80 md:max-w-sm">
+    <DialogContent class="max-w-sm rounded-2xl">
       <DialogHeader>
-        <DialogTitle class="text-2xl font-bold text-left">Create iCalendar file</DialogTitle>
-        <DialogDescription class="text-left text-ms">
-          Make changes to your calendar using <strong>filters</strong> and choose
-          <strong>end date</strong> for events. <strong>Start date</strong> is set for today.
+        <DialogTitle class="text-left text-2xl font-bold"
+          >Create iCalendar file</DialogTitle
+        >
+        <DialogDescription class="text-ms text-left">
+          Make changes to your calendar using <strong>filters</strong> and
+          choose <strong>end date</strong> for events.
+          <strong>Start date</strong> is set for today.
         </DialogDescription>
       </DialogHeader>
 
@@ -130,43 +152,43 @@ const getICalFile = (): void => {
         </h1>
       </div>
 
-      <div class="rounded-xl border p-4">
-        <div class="">
-          <div class="">Event Types</div>
-          <div class="my-2 flex select-none gap-1">
-            <span v-for="(enabled, type) in filters?.eventTypes" :key="type">
-              <Badge :variant="enabled ? 'default' : 'destructive'">
-                {{ type }}
-              </Badge>
-            </span>
+      <div class="flex flex-col gap-3 rounded-xl border p-4">
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm font-medium">Event Types</span>
+          <div class="flex flex-wrap gap-1 select-none">
+            <Badge
+              v-for="(enabled, type) in filters?.eventTypes"
+              :key="type"
+              :variant="enabled ? 'default' : 'destructive'"
+              >{{ type }}</Badge
+            >
           </div>
         </div>
 
-        <hr class="my-2" />
-
-        <div class="">
-          <div class="">Event Formats:</div>
-          <div class="my-2 flex select-none gap-1">
-            <span v-for="(enabled, format) in filters?.eventFormats" :key="format">
-              <Badge :variant="enabled ? 'default' : 'destructive'">
-                {{ format }}
-              </Badge>
-            </span>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm font-medium">Event Formats</span>
+          <div class="flex flex-wrap gap-1 select-none">
+            <Badge
+              v-for="(enabled, format) in filters?.eventFormats"
+              :key="format"
+              :variant="enabled ? 'default' : 'destructive'"
+              >{{ format }}</Badge
+            >
           </div>
         </div>
 
-        <div v-if="filters?.excludedCourses?.length && filters?.excludedCourses.length > 0">
-          <hr class="my-2" />
-
-          <div class="">
-            <div class="">Excluded Courses:</div>
-            <div class="my-2 flex select-none flex-wrap gap-1">
-              <span v-for="course in filters?.excludedCourses" :key="course">
-                <Badge variant="destructive">
-                  {{ course }}
-                </Badge>
-              </span>
-            </div>
+        <div
+          v-if="filters?.excludedCourses?.length"
+          class="flex flex-col gap-1.5"
+        >
+          <span class="text-sm font-medium">Excluded Courses</span>
+          <div class="flex flex-wrap gap-1 select-none">
+            <Badge
+              v-for="course in filters?.excludedCourses"
+              :key="course"
+              variant="destructive"
+              >{{ course }}</Badge
+            >
           </div>
         </div>
       </div>
@@ -175,9 +197,16 @@ const getICalFile = (): void => {
         <div class="flex gap-2">
           <Popover>
             <PopoverTrigger as-child>
-              <Button variant="outline" class="w-[280px] justify-start text-left font-normal">
+              <Button
+                variant="outline"
+                class="w-full justify-start text-left font-normal"
+              >
                 <CalendarIcon class="mr-2 h-4 w-4" />
-                {{ value ? df.format(value.toDate(getLocalTimeZone())) : "Pick an end date" }}
+                {{
+                  value
+                    ? df.format(value.toDate(getLocalTimeZone()))
+                    : "Pick an end date"
+                }}
               </Button>
             </PopoverTrigger>
             <PopoverContent class="w-auto p-0">
@@ -188,7 +217,10 @@ const getICalFile = (): void => {
       </div>
 
       <DialogFooter>
-        <Button @click="getICalFile" type="submit"> Download </Button>
+        <Button @click="getICalFile" type="submit" class="gap-2">
+          <Download class="h-4 w-4" />
+          Download .ics
+        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

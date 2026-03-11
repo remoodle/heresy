@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAppStore } from "@/stores/app";
-import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-vue-next";
+import { Button } from "@/components/ui/button";
+import { useAppStore } from "@/stores/app";
 
 const appStore = useAppStore();
 
@@ -12,9 +12,15 @@ const toggleTheme = () => {
 
 <template>
   <slot :toggle-theme="toggleTheme" :theme="appStore.theme">
-    <Button variant="secondary" size="icon" @click="toggleTheme" style="cursor: pointer">
-      <Sun v-if="appStore.theme === 'light'" class="h-6 w-6" />
-      <Moon v-else class="h-6 w-6" />
+    <Button
+      variant="outline"
+      size="icon"
+      class="h-7 w-7"
+      @click="toggleTheme"
+      style="cursor: pointer"
+    >
+      <Sun v-if="appStore.theme === 'light'" class="h-4 w-4" />
+      <Moon v-else class="h-4 w-4" />
     </Button>
   </slot>
 </template>

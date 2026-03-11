@@ -18,7 +18,9 @@ export const useGroupsQuery = () =>
     queryFn: getGroups,
   });
 
-export const getGroupSchedule = async (group: string): Promise<ScheduleItem[]> => {
+export const getGroupSchedule = async (
+  group: string,
+): Promise<ScheduleItem[]> => {
   const res = await client.api.groups.$get({ query: { group } });
 
   if (!res.ok) {

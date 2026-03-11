@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { Icon } from "@iconify/vue";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 </script>
 
 <template>
@@ -11,7 +11,7 @@ import { Icon } from "@iconify/vue";
           <div class="flex items-center gap-3">
             <div class="flex flex-col items-center justify-center gap-0.5">
               <ThemeSwitcher class="flex-none" />
-              <span class="text-muted-foreground text-xs"> theme </span>
+              <span class="text-xs text-muted-foreground"> theme </span>
             </div>
             <div class="flex flex-col items-center justify-center gap-0.5">
               <a
@@ -20,7 +20,7 @@ import { Icon } from "@iconify/vue";
               >
                 <Icon icon="mdi:telegram" class="h-6 w-6" />
               </a>
-              <span class="text-muted-foreground text-xs"> chat </span>
+              <span class="text-xs text-muted-foreground"> chat </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -30,7 +30,7 @@ import { Icon } from "@iconify/vue";
               >
                 <Icon icon="mdi:telegram" class="h-6 w-6" />
               </a>
-              <span class="text-muted-foreground text-xs"> bot </span>
+              <span class="text-xs text-muted-foreground"> bot </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -40,7 +40,7 @@ import { Icon } from "@iconify/vue";
               >
                 <Icon icon="mdi:telegram" class="h-6 w-6" />
               </a>
-              <span class="text-muted-foreground text-xs"> donate </span>
+              <span class="text-xs text-muted-foreground"> donate </span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-0.5">
@@ -50,11 +50,11 @@ import { Icon } from "@iconify/vue";
               >
                 <Icon icon="mdi:github" class="h-6 w-6" />
               </a>
-              <span class="text-muted-foreground text-xs"> ⭐ </span>
+              <span class="text-xs text-muted-foreground"> ⭐ </span>
             </div>
           </div>
         </div>
-        <span class="text-muted-foreground text-xs"> Powered by ReMoodle </span>
+        <span class="text-xs text-muted-foreground"> Powered by ReMoodle </span>
       </div>
     </div>
   </div>

@@ -18,7 +18,9 @@ import {
   CalendarPrevButton,
 } from ".";
 
-const props = defineProps<CalendarRootProps & { class?: HTMLAttributes["class"] }>();
+const props = defineProps<
+  CalendarRootProps & { class?: HTMLAttributes["class"] }
+>();
 const emits = defineEmits<CalendarRootEmits>();
 
 const delegatedProps = reactiveOmit(props, "class");
@@ -42,7 +44,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       </div>
     </CalendarHeader>
 
-    <div class="flex flex-col gap-y-4 mt-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
+    <div class="mt-4 flex flex-col gap-y-4 sm:flex-row sm:gap-x-4 sm:gap-y-0">
       <CalendarGrid v-for="month in grid" :key="month.value.toString()">
         <CalendarGridHead>
           <CalendarGridRow>
@@ -57,7 +59,11 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
             :key="`weekDate-${index}`"
             class="mt-2 w-full"
           >
-            <CalendarCell v-for="weekDate in weekDates" :key="weekDate.toString()" :date="weekDate">
+            <CalendarCell
+              v-for="weekDate in weekDates"
+              :key="weekDate.toString()"
+              :date="weekDate"
+            >
               <CalendarCellTrigger :day="weekDate" :month="month.value" />
             </CalendarCell>
           </CalendarGridRow>

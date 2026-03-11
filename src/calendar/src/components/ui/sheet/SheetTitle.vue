@@ -5,7 +5,9 @@ import { reactiveOmit } from "@vueuse/core";
 import { DialogTitle } from "reka-ui";
 import { cn } from "@/lib/utils";
 
-const props = defineProps<DialogTitleProps & { class?: HTMLAttributes["class"] }>();
+const props = defineProps<
+  DialogTitleProps & { class?: HTMLAttributes["class"] }
+>();
 
 const delegatedProps = reactiveOmit(props, "class");
 </script>
@@ -13,7 +15,7 @@ const delegatedProps = reactiveOmit(props, "class");
 <template>
   <DialogTitle
     data-slot="sheet-title"
-    :class="cn('text-foreground font-semibold', props.class)"
+    :class="cn('font-semibold text-foreground', props.class)"
     v-bind="delegatedProps"
   >
     <slot />

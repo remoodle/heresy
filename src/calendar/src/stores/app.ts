@@ -1,6 +1,6 @@
-import { computed, watchEffect } from "vue";
-import { defineStore } from "pinia";
 import { useColorMode, useLocalStorage } from "@vueuse/core";
+import { defineStore } from "pinia";
+import { computed, watchEffect } from "vue";
 import { getStorageKey } from "@/lib/helpers";
 import type { ScheduleFilter } from "@/lib/types";
 

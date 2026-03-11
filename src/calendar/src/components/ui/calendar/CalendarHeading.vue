@@ -5,7 +5,9 @@ import { reactiveOmit } from "@vueuse/core";
 import { CalendarHeading, useForwardProps } from "reka-ui";
 import { cn } from "@/lib/utils";
 
-const props = defineProps<CalendarHeadingProps & { class?: HTMLAttributes["class"] }>();
+const props = defineProps<
+  CalendarHeadingProps & { class?: HTMLAttributes["class"] }
+>();
 
 defineSlots<{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

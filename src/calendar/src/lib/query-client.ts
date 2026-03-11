@@ -1,5 +1,5 @@
-import { QueryClient } from "@tanstack/vue-query";
 import { experimental_createQueryPersister } from "@tanstack/query-persist-client-core";
+import { QueryClient } from "@tanstack/vue-query";
 
 const persister = experimental_createQueryPersister({
   storage: window.localStorage,
