@@ -15,5 +15,5 @@ export function generateIcal(
     ? mergeAdjacentScheduleItems(items)
     : items;
 
-  return generateScheduleIcal(sourceItems, now);
+  return generateScheduleIcal(sourceItems, now, { eventTimeFormat: "utc" });
 }

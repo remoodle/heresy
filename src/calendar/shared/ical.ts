@@ -20,6 +20,7 @@ export type MergeableCalendarEvent = {
 
 const SLOT_BREAK_THRESHOLD_MINUTES = 15;
 const CALENDAR_TIME_ZONE = "Asia/Almaty";
+const CALENDAR_TIME_ZONE_OFFSET_MINUTES = 5 * 60;
 const WEEKDAY_ORDER: Record<string, number> = {
   Monday: 1,
   Tuesday: 2,
@@ -103,6 +104,27 @@ function formatUtcDate(date: Date): string {
     pad(date.getUTCMinutes()) +
     "00Z"
   );
+}
+
+function formatUtcDateFromParts(
+  year: number,
+  month: number,
+  day: number,
+  hours: number,
+  minutes: number,
+): string {
+  const utcDate = new Date(
+    Date.UTC(
+      year,
+      month - 1,
+      day,
+      hours,
+      minutes - CALENDAR_TIME_ZONE_OFFSET_MINUTES,
+      0,
+      0,
+    ),
+  );
+  return formatUtcDate(utcDate);
 }
 
 function formatLocalDateTime(
@@ -189,6 +211,18 @@ function createCalendarHeader(prodId: string, name: string) {
   ];
 }
 
+function createUtcCalendarHeader(prodId: string, name: string) {
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    `PRODID:${prodId}`,
+    "CALSCALE:GREGORIAN",
+    "METHOD:PUBLISH",
+    `X-WR-CALNAME:${escapeText(name)}`,
+    `X-WR-TIMEZONE:${CALENDAR_TIME_ZONE}`,
+  ];
+}
+
 function createCalendarEventLines(input: {
   uid: string;
   summary: string;
@@ -205,6 +239,44 @@ function createCalendarEventLines(input: {
     `SUMMARY:${escapeText(input.summary)}`,
     `DTSTART;TZID=${CALENDAR_TIME_ZONE}:${input.dtstart}`,
     `DTEND;TZID=${CALENDAR_TIME_ZONE}:${input.dtend}`,
+  ];
+
+  if (input.description) {
+    lines.push(`DESCRIPTION:${escapeText(input.description)}`);
+  }
+
+  if (input.location) {
+    lines.push(`LOCATION:${escapeText(input.location)}`);
+  }
+
+  if (input.rrule) {
+    lines.push(`RRULE:${input.rrule}`);
+  }
+
+  if (input.dtstamp) {
+    lines.push(`DTSTAMP:${input.dtstamp}`);
+  }
+
+  lines.push("END:VEVENT");
+  return lines;
+}
+
+function createUtcCalendarEventLines(input: {
+  uid: string;
+  summary: string;
+  description?: string;
+  location?: string;
+  dtstart: string;
+  dtend: string;
+  dtstamp?: string;
+  rrule?: string;
+}) {
+  const lines = [
+    "BEGIN:VEVENT",
+    `UID:${escapeText(input.uid)}`,
+    `SUMMARY:${escapeText(input.summary)}`,
+    `DTSTART:${input.dtstart}`,
+    `DTEND:${input.dtend}`,
   ];
 
   if (input.description) {
@@ -341,8 +413,13 @@ export function mergeAdjacentCalendarEvents<T extends MergeableCalendarEvent>(
 export function generateScheduleIcal(
   items: IcalScheduleItem[],
   now: Date = new Date(),
+  options?: { eventTimeFormat?: "local" | "utc" },
 ) {
-  const lines = createCalendarHeader("-//Remoodle Calendar//EN", "Schedule");
+  const eventTimeFormat = options?.eventTimeFormat ?? "local";
+  const lines =
+    eventTimeFormat === "utc"
+      ? createUtcCalendarHeader("-//Remoodle Calendar//EN", "Schedule")
+      : createCalendarHeader("-//Remoodle Calendar//EN", "Schedule");
 
   for (const item of items) {
     const startParsed = parseScheduleTime(item.start);
@@ -350,26 +427,44 @@ export function generateScheduleIcal(
     const weekdayNum = WEEKDAY_ORDER[startParsed.weekday] ?? 1;
     const rruleDay = RRULE_DAY[startParsed.weekday] ?? "MO";
     const firstDay = getNextWeekdayInTimeZone(weekdayNum, now);
-    const dtstart = formatLocalDateTime(
-      firstDay.year,
-      firstDay.month,
-      firstDay.day,
-      startParsed.hours,
-      startParsed.minutes,
-    );
+    const dtstart =
+      eventTimeFormat === "utc"
+        ? formatUtcDateFromParts(
+            firstDay.year,
+            firstDay.month,
+            firstDay.day,
+            startParsed.hours,
+            startParsed.minutes,
+          )
+        : formatLocalDateTime(
+            firstDay.year,
+            firstDay.month,
+            firstDay.day,
+            startParsed.hours,
+            startParsed.minutes,
+          );
     const endDay =
       endParsed.hours < startParsed.hours ||
       (endParsed.hours === startParsed.hours &&
         endParsed.minutes <= startParsed.minutes)
         ? addDays(firstDay.year, firstDay.month, firstDay.day, 1)
         : firstDay;
-    const dtend = formatLocalDateTime(
-      endDay.year,
-      endDay.month,
-      endDay.day,
-      endParsed.hours,
-      endParsed.minutes,
-    );
+    const dtend =
+      eventTimeFormat === "utc"
+        ? formatUtcDateFromParts(
+            endDay.year,
+            endDay.month,
+            endDay.day,
+            endParsed.hours,
+            endParsed.minutes,
+          )
+        : formatLocalDateTime(
+            endDay.year,
+            endDay.month,
+            endDay.day,
+            endParsed.hours,
+            endParsed.minutes,
+          );
     const description = [
       item.teacher ? `Teacher: ${item.teacher}` : "",
       item.type ? `Type: ${item.type}` : "",
@@ -378,16 +473,27 @@ export function generateScheduleIcal(
       .join("\n");
 
     lines.push(
-      ...createCalendarEventLines({
-        uid: `${item.id}@calendar`,
-        summary: item.courseName,
-        description,
-        location: item.isOnline ? "Online" : item.location,
-        dtstart,
-        dtend,
-        dtstamp: formatUtcDate(now),
-        rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
-      }),
+      ...(eventTimeFormat === "utc"
+        ? createUtcCalendarEventLines({
+            uid: `${item.id}@calendar`,
+            summary: item.courseName,
+            description,
+            location: item.isOnline ? "Online" : item.location,
+            dtstart,
+            dtend,
+            dtstamp: formatUtcDate(now),
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+          })
+        : createCalendarEventLines({
+            uid: `${item.id}@calendar`,
+            summary: item.courseName,
+            description,
+            location: item.isOnline ? "Online" : item.location,
+            dtstart,
+            dtend,
+            dtstamp: formatUtcDate(now),
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+          })),
     );
   }
 
