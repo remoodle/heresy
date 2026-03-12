@@ -19,8 +19,8 @@
   "r2_buckets": [
     {
       "binding": "SCHEDULE_BUCKET",
-      "bucket_name": "schedule",
-      "preview_bucket_name": "schedule-preview",
+      "bucket_name": "calendar-schedule",
+      "preview_bucket_name": "calendar-schedule",
     },
   ],
   "d1_databases": [

@@ -47,4 +47,4 @@ jobs:
         run: |
           echo "Uploading parsed schedule files to R2..."
 
-          rclone sync ./output remoodle:schedule -v
+          rclone sync ./output remoodle:calendar-schedule -v
