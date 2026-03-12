@@ -4,6 +4,7 @@ import { QueryClient } from "@tanstack/vue-query";
 const persister = experimental_createQueryPersister({
   storage: window.localStorage,
   maxAge: 1000 * 60 * 60 * 12, // 12 hours
+  prefix: "re-cal-tanstack-query-",
 });
 
 const queryClient = new QueryClient({

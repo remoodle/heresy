@@ -1,1 +1,1 @@
-export const getStorageKey = (key: string) => `re-sch-${key}`;
+export const getStorageKey = (key: string) => `re-cal-${key}`;
