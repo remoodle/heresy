@@ -3,11 +3,21 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index";
 import { users } from "../../db/schema";
 import { config } from "../../config";
+import { durationToMs, humanizeDuration } from "../../library/dates";
 import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
+
+function formatThresholds(thresholds: string[]): string {
+  if (thresholds.length === 0) return "none";
+
+  return [...thresholds]
+    .sort((a, b) => durationToMs(a) - durationToMs(b))
+    .map(humanizeDuration)
+    .join(", ");
+}
 
 feature.command("start", async (ctx) => {
   const telegramId = ctx.from.id;
@@ -20,7 +30,7 @@ feature.command("start", async (ctx) => {
     await ctx.reply(
       `👋 You're already registered.\n\n` +
         `📅 Calendar URL is set.\n` +
-        `🔔 Thresholds: ${thresholds.length > 0 ? thresholds.join(", ") : "none"}\n\n` +
+        `🔔 Thresholds: ${formatThresholds(thresholds)}\n\n` +
         `Commands:\n` +
         `/deadlines — show upcoming deadlines\n` +
         `/settings — configure reminder thresholds\n` +
