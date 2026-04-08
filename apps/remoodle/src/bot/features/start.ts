@@ -11,7 +11,9 @@ export const composer = new Composer<Context>();
 const feature = composer.chatType("private");
 
 function formatThresholds(thresholds: string[]): string {
-  if (thresholds.length === 0) return "none";
+  if (thresholds.length === 0) {
+    return "none";
+  }
 
   return [...thresholds]
     .sort((a, b) => durationToMs(a) - durationToMs(b))
@@ -26,11 +28,10 @@ feature.command("start", async (ctx) => {
 
   if (existing.length > 0) {
     const user = existing[0]!;
-    const thresholds: string[] = JSON.parse(user.thresholds);
     await ctx.reply(
       `👋 You're already registered.\n\n` +
         `📅 Calendar URL is set.\n` +
-        `🔔 Thresholds: ${formatThresholds(thresholds)}\n\n` +
+        `🔔 Thresholds: ${formatThresholds(user.thresholds)}\n\n` +
         `Commands:\n` +
         `/deadlines — show upcoming deadlines\n` +
         `/settings — configure reminder thresholds\n` +
@@ -54,7 +55,9 @@ feature.command("update", async (ctx) => {
 });
 
 feature.on("message:text", async (ctx, next) => {
-  if (!ctx.session.awaitingCalendarUrl) return next();
+  if (!ctx.session.awaitingCalendarUrl) {
+    return next();
+  }
 
   const url = ctx.message.text.trim();
 
@@ -70,7 +73,7 @@ feature.on("message:text", async (ctx, next) => {
     .values({
       telegramId,
       calendarUrl: url,
-      thresholds: JSON.stringify(config.reminders.defaultThresholds),
+      thresholds: config.reminders.defaultThresholds,
     })
     .onConflictDoUpdate({
       target: users.telegramId,

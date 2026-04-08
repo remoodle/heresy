@@ -33,7 +33,9 @@ function buildThresholdsKeyboard(activeThresholds: string[]) {
 
 feature.command("settings", async (ctx) => {
   const telegramId = ctx.from?.id;
-  if (!telegramId) return;
+  if (!telegramId) {
+    return;
+  }
 
   const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
@@ -43,11 +45,10 @@ feature.command("settings", async (ctx) => {
   }
 
   const user = rows[0]!;
-  const thresholds: string[] = JSON.parse(user.thresholds);
 
-  await ctx.reply(buildThresholdsMessage(thresholds), {
+  await ctx.reply(buildThresholdsMessage(user.thresholds), {
     parse_mode: "HTML",
-    reply_markup: buildThresholdsKeyboard(thresholds),
+    reply_markup: buildThresholdsKeyboard(user.thresholds),
   });
 });
 
@@ -62,11 +63,10 @@ feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
   }
 
   const user = rows[0]!;
-  const thresholds: string[] = JSON.parse(user.thresholds);
 
-  await ctx.editMessageText(buildThresholdsMessage(thresholds), {
+  await ctx.editMessageText(buildThresholdsMessage(user.thresholds), {
     parse_mode: "HTML",
-    reply_markup: buildThresholdsKeyboard(thresholds),
+    reply_markup: buildThresholdsKeyboard(user.thresholds),
   });
 
   await ctx.answerCallbackQuery();
@@ -86,27 +86,23 @@ feature.callbackQuery(toggleThresholdCallback.filter(), async (ctx) => {
   }
 
   const user = rows[0]!;
-  const thresholds: string[] = JSON.parse(user.thresholds);
-  const isActive = thresholds.includes(threshold);
+  const isActive = user.thresholds.includes(threshold);
 
   let updated: string[];
   if (isActive) {
-    updated = thresholds.filter((t) => t !== threshold);
+    updated = user.thresholds.filter((t) => t !== threshold);
   } else {
-    if (thresholds.length >= config.reminders.maxThresholds) {
+    if (user.thresholds.length >= config.reminders.maxThresholds) {
       await ctx.answerCallbackQuery({
         text: `Maximum ${config.reminders.maxThresholds} thresholds allowed.`,
         show_alert: true,
       });
       return;
     }
-    updated = [...thresholds, threshold].sort((a, b) => durationToMs(a) - durationToMs(b));
+    updated = [...user.thresholds, threshold].sort((a, b) => durationToMs(a) - durationToMs(b));
   }
 
-  await db
-    .update(users)
-    .set({ thresholds: JSON.stringify(updated) })
-    .where(eq(users.telegramId, telegramId));
+  await db.update(users).set({ thresholds: updated }).where(eq(users.telegramId, telegramId));
 
   await ctx.editMessageText(buildThresholdsMessage(updated), {
     parse_mode: "HTML",

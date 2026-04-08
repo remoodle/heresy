@@ -12,7 +12,9 @@ const feature = composer.chatType(["private", "group", "supergroup"]);
 
 feature.command(["deadlines", "d"], async (ctx) => {
   const telegramId = ctx.from?.id;
-  if (!telegramId) return;
+  if (!telegramId) {
+    return;
+  }
 
   const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 

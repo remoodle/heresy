@@ -17,8 +17,12 @@ export const getTimeLeft = (timestampMs: number): string => {
   const seconds = String(d.seconds()).padStart(2, "0");
 
   const parts: string[] = [];
-  if (months > 0) parts.push(`${months} ${months === 1 ? "month" : "months"}`);
-  if (days > 0) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+  if (months > 0) {
+    parts.push(`${months} ${months === 1 ? "month" : "months"}`);
+  }
+  if (days > 0) {
+    parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+  }
   parts.push(`${hours}:${minutes}:${seconds}`);
 
   return parts.join(", ");

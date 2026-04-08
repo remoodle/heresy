@@ -14,6 +14,10 @@ FROM base AS runner
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile --prod
+RUN apk add --no-cache tzdata \
+    && export TZ="Asia/Almaty" \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
 COPY --from=builder /app/dist ./dist
 
 ENV NODE_ENV=production

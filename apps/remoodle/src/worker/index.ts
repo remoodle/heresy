@@ -1,11 +1,12 @@
 import { logger } from "../library/logger";
 import { hatchet } from "./hatchet-client";
 import { deadlineCheck } from "./workflows/deadline-check";
+import { deadlineCheckUser } from "./workflows/deadline-check-user";
 import { telegramSender } from "./workflows/telegram-sender";
 
 async function main() {
   const worker = await hatchet.worker("remoodle-worker", {
-    workflows: [deadlineCheck, telegramSender],
+    workflows: [deadlineCheck, deadlineCheckUser, telegramSender],
   });
 
   await worker.start();

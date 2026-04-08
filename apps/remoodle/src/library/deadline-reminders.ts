@@ -24,7 +24,9 @@ export function trackDeadlineReminders(
     const dueMs = event.timestampMs;
     const remainingMs = dueMs - nowMs;
 
-    if (!Number.isFinite(dueMs) || remainingMs <= 0) continue;
+    if (!Number.isFinite(dueMs) || remainingMs <= 0) {
+      continue;
+    }
 
     const eventReminders = existing.filter((r) => r.eventId === event.uid);
 
@@ -63,7 +65,9 @@ export function buildReminderMessage(
 
   for (const reminder of reminders) {
     const event = eventMap.get(reminder.eventId);
-    if (!event) continue;
+    if (!event) {
+      continue;
+    }
 
     message += `• <b>${event.summary}</b>\n`;
     message += `  ${getTimeLeft(event.timestampMs)} — ${formatDate(event.timestampMs)}\n\n`;

@@ -4,7 +4,10 @@ export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   telegramId: integer("telegram_id").notNull().unique(),
   calendarUrl: text("calendar_url").notNull(),
-  thresholds: text("thresholds").notNull().default('["P1D","PT3H"]'),
+  thresholds: text("thresholds", { mode: "json" })
+    .$type<string[]>()
+    .notNull()
+    .default(["P1D", "PT3H"]),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
