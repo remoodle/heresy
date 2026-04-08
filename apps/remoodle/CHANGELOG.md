@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.1](https://github.com/remoodle/heresy/compare/remoodle-v0.11.0...remoodle-v0.11.1) (2026-04-08)
+
+
+### Miscellaneous Chores
+
+* **deps:** update drizzle ([408a67b](https://github.com/remoodle/heresy/commit/408a67b4f9ddf644627adc836b88a2ec84c34c4f))
+
 ## [0.11.0](https://github.com/remoodle/heresy/compare/remoodle-v0.10.0...remoodle-v0.11.0) (2026-04-08)
 
 
