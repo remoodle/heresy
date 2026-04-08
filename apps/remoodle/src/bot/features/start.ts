@@ -4,6 +4,7 @@ import { db } from "../../db/index";
 import { users } from "../../db/schema";
 import { config } from "../../config";
 import { durationToMs, humanizeDuration } from "../../library/dates";
+import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
 import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
@@ -81,7 +82,16 @@ feature.on("message:text", async (ctx, next) => {
       set: { calendarUrl: url },
     });
 
+  const [user] = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
+
   ctx.session.awaitingCalendarUrl = false;
+
+  await calendarFetchUser.run({
+    userId: user!.id,
+    telegramId,
+    calendarUrl: url,
+    thresholds: user!.thresholds,
+  });
 
   await ctx.reply(
     `✅ Calendar URL saved!\n\n` +

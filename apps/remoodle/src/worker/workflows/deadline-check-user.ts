@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db/index";
-import { sentReminders } from "../../db/schema";
-import { fetchCalendarEvents } from "../../library/calendar";
+import { calendarEvents, sentReminders } from "../../db/schema";
+import { type CalendarEvent } from "../../library/calendar";
 import { buildReminderMessage, trackDeadlineReminders } from "../../library/deadline-reminders";
 import { hatchet } from "../hatchet-client";
 import { telegramSender } from "./telegram-sender";
@@ -9,7 +9,6 @@ import { telegramSender } from "./telegram-sender";
 type Input = {
   userId: number;
   telegramId: number;
-  calendarUrl: string;
   thresholds: string[];
 };
 
@@ -21,7 +20,22 @@ export const deadlineCheckUser = hatchet.task<Input>({
       return;
     }
 
-    const events = await fetchCalendarEvents(input.calendarUrl);
+    const rows = await db
+      .select()
+      .from(calendarEvents)
+      .where(eq(calendarEvents.userId, input.userId));
+
+    const events: CalendarEvent[] = rows.map((row) => ({
+      uid: row.eventId,
+      summary: row.summary,
+      timestampMs: row.timestampMs,
+      courseName: row.categories ?? undefined,
+    }));
+
+    if (events.length === 0) {
+      await ctx.logger.info("no cached calendar events found", { userId: input.userId });
+      return;
+    }
 
     const existing = await db
       .select({ eventId: sentReminders.eventId, triggeredAt: sentReminders.triggeredAt })

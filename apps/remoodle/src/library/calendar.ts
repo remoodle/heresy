@@ -3,6 +3,7 @@ export type CalendarEvent = {
   summary: string;
   timestampMs: number;
   courseName?: string;
+  description?: string;
 };
 
 export function shouldIgnoreCalendarEvent(event: Pick<CalendarEvent, "summary">): boolean {
@@ -74,6 +75,7 @@ export function parseIcs(ics: string): CalendarEvent[] {
     let uid: string | undefined;
     let summary: string | undefined;
     let courseName: string | undefined;
+    let description: string | undefined;
     let timestampMs: number | null = null;
 
     for (const line of lines) {
@@ -83,13 +85,15 @@ export function parseIcs(ics: string): CalendarEvent[] {
         summary = parseTextValue(line);
       } else if (line.startsWith("CATEGORIES:")) {
         courseName = parseCourseName(parseTextValue(line));
+      } else if (line.startsWith("DESCRIPTION:")) {
+        description = parseTextValue(line) || undefined;
       } else if (line.startsWith("DTSTART")) {
         timestampMs = parseDtstart(line);
       }
     }
 
     if (uid && summary && timestampMs !== null) {
-      const event = { uid, summary, timestampMs, courseName };
+      const event = { uid, summary, timestampMs, courseName, description };
 
       if (!shouldIgnoreCalendarEvent(event)) {
         events.push(event);

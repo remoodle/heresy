@@ -13,6 +13,25 @@ export const users = sqliteTable("users", {
     .$defaultFn(() => new Date()),
 });
 
+export const calendarEvents = sqliteTable(
+  "calendar_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    eventId: text("event_id").notNull(),
+    summary: text("summary").notNull(),
+    timestampMs: integer("timestamp_ms").notNull(),
+    categories: text("categories"),
+    description: text("description"),
+    fetchedAt: integer("fetched_at", { mode: "timestamp_ms" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (table) => [unique().on(table.userId, table.eventId)],
+);
+
 export const sentReminders = sqliteTable(
   "sent_reminders",
   {

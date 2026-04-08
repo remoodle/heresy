@@ -1,7 +1,7 @@
 import { db } from "../../db/index";
 import { users } from "../../db/schema";
 import { hatchet } from "../hatchet-client";
-import { deadlineCheckUser } from "./deadline-check-user";
+import { calendarFetchUser } from "./calendar-fetch-user";
 
 type Input = Record<string, never>;
 
@@ -23,7 +23,7 @@ deadlineCheck.task({
     const allUsers = await db.select().from(users);
 
     const childTasks = allUsers.map((user) => ({
-      workflow: deadlineCheckUser.name,
+      workflow: calendarFetchUser.name,
       input: {
         userId: user.id,
         telegramId: user.telegramId,
@@ -43,8 +43,8 @@ deadlineCheck.task({
       };
     }
 
-    await ctx.logger.info("dispatching deadline checks", {
-      childWorkflow: deadlineCheckUser.name,
+    await ctx.logger.info("dispatching calendar fetches", {
+      childWorkflow: calendarFetchUser.name,
       childCount: childTasks.length,
     });
 
