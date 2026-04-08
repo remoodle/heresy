@@ -23,6 +23,15 @@ export function createBot(token: string) {
   bot.use(deadlinesFeature);
   bot.use(settingsFeature);
 
+  bot.callbackQuery("remove_message", async (ctx) => {
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      await ctx.editMessageText("✅ Cleared");
+    }
+    await ctx.answerCallbackQuery();
+  });
+
   bot.catch((err) => {
     logger.bot.error({ error: err.error, update: err.ctx.update }, "Unhandled bot error");
   });

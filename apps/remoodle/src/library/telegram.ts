@@ -11,6 +11,9 @@ export async function sendTelegramMessage(chatId: number, message: string): Prom
       text: message,
       parse_mode: "HTML",
       link_preview_options: { is_disabled: true },
+      reply_markup: {
+        inline_keyboard: [[{ text: "Clear", callback_data: "remove_message" }]],
+      },
     }),
   });
 
