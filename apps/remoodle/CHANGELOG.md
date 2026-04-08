@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/remoodle/heresy/compare/remoodle-v0.6.0...remoodle-v0.7.0) (2026-04-08)
+
+
+### Features
+
+* add about page ([62ead22](https://github.com/remoodle/heresy/commit/62ead220e2ee6f69a26322f871ba8cdafcbee571))
+
 ## [0.6.0](https://github.com/remoodle/heresy/compare/remoodle-v0.5.0...remoodle-v0.6.0) (2026-04-08)
 
 
