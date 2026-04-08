@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.0](https://github.com/remoodle/heresy/compare/remoodle-v0.5.0...remoodle-v0.6.0) (2026-04-08)
+
+
+### Features
+
+* add hatchet skills ([945abb1](https://github.com/remoodle/heresy/commit/945abb11b8f8dda66e3877520dca8449c4f473cb))
+
+
+### Bug Fixes
+
+* remove otel ([bd4acc8](https://github.com/remoodle/heresy/commit/bd4acc8029f1fbf2e810a47d616a5d4a27ecc6df))
+
 ## [0.5.0](https://github.com/remoodle/heresy/compare/remoodle-v0.4.0...remoodle-v0.5.0) (2026-04-08)
 
 
