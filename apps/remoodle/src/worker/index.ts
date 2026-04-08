@@ -1,4 +1,3 @@
-import "./opentelemetry";
 import { logger } from "../library/logger";
 import { hatchet } from "./hatchet-client";
 import { deadlineCheck } from "./workflows/deadline-check";
