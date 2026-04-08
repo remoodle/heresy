@@ -11,7 +11,7 @@ type Input = {
 export const telegramSender = hatchet.task<Input>({
   name: "telegram-send-message",
   concurrency: {
-    expression: "input.chatId",
+    expression: "string(input.chatId)",
     maxRuns: 1,
     limitStrategy: ConcurrencyLimitStrategy.GROUP_ROUND_ROBIN,
   },
