@@ -35,6 +35,7 @@ feature.command("start", async (ctx) => {
         `Commands:\n` +
         `/deadlines — show upcoming deadlines\n` +
         `/settings — configure reminder thresholds\n` +
+        `/about — project links and info\n` +
         `/update — update your calendar URL`,
     );
     return;
@@ -86,7 +87,8 @@ feature.on("message:text", async (ctx, next) => {
     `✅ Calendar URL saved!\n\n` +
       `Commands:\n` +
       `/deadlines — show upcoming deadlines\n` +
-      `/settings — configure reminder thresholds`,
+      `/settings — configure reminder thresholds\n` +
+      `/about — project links and info`,
   );
 });
 

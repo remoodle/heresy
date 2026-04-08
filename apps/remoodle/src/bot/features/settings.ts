@@ -12,6 +12,16 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
+const REPOSITORY_URL = "https://github.com/remoodle/heresy";
+
+function buildAboutMessage() {
+  return (
+    `About ReMoodle\n\n` +
+    `Source code: ${REPOSITORY_URL}\n` +
+    `Issues and contributions are welcome.`
+  );
+}
+
 function buildThresholdsKeyboard(activeThresholds: string[]) {
   const keyboard = new InlineKeyboard();
 
@@ -27,6 +37,8 @@ function buildThresholdsKeyboard(activeThresholds: string[]) {
       );
     }
   }
+
+  keyboard.row().url("About / Repo", REPOSITORY_URL);
 
   return keyboard;
 }
@@ -49,6 +61,12 @@ feature.command("settings", async (ctx) => {
   await ctx.reply(buildThresholdsMessage(user.thresholds), {
     parse_mode: "HTML",
     reply_markup: buildThresholdsKeyboard(user.thresholds),
+  });
+});
+
+feature.command("about", async (ctx) => {
+  await ctx.reply(buildAboutMessage(), {
+    reply_markup: new InlineKeyboard().url("Open repository", REPOSITORY_URL),
   });
 });
 
