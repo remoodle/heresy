@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/remoodle/heresy/compare/remoodle-v0.7.0...remoodle-v0.7.1) (2026-04-08)
+
+
+### Tests
+
+* add unit tests ([74b4b69](https://github.com/remoodle/heresy/commit/74b4b6958318073233b24f5365c9f9fb4308195f))
+
 ## [0.7.0](https://github.com/remoodle/heresy/compare/remoodle-v0.6.0...remoodle-v0.7.0) (2026-04-08)
 
 
