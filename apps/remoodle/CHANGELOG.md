@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/remoodle/heresy/compare/remoodle-v0.4.0...remoodle-v0.5.0) (2026-04-08)
+
+
+### Features
+
+* improve logging and add otel ([314d3c5](https://github.com/remoodle/heresy/commit/314d3c5f4f518662175a4cd04011c56eca177917))
+
 ## [0.4.0](https://github.com/remoodle/heresy/compare/remoodle-v0.3.0...remoodle-v0.4.0) (2026-04-08)
 
 
