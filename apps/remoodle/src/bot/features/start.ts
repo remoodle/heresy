@@ -5,6 +5,7 @@ import { users } from "../../db/schema";
 import { config } from "../../config";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
+import { startMenuCallback } from "../callback-data";
 import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
@@ -22,6 +23,19 @@ function formatThresholds(thresholds: string[]): string {
     .join(", ");
 }
 
+function buildMenuMessage(thresholds: string[]): string {
+  return (
+    `👋 You're already registered.\n\n` +
+    `📅 Calendar URL is set.\n` +
+    `🔔 Thresholds: ${formatThresholds(thresholds)}\n\n` +
+    `Commands:\n` +
+    `/deadlines — show upcoming deadlines\n` +
+    `/settings — configure reminder thresholds\n` +
+    `/about — project links and info\n` +
+    `/update — update your calendar URL`
+  );
+}
+
 feature.command("start", async (ctx) => {
   const telegramId = ctx.from.id;
 
@@ -29,16 +43,7 @@ feature.command("start", async (ctx) => {
 
   if (existing.length > 0) {
     const user = existing[0]!;
-    await ctx.reply(
-      `👋 You're already registered.\n\n` +
-        `📅 Calendar URL is set.\n` +
-        `🔔 Thresholds: ${formatThresholds(user.thresholds)}\n\n` +
-        `Commands:\n` +
-        `/deadlines — show upcoming deadlines\n` +
-        `/settings — configure reminder thresholds\n` +
-        `/about — project links and info\n` +
-        `/update — update your calendar URL`,
-    );
+    await ctx.reply(buildMenuMessage(user.thresholds));
     return;
   }
 
@@ -100,6 +105,21 @@ feature.on("message:text", async (ctx, next) => {
       `/settings — configure reminder thresholds\n` +
       `/about — project links and info`,
   );
+});
+
+feature.callbackQuery(startMenuCallback.filter(), async (ctx) => {
+  const telegramId = ctx.from.id;
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  const user = rows[0]!;
+  await ctx.editMessageText(buildMenuMessage(user.thresholds));
+
+  await ctx.answerCallbackQuery();
 });
 
 export { composer as startFeature };

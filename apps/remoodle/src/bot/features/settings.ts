@@ -4,7 +4,7 @@ import { db } from "../../db/index";
 import { users } from "../../db/schema";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { durationToMs, humanizeDuration } from "../../library/dates";
-import { settingsCallback, toggleThresholdCallback } from "../callback-data";
+import { settingsCallback, toggleThresholdCallback, startMenuCallback } from "../callback-data";
 import { config } from "../../config";
 import type { Context } from "../context";
 
@@ -38,7 +38,7 @@ function buildThresholdsKeyboard(activeThresholds: string[]) {
     }
   }
 
-  keyboard.row().url("About / Repo", REPOSITORY_URL);
+  keyboard.row().text("← Back to menu", startMenuCallback.pack({}));
 
   return keyboard;
 }
