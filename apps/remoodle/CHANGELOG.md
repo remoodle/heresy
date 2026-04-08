@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.10.0](https://github.com/remoodle/heresy/compare/remoodle-v0.9.0...remoodle-v0.10.0) (2026-04-08)
+
+
+### Features
+
+* update navigation ([ecc5264](https://github.com/remoodle/heresy/commit/ecc5264b11bb90c723cc26ba7b04e6c0550fc7f3))
+
+
+### Code Refactoring
+
+* update bot menus ([350418a](https://github.com/remoodle/heresy/commit/350418ac596d953fcd75833fb1b9e186659f2b97))
+
 ## [0.9.0](https://github.com/remoodle/heresy/compare/remoodle-v0.8.0...remoodle-v0.9.0) (2026-04-08)
 
 
