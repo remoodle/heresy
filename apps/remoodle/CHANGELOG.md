@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/remoodle/heresy/compare/remoodle-v0.1.0...remoodle-v0.2.0) (2026-04-08)
+
+
+### Features
+
+* **remoodle:** handle migrations ([5e1a085](https://github.com/remoodle/heresy/commit/5e1a08503387ddb09386fa246c7eb7321b438a3c))
+
 ## [0.1.0](https://github.com/remoodle/heresy/compare/remoodle-v0.0.2...remoodle-v0.1.0) (2026-04-08)
 
 
