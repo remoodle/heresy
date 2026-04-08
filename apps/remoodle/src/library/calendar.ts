@@ -4,6 +4,10 @@ export type CalendarEvent = {
   timestampMs: number;
 };
 
+export function shouldIgnoreCalendarEvent(event: Pick<CalendarEvent, "summary">): boolean {
+  return /^attendance\b/i.test(event.summary.trim());
+}
+
 function unfold(ics: string): string {
   return ics.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "");
 }
@@ -66,7 +70,11 @@ export function parseIcs(ics: string): CalendarEvent[] {
     }
 
     if (uid && summary && timestampMs !== null) {
-      events.push({ uid, summary, timestampMs });
+      const event = { uid, summary, timestampMs };
+
+      if (!shouldIgnoreCalendarEvent(event)) {
+        events.push(event);
+      }
     }
   }
 
