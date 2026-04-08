@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.4.0](https://github.com/remoodle/heresy/compare/remoodle-v0.3.0...remoodle-v0.4.0) (2026-04-08)
+
+
+### Features
+
+* update messages ([14f3198](https://github.com/remoodle/heresy/commit/14f31986d6b916ce14dc69f2ebfa002923fc2d7b))
+
+
+### Miscellaneous Chores
+
+* delete apps/remoodle/compose.yml ([b3bf7aa](https://github.com/remoodle/heresy/commit/b3bf7aa2540d15e373a243171782c37be7e459f8))
+
 ## [0.3.0](https://github.com/remoodle/heresy/compare/remoodle-v0.2.1...remoodle-v0.3.0) (2026-04-08)
 
 
