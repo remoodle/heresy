@@ -24,12 +24,17 @@ export const telegramSender = hatchet.task<Input>({
     maxRuns: 1,
     limitStrategy: ConcurrencyLimitStrategy.GROUP_ROUND_ROBIN,
   },
-  fn: async (input) => {
+  fn: async (input, ctx) => {
     await sendTelegramMessage(input.chatId, input.message);
 
     await db
       .insert(sentReminders)
       .values(input.reminders.map((r) => ({ ...r, triggeredAt: new Date(r.triggeredAt) })))
       .onConflictDoNothing();
+
+    await ctx.logger.info("sent telegram reminder", {
+      chatId: input.chatId,
+      reminderCount: input.reminders.length,
+    });
   },
 });

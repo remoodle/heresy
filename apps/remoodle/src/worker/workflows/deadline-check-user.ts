@@ -41,6 +41,12 @@ export const deadlineCheckUser = hatchet.task<Input>({
 
     const message = buildReminderMessage(events, pending);
 
+    await ctx.logger.info("queueing reminder delivery", {
+      userId: input.userId,
+      telegramId: input.telegramId,
+      reminderCount: pending.length,
+    });
+
     await telegramSender.runNoWait({
       chatId: input.telegramId,
       message,
@@ -50,7 +56,5 @@ export const deadlineCheckUser = hatchet.task<Input>({
         triggeredAt: reminder.triggeredAt.getTime(),
       })),
     });
-
-    ctx.logger.info("dispatched reminder", { telegramId: input.telegramId });
   },
 });

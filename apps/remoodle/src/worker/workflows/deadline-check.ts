@@ -22,8 +22,6 @@ deadlineCheck.task({
   fn: async (_, ctx) => {
     const allUsers = await db.select().from(users);
 
-    ctx.logger.info("spawning deadline checks", { count: allUsers.length });
-
     const childTasks = allUsers.map((user) => ({
       workflow: deadlineCheckUser.name,
       input: {
@@ -32,12 +30,28 @@ deadlineCheck.task({
         calendarUrl: user.calendarUrl,
         thresholds: user.thresholds,
       },
+      options: {
+        key: String(user.id),
+      },
     }));
+
+    if (childTasks.length === 0) {
+      await ctx.logger.info("no users found for deadline check");
+
+      return {
+        dispatched: 0,
+      };
+    }
+
+    await ctx.logger.info("dispatching deadline checks", {
+      childWorkflow: deadlineCheckUser.name,
+      childCount: childTasks.length,
+    });
 
     await ctx.bulkRunNoWaitChildren(childTasks);
 
     return {
-      dispatched: allUsers.length,
+      dispatched: childTasks.length,
     };
   },
 });
