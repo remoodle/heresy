@@ -55,13 +55,31 @@ export type DeadlineGroup = {
   }[];
 };
 
+export function getDeadlineName(summary: string): string {
+  return summary.replace(/ is due( to be graded)?$/i, "").trim();
+}
+
+function getCourseLabel(event: Pick<CalendarEvent, "courseName">): string {
+  return event.courseName?.trim() || "Unknown course";
+}
+
+function getDeadlineIcon(timestampMs: number, fireThresholdHours = 3): string {
+  const hoursLeft = (timestampMs - Date.now()) / (60 * 60 * 1000);
+  return hoursLeft <= fireThresholdHours ? "🔥" : "📅";
+}
+
 export function buildReminderMessage(
   events: CalendarEvent[],
   reminders: PendingReminder[],
 ): string {
   const eventMap = new Map(events.map((e) => [e.uid, e]));
+  type ReminderItem = {
+    uid: string;
+    summary: string;
+    timestampMs: number;
+  };
 
-  let message = "🔔 Upcoming deadlines\n\n";
+  const remindersByCourse = new Map<string, ReminderItem[]>();
 
   for (const reminder of reminders) {
     const event = eventMap.get(reminder.eventId);
@@ -69,8 +87,30 @@ export function buildReminderMessage(
       continue;
     }
 
-    message += `• <b>${event.summary}</b>\n`;
-    message += `  ${getTimeLeft(event.timestampMs)} — ${formatDate(event.timestampMs)}\n\n`;
+    const courseLabel = getCourseLabel(event);
+    const items = remindersByCourse.get(courseLabel) ?? [];
+    items.push({
+      uid: event.uid,
+      summary: event.summary,
+      timestampMs: event.timestampMs,
+    });
+    remindersByCourse.set(courseLabel, items);
+  }
+
+  let message = "🔔 Upcoming deadlines 🔔\n\n";
+
+  for (const [courseLabel, courseReminders] of Array.from(remindersByCourse.entries())) {
+    message += `🗓 ${courseLabel}\n`;
+
+    for (const event of courseReminders.sort(
+      (a: ReminderItem, b: ReminderItem) => a.timestampMs - b.timestampMs,
+    )) {
+      message += `  • ${getDeadlineName(event.summary)}: <b>${getTimeLeft(
+        event.timestampMs,
+      )}</b>, ${formatDate(event.timestampMs)}\n`;
+    }
+
+    message += "\n";
   }
 
   return message.trim();
@@ -88,11 +128,14 @@ export function buildDeadlinesMessage(events: CalendarEvent[], daysLimit = 14): 
     return `No upcoming deadlines in the next ${daysLimit} days.`;
   }
 
-  let message = `📅 Upcoming deadlines (next ${daysLimit} days)\n\n`;
+  let message = "Upcoming deadlines:\n\n";
 
   for (const event of upcoming) {
-    message += `• <b>${event.summary}</b>\n`;
-    message += `  ${getTimeLeft(event.timestampMs)} — ${formatDate(event.timestampMs)}\n\n`;
+    message += `${getDeadlineIcon(event.timestampMs)}  <b>${getDeadlineName(
+      event.summary,
+    )}</b>  |  ${getCourseLabel(event)}  |  Date → ${formatDate(
+      event.timestampMs,
+    )}  |  Time left → <b>${getTimeLeft(event.timestampMs)}</b>\n\n`;
   }
 
   return message.trim();

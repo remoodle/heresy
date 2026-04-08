@@ -2,10 +2,26 @@ export type CalendarEvent = {
   uid: string;
   summary: string;
   timestampMs: number;
+  courseName?: string;
 };
 
 export function shouldIgnoreCalendarEvent(event: Pick<CalendarEvent, "summary">): boolean {
   return /^attendance\b/i.test(event.summary.trim());
+}
+
+function parseTextValue(line: string): string {
+  return line
+    .replace(/^[^:]+:/, "")
+    .replace(/\\n/gi, "\n")
+    .replace(/\\,/g, ",")
+    .replace(/\\;/g, ";")
+    .replace(/\\\\/g, "\\")
+    .trim();
+}
+
+function parseCourseName(categories: string): string | undefined {
+  const courseName = categories.split("|", 1)[0]?.trim().replace(/\s+/g, " ");
+  return courseName || undefined;
 }
 
 function unfold(ics: string): string {
@@ -57,20 +73,23 @@ export function parseIcs(ics: string): CalendarEvent[] {
 
     let uid: string | undefined;
     let summary: string | undefined;
+    let courseName: string | undefined;
     let timestampMs: number | null = null;
 
     for (const line of lines) {
       if (line.startsWith("UID:")) {
         uid = line.slice(4).trim();
       } else if (line.startsWith("SUMMARY:")) {
-        summary = line.slice(8).trim();
+        summary = parseTextValue(line);
+      } else if (line.startsWith("CATEGORIES:")) {
+        courseName = parseCourseName(parseTextValue(line));
       } else if (line.startsWith("DTSTART")) {
         timestampMs = parseDtstart(line);
       }
     }
 
     if (uid && summary && timestampMs !== null) {
-      const event = { uid, summary, timestampMs };
+      const event = { uid, summary, timestampMs, courseName };
 
       if (!shouldIgnoreCalendarEvent(event)) {
         events.push(event);
