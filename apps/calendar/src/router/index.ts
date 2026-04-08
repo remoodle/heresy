@@ -30,9 +30,17 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to) => {
-  if (!to.meta.requiresAuth) return true;
   const session = await authClient.getSession();
-  if (!session.data) return { path: "/" };
+
+  if (to.meta.requiresAuth) {
+    if (!session.data) return { path: "/" };
+    return true;
+  }
+
+  if (to.name === "landing" && session.data) {
+    return { path: "/schedule" };
+  }
+
   return true;
 });
 
