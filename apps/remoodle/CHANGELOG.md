@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/remoodle/heresy/compare/remoodle-v0.8.0...remoodle-v0.9.0) (2026-04-08)
+
+
+### Features
+
+* cache calendar events ([6c91d4e](https://github.com/remoodle/heresy/commit/6c91d4e74bc6f827b56e44e2dbad5827a88fd0fa))
+
 ## [0.8.0](https://github.com/remoodle/heresy/compare/remoodle-v0.7.1...remoodle-v0.8.0) (2026-04-08)
 
 
