@@ -1,4 +1,4 @@
-import { ConcurrencyLimitStrategy } from "@hatchet-dev/typescript-sdk/v1";
+import { ConcurrencyLimitStrategy } from "@hatchet-dev/typescript-sdk";
 import { sendTelegramMessage } from "../../library/telegram";
 import { hatchet } from "../hatchet-client";
 

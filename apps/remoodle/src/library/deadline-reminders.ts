@@ -31,9 +31,7 @@ export function trackDeadlineReminders(
     for (const thresholdMs of thresholdsMs) {
       if (thresholdMs >= remainingMs) {
         const thresholdDateMs = dueMs - thresholdMs;
-        const alreadySent = eventReminders.some(
-          (r) => r.triggeredAt.getTime() >= thresholdDateMs,
-        );
+        const alreadySent = eventReminders.some((r) => r.triggeredAt.getTime() >= thresholdDateMs);
 
         if (!alreadySent) {
           pending.push({ eventId: event.uid, triggeredAt: new Date() });

@@ -12,11 +12,7 @@ const feature = composer.chatType("private");
 feature.command("start", async (ctx) => {
   const telegramId = ctx.from.id;
 
-  const existing = await db
-    .select()
-    .from(users)
-    .where(eq(users.telegramId, telegramId))
-    .limit(1);
+  const existing = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (existing.length > 0) {
     const user = existing[0]!;

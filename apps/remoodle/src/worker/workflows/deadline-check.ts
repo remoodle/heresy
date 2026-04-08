@@ -2,10 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "../../db/index";
 import { sentReminders, users } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
-import {
-  buildReminderMessage,
-  trackDeadlineReminders,
-} from "../../library/deadline-reminders";
+import { buildReminderMessage, trackDeadlineReminders } from "../../library/deadline-reminders";
 import { hatchet } from "../hatchet-client";
 import { telegramSender } from "./telegram-sender";
 

@@ -2,10 +2,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
 import { db } from "../../db/index";
 import { users } from "../../db/schema";
-import {
-  AVAILABLE_THRESHOLDS,
-  buildThresholdsMessage,
-} from "../../library/deadline-reminders";
+import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { settingsCallback, toggleThresholdCallback } from "../callback-data";
 import { config } from "../../config";
@@ -38,11 +35,7 @@ feature.command("settings", async (ctx) => {
   const telegramId = ctx.from?.id;
   if (!telegramId) return;
 
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.telegramId, telegramId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
     await ctx.reply("You're not registered. Use /start first.");
@@ -61,11 +54,7 @@ feature.command("settings", async (ctx) => {
 feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
   const telegramId = ctx.from.id;
 
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.telegramId, telegramId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
     await ctx.answerCallbackQuery("Not registered.");
@@ -89,11 +78,7 @@ feature.callbackQuery(toggleThresholdCallback.filter(), async (ctx) => {
     threshold: string;
   };
 
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.telegramId, telegramId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
     await ctx.answerCallbackQuery("Not registered.");
@@ -115,9 +100,7 @@ feature.callbackQuery(toggleThresholdCallback.filter(), async (ctx) => {
       });
       return;
     }
-    updated = [...thresholds, threshold].sort(
-      (a, b) => durationToMs(a) - durationToMs(b),
-    );
+    updated = [...thresholds, threshold].sort((a, b) => durationToMs(a) - durationToMs(b));
   }
 
   await db

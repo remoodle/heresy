@@ -14,11 +14,7 @@ feature.command(["deadlines", "d"], async (ctx) => {
   const telegramId = ctx.from?.id;
   if (!telegramId) return;
 
-  const rows = await db
-    .select()
-    .from(users)
-    .where(eq(users.telegramId, telegramId))
-    .limit(1);
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
     await ctx.reply("You're not registered. Use /start to set up your calendar URL.");
