@@ -19,4 +19,4 @@ COPY --from=builder /app/dist ./dist
 ENV NODE_ENV=production
 ENV SERVICE_NAME=bot
 
-CMD node dist/${SERVICE_NAME}/index.mjs
+CMD pnpm start:${SERVICE_NAME}
