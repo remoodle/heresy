@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/remoodle/heresy/compare/remoodle-v0.2.0...remoodle-v0.2.1) (2026-04-08)
+
+
+### Bug Fixes
+
+* **remoodle:** cast chatId to string for hatchet concurrency expression ([abfd08a](https://github.com/remoodle/heresy/commit/abfd08a4240a21f46d060a3b719a432ad005f9e9))
+* **remoodle:** only record sent reminders after successful telegram delivery ([627251d](https://github.com/remoodle/heresy/commit/627251d36f29f0e927c898977885a70cdd0ce52b))
+
 ## [0.2.0](https://github.com/remoodle/heresy/compare/remoodle-v0.1.0...remoodle-v0.2.0) (2026-04-08)
 
 
