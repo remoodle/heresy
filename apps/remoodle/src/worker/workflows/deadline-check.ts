@@ -56,18 +56,15 @@ deadlineCheck.task({
 
         const message = buildReminderMessage(events, pending);
 
-        await telegramSender.runNoWait({ chatId: user.telegramId, message });
-
-        await db
-          .insert(sentReminders)
-          .values(
-            pending.map((reminder) => ({
-              userId: user.id,
-              eventId: reminder.eventId,
-              triggeredAt: reminder.triggeredAt,
-            })),
-          )
-          .onConflictDoNothing();
+        await telegramSender.runNoWait({
+          chatId: user.telegramId,
+          message,
+          reminders: pending.map((reminder) => ({
+            userId: user.id,
+            eventId: reminder.eventId,
+            triggeredAt: reminder.triggeredAt.getTime(),
+          })),
+        });
 
         dispatched++;
         ctx.logger.info(`dispatched reminder for user ${user.telegramId}`);
