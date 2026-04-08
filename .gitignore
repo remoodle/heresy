@@ -7,10 +7,13 @@ node_modules
 .dev.vars
 .wrangler/
 
+dist
 .env
 *.local
 data/
 *.log
 .idea/
+
+*.db
 
 .github/scripts/schedule-parser/vendor/*

@@ -1,0 +1,37 @@
+{
+  "name": "@heresy/remoodle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:bot": "tsx watch src/bot/index.ts | pino-pretty",
+    "dev:worker": "tsx src/worker/index.ts",
+    "build": "tsdown",
+    "start:bot": "node dist/bot/index.mjs",
+    "start:worker": "node dist/worker/index.mjs",
+    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@grammyjs/hydrate": "^1.6.0",
+    "@hatchet-dev/typescript-sdk": "^1.19.1",
+    "@libsql/client": "^0.17.2",
+    "callback-data": "^1.1.1",
+    "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "1.0.0-beta.15-859cf75",
+    "envalid": "^8.1.1",
+    "grammy": "^1.38.3",
+    "pino": "^10.1.1",
+    "pino-pretty": "^13.1.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "drizzle-kit": "1.0.0-beta.15-859cf75",
+    "tsdown": "^0.20.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

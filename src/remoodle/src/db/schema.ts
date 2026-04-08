@@ -1,0 +1,24 @@
+import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
+
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  telegramId: integer("telegram_id").notNull().unique(),
+  calendarUrl: text("calendar_url").notNull(),
+  thresholds: text("thresholds").notNull().default('["P1D","PT3H"]'),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const sentReminders = sqliteTable(
+  "sent_reminders",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id),
+    eventId: text("event_id").notNull(),
+    triggeredAt: integer("triggered_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [unique().on(table.userId, table.eventId, table.triggeredAt)],
+);
