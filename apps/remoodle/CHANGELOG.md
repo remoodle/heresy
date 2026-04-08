@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.11.0](https://github.com/remoodle/heresy/compare/remoodle-v0.10.0...remoodle-v0.11.0) (2026-04-08)
+
+
+### Features
+
+* update config and tests ([1f881e3](https://github.com/remoodle/heresy/commit/1f881e338d935f6c19dd371dbcb10b7424717a93))
+
 ## [0.10.0](https://github.com/remoodle/heresy/compare/remoodle-v0.9.0...remoodle-v0.10.0) (2026-04-08)
 
 
