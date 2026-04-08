@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/remoodle/heresy/compare/remoodle-v0.7.1...remoodle-v0.8.0) (2026-04-08)
+
+
+### Features
+
+* add clear button ([01ea06b](https://github.com/remoodle/heresy/commit/01ea06bce5b209b8d7da696aa0be8f2f449b8956))
+
 ## [0.7.1](https://github.com/remoodle/heresy/compare/remoodle-v0.7.0...remoodle-v0.7.1) (2026-04-08)
 
 
