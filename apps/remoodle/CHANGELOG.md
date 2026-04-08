@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/remoodle/heresy/compare/remoodle-v0.2.1...remoodle-v0.3.0) (2026-04-08)
+
+
+### Features
+
+* humanize duration ([67b5032](https://github.com/remoodle/heresy/commit/67b5032eb40da0f55b2c08eb112ca5cd9050d986))
+* update remoodle worker ([dc60ccf](https://github.com/remoodle/heresy/commit/dc60ccfe9bb7336a77b4b2c53aa41b251f429b16))
+
+
+### Bug Fixes
+
+* filter attendance events ([9e1785a](https://github.com/remoodle/heresy/commit/9e1785af16f777cdb28ffb0526d71102bfa277a3))
+
 ## [0.2.1](https://github.com/remoodle/heresy/compare/remoodle-v0.2.0...remoodle-v0.2.1) (2026-04-08)
 
 
