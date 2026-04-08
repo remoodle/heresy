@@ -18,6 +18,7 @@ describe("calendar processing", () => {
       summary: "Case Study Presentation is due",
       timestampMs: Date.parse("2026-04-08T18:59:00Z"),
       courseName: "Software Development Case Study",
+      description: "_SUBMISSIONS RECEIVED AFTER THE DEADLINE WILL NOT BE ACCEPTED._",
     });
   });
 
@@ -38,6 +39,7 @@ END:VCALENDAR`);
         summary: "Lab, Quiz; Review\\ Session is due",
         timestampMs: Date.parse("2026-04-15T00:00:00Z"),
         courseName: "Computer Networks",
+        description: undefined,
       },
     ]);
   });
@@ -62,6 +64,7 @@ END:VCALENDAR`);
         summary: "Assignment 5 is due",
         timestampMs: Date.parse("2026-04-15T12:00:00Z"),
         courseName: undefined,
+        description: undefined,
       },
     ]);
   });

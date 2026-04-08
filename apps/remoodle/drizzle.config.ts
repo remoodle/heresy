@@ -1,11 +1,11 @@
 import { defineConfig } from "drizzle-kit";
-import "dotenv/config";
+import { config } from "./src/config";
 
 export default defineConfig({
   schema: "./src/db/schema.ts",
   out: "./src/db/migrations",
-  dialect: "turso",
+  dialect: "sqlite",
   dbCredentials: {
-    url: `file:${process.env.DATABASE_URL ?? "./remoodle.db"}`,
+    url: config.database.url,
   },
 });
