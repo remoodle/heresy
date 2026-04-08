@@ -5,36 +5,25 @@ import { users } from "../../db/schema";
 import { config } from "../../config";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
-import { startMenuCallback } from "../callback-data";
+import { menuCallback, updateCalendarCallback } from "../callback-data";
+import { buildMenuKeyboard } from "../keyboards/menu";
 import type { Context } from "../context";
+
+function buildMenuMessage(thresholds: string[]): string {
+  const formatted =
+    thresholds.length === 0
+      ? "none"
+      : [...thresholds]
+          .sort((a, b) => durationToMs(a) - durationToMs(b))
+          .map(humanizeDuration)
+          .join(", ");
+
+  return `👋 You're already registered.\n\n📅 Calendar URL is set.\n🔔 Thresholds: ${formatted}`;
+}
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
-
-function formatThresholds(thresholds: string[]): string {
-  if (thresholds.length === 0) {
-    return "none";
-  }
-
-  return [...thresholds]
-    .sort((a, b) => durationToMs(a) - durationToMs(b))
-    .map(humanizeDuration)
-    .join(", ");
-}
-
-function buildMenuMessage(thresholds: string[]): string {
-  return (
-    `👋 You're already registered.\n\n` +
-    `📅 Calendar URL is set.\n` +
-    `🔔 Thresholds: ${formatThresholds(thresholds)}\n\n` +
-    `Commands:\n` +
-    `/deadlines — show upcoming deadlines\n` +
-    `/settings — configure reminder thresholds\n` +
-    `/about — project links and info\n` +
-    `/update — update your calendar URL`
-  );
-}
 
 feature.command("start", async (ctx) => {
   const telegramId = ctx.from.id;
@@ -43,22 +32,41 @@ feature.command("start", async (ctx) => {
 
   if (existing.length > 0) {
     const user = existing[0]!;
-    await ctx.reply(buildMenuMessage(user.thresholds));
+    await ctx.reply(buildMenuMessage(user.thresholds), { reply_markup: buildMenuKeyboard() });
     return;
   }
 
   ctx.session.awaitingCalendarUrl = true;
   await ctx.reply(
-    `👋 Welcome to ReMoodle!\n\n` +
-      `Please send your Moodle calendar URL.\n\n` +
-      `You can find it at:\n` +
-      `LMS → Calendar → Export → Copy URL`,
+    `👋 Welcome to ReMoodle!\n\nPlease send your Moodle calendar URL.\n\nYou can find it at:\nLMS → Calendar → Export → Copy URL`,
   );
 });
 
 feature.command("update", async (ctx) => {
   ctx.session.awaitingCalendarUrl = true;
   await ctx.reply("Send your new Moodle calendar URL:");
+});
+
+feature.callbackQuery(menuCallback.filter(), async (ctx) => {
+  const telegramId = ctx.from.id;
+  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  const user = rows[0]!;
+  await ctx.editMessageText(buildMenuMessage(user.thresholds), {
+    reply_markup: buildMenuKeyboard(),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(updateCalendarCallback.filter(), async (ctx) => {
+  ctx.session.awaitingCalendarUrl = true;
+  await ctx.editMessageText("Send your new Moodle calendar URL:");
+  await ctx.answerCallbackQuery();
 });
 
 feature.on("message:text", async (ctx, next) => {
@@ -98,28 +106,9 @@ feature.on("message:text", async (ctx, next) => {
     thresholds: user!.thresholds,
   });
 
-  await ctx.reply(
-    `✅ Calendar URL saved!\n\n` +
-      `Commands:\n` +
-      `/deadlines — show upcoming deadlines\n` +
-      `/settings — configure reminder thresholds\n` +
-      `/about — project links and info`,
-  );
-});
-
-feature.callbackQuery(startMenuCallback.filter(), async (ctx) => {
-  const telegramId = ctx.from.id;
-  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
-
-  if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
-    return;
-  }
-
-  const user = rows[0]!;
-  await ctx.editMessageText(buildMenuMessage(user.thresholds));
-
-  await ctx.answerCallbackQuery();
+  await ctx.reply(`✅ Calendar URL saved!\n\n${buildMenuMessage(user!.thresholds)}`, {
+    reply_markup: buildMenuKeyboard(),
+  });
 });
 
 export { composer as startFeature };

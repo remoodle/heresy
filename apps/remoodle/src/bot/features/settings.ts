@@ -4,23 +4,18 @@ import { db } from "../../db/index";
 import { users } from "../../db/schema";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { durationToMs, humanizeDuration } from "../../library/dates";
-import { settingsCallback, toggleThresholdCallback, startMenuCallback } from "../callback-data";
+import {
+  settingsCallback,
+  toggleThresholdCallback,
+  updateCalendarCallback,
+  menuCallback,
+} from "../callback-data";
 import { config } from "../../config";
 import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
-
-const REPOSITORY_URL = "https://github.com/remoodle/heresy";
-
-function buildAboutMessage() {
-  return (
-    `About ReMoodle\n\n` +
-    `Source code: ${REPOSITORY_URL}\n` +
-    `Issues and contributions are welcome.`
-  );
-}
 
 function buildThresholdsKeyboard(activeThresholds: string[]) {
   const keyboard = new InlineKeyboard();
@@ -38,7 +33,8 @@ function buildThresholdsKeyboard(activeThresholds: string[]) {
     }
   }
 
-  keyboard.row().text("← Back to menu", startMenuCallback.pack({}));
+  keyboard.row().text("Update Calendar URL", updateCalendarCallback.pack({}));
+  keyboard.row().text("Back ←", menuCallback.pack({}));
 
   return keyboard;
 }
@@ -61,12 +57,6 @@ feature.command("settings", async (ctx) => {
   await ctx.reply(buildThresholdsMessage(user.thresholds), {
     parse_mode: "HTML",
     reply_markup: buildThresholdsKeyboard(user.thresholds),
-  });
-});
-
-feature.command("about", async (ctx) => {
-  await ctx.reply(buildAboutMessage(), {
-    reply_markup: new InlineKeyboard().url("Open repository", REPOSITORY_URL),
   });
 });
 
