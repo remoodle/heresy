@@ -35,7 +35,7 @@ watch(session, (s) => {
         class="flex w-full max-w-xl items-center justify-between rounded-lg border border-border bg-secondary py-2 pr-2 pl-4 backdrop-blur dark:bg-muted/10"
       >
         <span class="text-sm font-semibold tracking-tight">
-          Remoodle Calendar
+          ReMoodle Calendar
         </span>
         <div class="flex items-center gap-2">
           <ThemeSwitcher />

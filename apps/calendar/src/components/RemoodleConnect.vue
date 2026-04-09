@@ -76,7 +76,7 @@ async function copyCode() {
       </Button>
     </div>
 
-    <!-- Connect to Remoodle -->
+    <!-- Connect to ReMoodle -->
     <div class="flex flex-col gap-2">
       <p class="text-xs text-muted-foreground">Connect to @remoodle_bot</p>
 

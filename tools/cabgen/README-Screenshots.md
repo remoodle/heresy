@@ -16,11 +16,11 @@ This project automates taking screenshots of cabinet searches on the AITU Map we
 
 3. **`playwright-screenshots.config.js`** - Optimized Playwright configuration for screenshot automation
 4. **`playwright-dark-theme.config.js`** - Configuration that preserves the site's dark theme
-5. **`utils/cabinet_parser.py`** - Python script to fetch and extract cabinet locations from Remoodle API
+5. **`utils/cabinet_parser.py`** - Python script to fetch and extract cabinet locations from ReMoodle API
 
 ## Updating Cabinet List
 
-To get the most current list of cabinets from the Remoodle API:
+To get the most current list of cabinets from the ReMoodle API:
 
 ### Using Python Script (Recommended)
 
@@ -33,7 +33,7 @@ Or on Windows, simply double-click `run_parser.bat`
 
 This will:
 
-- Fetch all groups from `https://calendar.remoodle.app/api/groups`
+- Fetch all groups from `https://calendar.ReMoodle.app/api/groups`
 - Get schedule for each group
 - Extract unique cabinet locations
 - Filter and sort them naturally (C1.1.143, C1.1.144, C1.2.124K, etc.)
@@ -119,7 +119,7 @@ The advanced version includes a `CONFIG` object at the top of the file where you
 
 ```javascript
 const CONFIG = {
-  WEBSITE_URL: "https://aitumap.remoodle.app",
+  WEBSITE_URL: "https://aitumap.ReMoodle.app",
   SEARCH_SELECTOR: "#search__chakra-input",
   WAIT_AFTER_SEARCH: 3000, // Wait time after search (ms)
   WAIT_BETWEEN_SEARCHES: 1000, // Wait time between searches (ms)

@@ -10,12 +10,9 @@
     "tabs",
     "notifications"
   ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ],
+  "host_permissions": ["http://*/*", "https://*/*"],
   "action": {
-    "default_title": "Remoodle's Cookie Scoop"
+    "default_title": "ReMoodle's Cookie Scoop"
   },
   "background": {
     "service_worker": "bg.js"

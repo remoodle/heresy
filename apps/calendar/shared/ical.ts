@@ -418,8 +418,8 @@ export function generateScheduleIcal(
   const eventTimeFormat = options?.eventTimeFormat ?? "local";
   const lines =
     eventTimeFormat === "utc"
-      ? createUtcCalendarHeader("-//Remoodle Calendar//EN", "Schedule")
-      : createCalendarHeader("-//Remoodle Calendar//EN", "Schedule");
+      ? createUtcCalendarHeader("-//ReMoodle Calendar//EN", "Schedule")
+      : createCalendarHeader("-//ReMoodle Calendar//EN", "Schedule");
 
   for (const item of items) {
     const startParsed = parseScheduleTime(item.start);
@@ -430,41 +430,41 @@ export function generateScheduleIcal(
     const dtstart =
       eventTimeFormat === "utc"
         ? formatUtcDateFromParts(
-            firstDay.year,
-            firstDay.month,
-            firstDay.day,
-            startParsed.hours,
-            startParsed.minutes,
-          )
+          firstDay.year,
+          firstDay.month,
+          firstDay.day,
+          startParsed.hours,
+          startParsed.minutes,
+        )
         : formatLocalDateTime(
-            firstDay.year,
-            firstDay.month,
-            firstDay.day,
-            startParsed.hours,
-            startParsed.minutes,
-          );
+          firstDay.year,
+          firstDay.month,
+          firstDay.day,
+          startParsed.hours,
+          startParsed.minutes,
+        );
     const endDay =
       endParsed.hours < startParsed.hours ||
-      (endParsed.hours === startParsed.hours &&
-        endParsed.minutes <= startParsed.minutes)
+        (endParsed.hours === startParsed.hours &&
+          endParsed.minutes <= startParsed.minutes)
         ? addDays(firstDay.year, firstDay.month, firstDay.day, 1)
         : firstDay;
     const dtend =
       eventTimeFormat === "utc"
         ? formatUtcDateFromParts(
-            endDay.year,
-            endDay.month,
-            endDay.day,
-            endParsed.hours,
-            endParsed.minutes,
-          )
+          endDay.year,
+          endDay.month,
+          endDay.day,
+          endParsed.hours,
+          endParsed.minutes,
+        )
         : formatLocalDateTime(
-            endDay.year,
-            endDay.month,
-            endDay.day,
-            endParsed.hours,
-            endParsed.minutes,
-          );
+          endDay.year,
+          endDay.month,
+          endDay.day,
+          endParsed.hours,
+          endParsed.minutes,
+        );
     const description = [
       item.teacher ? `Teacher: ${item.teacher}` : "",
       item.type ? `Type: ${item.type}` : "",
@@ -475,25 +475,25 @@ export function generateScheduleIcal(
     lines.push(
       ...(eventTimeFormat === "utc"
         ? createUtcCalendarEventLines({
-            uid: `${item.id}@calendar`,
-            summary: item.courseName,
-            description,
-            location: item.isOnline ? "Online" : item.location,
-            dtstart,
-            dtend,
-            dtstamp: formatUtcDate(now),
-            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
-          })
+          uid: `${item.id}@calendar`,
+          summary: item.courseName,
+          description,
+          location: item.isOnline ? "Online" : item.location,
+          dtstart,
+          dtend,
+          dtstamp: formatUtcDate(now),
+          rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+        })
         : createCalendarEventLines({
-            uid: `${item.id}@calendar`,
-            summary: item.courseName,
-            description,
-            location: item.isOnline ? "Online" : item.location,
-            dtstart,
-            dtend,
-            dtstamp: formatUtcDate(now),
-            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
-          })),
+          uid: `${item.id}@calendar`,
+          summary: item.courseName,
+          description,
+          location: item.isOnline ? "Online" : item.location,
+          dtstart,
+          dtend,
+          dtstamp: formatUtcDate(now),
+          rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+        })),
     );
   }
 
