@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/remoodle/heresy/compare/remoodle-v0.13.0...remoodle-v0.14.0) (2026-04-09)
+
+
+### Features
+
+* add docs ([f634098](https://github.com/remoodle/heresy/commit/f6340987c54c4e046fae54f1e0aa376a1868344e))
+
 ## [0.13.0](https://github.com/remoodle/heresy/compare/remoodle-v0.12.0...remoodle-v0.13.0) (2026-04-09)
 
 
