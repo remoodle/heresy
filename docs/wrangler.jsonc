@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "remoodle-docs",
+  "name": "docs",
   "compatibility_date": "2025-09-06",
   "assets": {
     "directory": ".vitepress/dist",
