@@ -4,6 +4,8 @@ import type { Context, SessionData } from "./context";
 import { startFeature } from "./features/start";
 import { deadlinesFeature } from "./features/deadlines";
 import { settingsFeature } from "./features/settings";
+import { coursesFeature } from "./features/courses";
+import { scheduleFeature } from "./features/schedule";
 import { logger } from "../library/logger";
 
 export function createBot(token: string) {
@@ -22,6 +24,8 @@ export function createBot(token: string) {
   bot.use(startFeature);
   bot.use(deadlinesFeature);
   bot.use(settingsFeature);
+  bot.use(coursesFeature);
+  bot.use(scheduleFeature);
 
   bot.callbackQuery("remove_message", async (ctx) => {
     try {
@@ -34,6 +38,7 @@ export function createBot(token: string) {
 
   bot.catch((err) => {
     logger.bot.error({ error: err.error, update: err.ctx.update }, "Unhandled bot error");
+    err.ctx.answerCallbackQuery().catch(() => {});
   });
 
   return bot;

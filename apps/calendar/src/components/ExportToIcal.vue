@@ -26,7 +26,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
-  DialogContent,
   DialogScrollContent,
   DialogDescription,
   DialogFooter,

@@ -12,9 +12,13 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType(["private", "group", "supergroup"]);
 
-async function fetchDeadlinesMessage(calendarUrl: string) {
+async function fetchDeadlinesMessage(calendarUrl: string, excludedCourses: string[]) {
   const events = await fetchCalendarEvents(calendarUrl);
-  return buildDeadlinesMessage(events);
+  const filtered =
+    excludedCourses.length > 0
+      ? events.filter((e) => !excludedCourses.includes(e.courseName ?? ""))
+      : events;
+  return buildDeadlinesMessage(filtered);
 }
 
 feature.command(["deadlines", "d"], async (ctx) => {
@@ -26,17 +30,22 @@ feature.command(["deadlines", "d"], async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
-    await ctx.reply("You're not registered. Use /start to set up your calendar URL.");
+    await ctx.reply("You're not registered. Use /start to set up.");
     return;
   }
 
   const user = rows[0]!;
 
+  if (!user.calendarUrl) {
+    await ctx.reply("No Moodle calendar URL set. Use /settings → Deadlines → Update Calendar URL.");
+    return;
+  }
+
   await ctx.replyWithChatAction("typing");
 
   let message: string;
   try {
-    message = await fetchDeadlinesMessage(user.calendarUrl);
+    message = await fetchDeadlinesMessage(user.calendarUrl, user.excludedCourses);
   } catch {
     await ctx.reply("Failed to fetch your calendar. Check your URL with /update.");
     return;
@@ -46,9 +55,7 @@ feature.command(["deadlines", "d"], async (ctx) => {
 });
 
 feature.chatType("private").callbackQuery(deadlinesCallback.filter(), async (ctx) => {
-  const telegramId = ctx.from.id;
-
-  const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
 
   if (rows.length === 0) {
     await ctx.answerCallbackQuery("Not registered.");
@@ -57,11 +64,19 @@ feature.chatType("private").callbackQuery(deadlinesCallback.filter(), async (ctx
 
   const user = rows[0]!;
 
+  if (!user.calendarUrl) {
+    await ctx.answerCallbackQuery({
+      text: "No Moodle calendar URL set. Go to Settings → Deadlines.",
+      show_alert: true,
+    });
+    return;
+  }
+
   await ctx.answerCallbackQuery();
 
   let message: string;
   try {
-    message = await fetchDeadlinesMessage(user.calendarUrl);
+    message = await fetchDeadlinesMessage(user.calendarUrl, user.excludedCourses);
   } catch {
     await ctx.editMessageText("Failed to fetch your calendar.", {
       reply_markup: buildBackToMenuKeyboard(),

@@ -3,6 +3,7 @@ import { Icon } from "@iconify/vue";
 import { storeToRefs } from "pinia";
 import { watchEffect } from "vue";
 import { useRouter } from "vue-router";
+import AccountMenu from "@/components/AccountMenu.vue";
 import AuthDialog from "@/components/AuthDialog.vue";
 import ExportToIcal from "@/components/ExportToIcal.vue";
 import GroupSelect from "@/components/GroupSelect.vue";
@@ -188,6 +189,13 @@ async function signOut() {
 
       <SidebarFooter class="gap-3 p-3">
         <SidebarSeparator class="-mx-0" />
+        <template v-if="session?.data">
+          <AccountMenu
+            :name="session.data.user.name"
+            :email="session.data.user.email"
+            @sign-out="signOut"
+          />
+        </template>
         <div class="flex flex-wrap items-center gap-2">
           <ThemeSwitcher />
           <a
@@ -222,16 +230,6 @@ async function signOut() {
                 >Sign in</Button
               >
             </AuthDialog>
-          </template>
-          <template v-else>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="text-muted-foreground"
-              @click="signOut"
-            >
-              Sign out
-            </Button>
           </template>
         </div>
       </header>

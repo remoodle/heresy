@@ -6,6 +6,14 @@ const base = pino({
     level: (label) => ({ level: label.toUpperCase() }),
   },
   timestamp: pino.stdTimeFunctions.isoTime,
+  serializers: {
+    error: (err) => ({
+      type: err?.constructor?.name,
+      message: err?.message,
+      description: err?.description,
+      stack: err?.stack,
+    }),
+  },
 });
 
 export const logger = {

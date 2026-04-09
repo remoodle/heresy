@@ -1,17 +1,23 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
 import { watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import AuthDialog from "@/components/AuthDialog.vue";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useSessionQuery } from "@/lib/api/session";
 
+const route = useRoute();
 const router = useRouter();
 const { data: session, isLoading } = useSessionQuery();
 
+const next = Array.isArray(route.query.next)
+  ? route.query.next[0]
+  : route.query.next;
+const callbackURL = next || "/schedule";
+
 watch(session, (s) => {
-  if (s?.data) router.replace("/schedule");
+  if (s?.data) router.replace(callbackURL);
 });
 </script>
 
@@ -33,7 +39,7 @@ watch(session, (s) => {
           Access your class schedule with your university account.
         </p>
 
-        <AuthDialog v-if="!isLoading">
+        <AuthDialog v-if="!isLoading" :callback-u-r-l="callbackURL">
           <Button size="lg" class="min-w-36 rounded-full px-8">
             Sign in
           </Button>

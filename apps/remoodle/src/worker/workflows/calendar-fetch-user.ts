@@ -16,6 +16,15 @@ export const calendarFetchUser = hatchet.task<Input>({
   name: "calendar-fetch-user",
   executionTimeout: "2m",
   fn: async (input, ctx) => {
+    if (!input.calendarUrl) {
+      await deadlineCheckUser.runNoWait({
+        userId: input.userId,
+        telegramId: input.telegramId,
+        thresholds: input.thresholds,
+      });
+      return;
+    }
+
     try {
       const events = await fetchCalendarEvents(input.calendarUrl);
 

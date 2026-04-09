@@ -2,14 +2,21 @@ import { eq, and } from "drizzle-orm";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import type { ExtraEnv } from "../env-extra";
 import type { ScheduleData, ScheduleFilter } from "./types.d";
 import { createAuth } from "./auth";
 import { createDb } from "./db";
-import { icalTokens } from "./db/schema";
+import {
+  icalTokens,
+  user as userTable,
+  remoodleConnectTokens,
+} from "./db/schema";
 import { generateIcal } from "./ical";
 
+type Bindings = ExtraEnv & Env;
+
 const app = new Hono<{
-  Bindings: Env;
+  Bindings: Bindings;
 }>();
 
 app.use("*", cors());
@@ -47,19 +54,30 @@ const route = app
     }
 
     const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
-    const group = c.req.query("group");
 
     if (!schedule) {
       throw new HTTPException(404, { message: "Schedule not found" });
     }
 
     const scheduleData: ScheduleData = await schedule.json();
-
-    if (group) {
-      return c.json(scheduleData[group] ?? []);
+    return c.json(Object.keys(scheduleData));
+  })
+  .get("/api/groups/:group", async (c) => {
+    const session = await getSession(c.env, c.req.raw.headers);
+    if (!session) {
+      throw new HTTPException(401, { message: "Unauthorized" });
     }
 
-    return c.json(Object.keys(scheduleData));
+    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
+
+    if (!schedule) {
+      throw new HTTPException(404, { message: "Schedule not found" });
+    }
+
+    const scheduleData: ScheduleData = await schedule.json();
+    const group = c.req.param("group");
+
+    return c.json(scheduleData[group] ?? []);
   })
   .put("/api/schedule", async (c) => {
     const body = await c.req.text();
@@ -111,6 +129,71 @@ const route = app
         "Content-Disposition": 'inline; filename="calendar.ics"',
       },
     });
+  })
+  .get("/api/user/profile", async (c) => {
+    const session = await getSession(c.env, c.req.raw.headers);
+    if (!session) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const db = createDb(c.env.DB);
+    const [row] = await db
+      .select({ primaryGroup: userTable.primaryGroup })
+      .from(userTable)
+      .where(eq(userTable.id, session.user.id))
+      .limit(1);
+
+    return c.json({ primaryGroup: row?.primaryGroup ?? null });
+  })
+  .patch("/api/user/profile", async (c) => {
+    const session = await getSession(c.env, c.req.raw.headers);
+    if (!session) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const { primaryGroup } = await c.req.json<{ primaryGroup: string }>();
+
+    const db = createDb(c.env.DB);
+    await db
+      .update(userTable)
+      .set({ primaryGroup, updatedAt: new Date() })
+      .where(eq(userTable.id, session.user.id));
+
+    return c.json({ ok: true });
+  })
+  .post("/api/user/remoodle-token", async (c) => {
+    const session = await getSession(c.env, c.req.raw.headers);
+    if (!session) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const db = createDb(c.env.DB);
+
+    // Delete any existing tokens for this user (one active at a time)
+    await db
+      .delete(remoodleConnectTokens)
+      .where(eq(remoodleConnectTokens.userId, session.user.id));
+
+    // Generate a short human-friendly code with RE_ prefix
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const token =
+      "RE_" +
+      Array.from(
+        { length: 6 },
+        () => chars[Math.floor(Math.random() * chars.length)],
+      ).join("");
+
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+    await db.insert(remoodleConnectTokens).values({
+      id: crypto.randomUUID(),
+      userId: session.user.id,
+      token,
+      expiresAt,
+      createdAt: new Date(),
+    });
+
+    return c.json({ token, expiresAt: expiresAt.toISOString() });
   })
   .get("/api/user/ical-token", async (c) => {
     const session = await getSession(c.env, c.req.raw.headers);
@@ -226,6 +309,64 @@ const route = app
       .where(eq(icalTokens.id, existing.id));
 
     return c.json({ ok: true });
+  })
+  .post("/api/internal/remoodle/connect", async (c) => {
+    if (c.req.header("X-Internal-Token") !== c.env.INTERNAL_TOKEN) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const { token } = await c.req.json<{ token: string }>();
+    const db = createDb(c.env.DB);
+
+    const [tokenRow] = await db
+      .select()
+      .from(remoodleConnectTokens)
+      .where(eq(remoodleConnectTokens.token, token))
+      .limit(1);
+
+    if (!tokenRow || tokenRow.expiresAt < new Date()) {
+      if (tokenRow) {
+        await db
+          .delete(remoodleConnectTokens)
+          .where(eq(remoodleConnectTokens.id, tokenRow.id));
+      }
+      throw new HTTPException(404, { message: "Token not found or expired" });
+    }
+
+    await db
+      .delete(remoodleConnectTokens)
+      .where(eq(remoodleConnectTokens.id, tokenRow.id));
+
+    const [u] = await db
+      .select({
+        id: userTable.id,
+        email: userTable.email,
+        primaryGroup: userTable.primaryGroup,
+      })
+      .from(userTable)
+      .where(eq(userTable.id, tokenRow.userId))
+      .limit(1);
+
+    if (!u) {
+      throw new HTTPException(404, { message: "User not found" });
+    }
+
+    return c.json({ userId: u.id, email: u.email, group: u.primaryGroup });
+  })
+  .get("/api/internal/schedule/:group", async (c) => {
+    if (c.req.header("X-Internal-Token") !== c.env.INTERNAL_TOKEN) {
+      throw new HTTPException(401, { message: "Unauthorized" });
+    }
+
+    const group = c.req.param("group");
+    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
+
+    if (!schedule) {
+      throw new HTTPException(404, { message: "Schedule not found" });
+    }
+
+    const scheduleData: ScheduleData = await schedule.json();
+    return c.json(scheduleData[group] ?? []);
   });
 
 app.onError((error, ctx) => {

@@ -2,6 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "noEmit": true,
+    "rootDir": "..",
     "strict": true,
     "outDir": "dist",
     "types": ["node"],
@@ -15,6 +16,6 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
   },
-  "include": ["./src/**/*.ts", "tsdown.config.ts", "drizzle.config.ts"],
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "tsdown.config.ts", "drizzle.config.ts"],
   "exclude": ["dist", "node_modules"]
 }

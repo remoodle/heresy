@@ -1,38 +1,18 @@
 import { useQuery } from "@tanstack/vue-query";
-import type { ScheduleItem } from "@/lib/types";
-import { client } from "./client";
-
-export const getGroups = async (): Promise<string[]> => {
-  const res = await client.api.groups.$get();
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch groups");
-  }
-
-  return res.json() as Promise<string[]>;
-};
+import { client, parseResponse } from "./client";
 
 export const useGroupsQuery = () =>
   useQuery({
     queryKey: ["groups"],
-    queryFn: getGroups,
+    queryFn: () => parseResponse(client.api.groups.$get()),
   });
-
-export const getGroupSchedule = async (
-  group: string,
-): Promise<ScheduleItem[]> => {
-  const res = await client.api.groups.$get({ query: { group } });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch group schedule");
-  }
-
-  return res.json() as Promise<ScheduleItem[]>;
-};
 
 export const useGroupScheduleQuery = (group: () => string) =>
   useQuery({
     queryKey: ["schedule", group],
-    queryFn: () => getGroupSchedule(group()),
+    queryFn: () =>
+      parseResponse(
+        client.api.groups[":group"].$get({ param: { group: group() } }),
+      ),
     enabled: () => !!group(),
   });

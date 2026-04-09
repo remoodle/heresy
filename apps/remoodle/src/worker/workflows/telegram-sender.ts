@@ -13,7 +13,7 @@ type Reminder = {
 type Input = {
   chatId: number;
   message: string;
-  reminders: Reminder[];
+  reminders?: Reminder[];
 };
 
 // One message at a time per chat, extras queue up (GROUP_ROUND_ROBIN = fair queuing across chats)
@@ -27,14 +27,21 @@ export const telegramSender = hatchet.task<Input>({
   fn: async (input, ctx) => {
     await sendTelegramMessage(input.chatId, input.message);
 
-    await db
-      .insert(sentReminders)
-      .values(input.reminders.map((r) => ({ ...r, triggeredAt: new Date(r.triggeredAt) })))
-      .onConflictDoNothing();
+    if (input.reminders && input.reminders.length > 0) {
+      await db
+        .insert(sentReminders)
+        .values(
+          input.reminders.map((reminder) => ({
+            ...reminder,
+            triggeredAt: new Date(reminder.triggeredAt),
+          })),
+        )
+        .onConflictDoNothing();
+    }
 
     await ctx.logger.info("sent telegram reminder", {
       chatId: input.chatId,
-      reminderCount: input.reminders.length,
+      reminderCount: input.reminders?.length,
     });
   },
 });

@@ -6,7 +6,8 @@ dotenv.config({ path: "./.dev.vars" });
 
 const crawledDbHelper = D1Helper.get("DB");
 
-const isProd = () => process.env.NODE_ENV === 'production'
+const isRemote = () =>
+  process.env.DRIZZLE_ENV === "remote" || process.env.NODE_ENV === "production";
 
 const getCredentials = () => {
   const prod = {
@@ -25,8 +26,7 @@ const getCredentials = () => {
     }
   }
 
-  // return prod;
-  return isProd() ? prod : dev
+  return isRemote() ? prod : dev;
 }
 
 export default defineConfig({

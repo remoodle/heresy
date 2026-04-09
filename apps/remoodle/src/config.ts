@@ -9,6 +9,8 @@ export const env = cleanEnv(process.env, {
   TELEGRAM_BOT_TOKEN: str(),
   HATCHET_CLIENT_TOKEN: str({ default: "" }),
   DATABASE_URL: str({ default: "./remoodle.db" }),
+  CALENDAR_API_URL: str({ default: "" }),
+  CALENDAR_INTERNAL_TOKEN: str({ default: "" }),
 });
 
 export const config = {
@@ -20,6 +22,10 @@ export const config = {
   },
   database: {
     url: env.DATABASE_URL,
+  },
+  calendarApi: {
+    url: env.CALENDAR_API_URL,
+    internalToken: env.CALENDAR_INTERNAL_TOKEN,
   },
   reminders: {
     defaultThresholds: ["P1D", "PT3H"],

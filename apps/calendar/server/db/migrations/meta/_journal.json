@@ -15,6 +15,13 @@
       "when": 1773236277800,
       "tag": "0001_amazing_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775737538212,
+      "tag": "0002_empty_grim_reaper",
+      "breakpoints": true
     }
   ]
 }

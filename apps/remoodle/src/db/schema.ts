@@ -3,11 +3,31 @@ import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   telegramId: integer("telegram_id").notNull().unique(),
-  calendarUrl: text("calendar_url").notNull(),
+  calendarUrl: text("calendar_url").notNull().default(""),
   thresholds: text("thresholds", { mode: "json" })
     .$type<string[]>()
     .notNull()
     .default(["P1D", "PT3H"]),
+  group: text("group"),
+  calendarAccountLinked: integer("calendar_account_linked", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  deadlinesEnabled: integer("deadlines_enabled", { mode: "boolean" }).notNull().default(true),
+  scheduleEnabled: integer("schedule_enabled", { mode: "boolean" }).notNull().default(false),
+  excludedCourses: text("excluded_courses", { mode: "json" })
+    .$type<string[]>()
+    .notNull()
+    .default([]),
+  scheduleFilters: text("schedule_filters", { mode: "json" })
+    .$type<{
+      eventTypes: { lecture: boolean; practice: boolean; learn: boolean };
+      eventFormats: { online: boolean; offline: boolean };
+    }>()
+    .notNull()
+    .$defaultFn(() => ({
+      eventTypes: { lecture: true, practice: true, learn: true },
+      eventFormats: { online: true, offline: true },
+    })),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),

@@ -12,6 +12,10 @@ import {
 } from "@/components/ui/dialog";
 import { authClient } from "@/lib/auth-client";
 
+const props = withDefaults(defineProps<{ callbackURL?: string }>(), {
+  callbackURL: "/schedule",
+});
+
 const open = ref(false);
 
 const {
@@ -21,7 +25,7 @@ const {
 } = useMutation({
   mutationFn: () =>
     authClient.signIn
-      .social({ provider: "microsoft", callbackURL: "/schedule" })
+      .social({ provider: "microsoft", callbackURL: props.callbackURL })
       .then(({ error }) => {
         if (error) throw new Error(error.message ?? "Sign in failed");
       }),
