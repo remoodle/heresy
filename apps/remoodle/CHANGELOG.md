@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/remoodle/heresy/compare/remoodle-v0.12.0...remoodle-v0.13.0) (2026-04-09)
+
+
+### Features
+
+* update calendar ui and remoodle integration ([f454f5b](https://github.com/remoodle/heresy/commit/f454f5b23b4d37e7d66c7dd814d4d3d05c5a574c))
+
 ## [0.12.0](https://github.com/remoodle/heresy/compare/remoodle-v0.11.1...remoodle-v0.12.0) (2026-04-09)
 
 
