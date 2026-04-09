@@ -3,9 +3,10 @@ import { hatchet } from "./hatchet-client";
 import { calendarFetchUser } from "./workflows/calendar-fetch-user";
 import { deadlineCheck } from "./workflows/deadline-check";
 import { deadlineCheckUser } from "./workflows/deadline-check-user";
+import { deadlineNotifyUser } from "./workflows/deadline-notify-user";
 import { scheduleCheck } from "./workflows/schedule-check";
 import { scheduleCheckUser } from "./workflows/schedule-check-user";
-import { telegramSender } from "./workflows/telegram-sender";
+import { telegramSendMessage } from "./workflows/telegram-send-message";
 
 async function main() {
   logger.worker.info("Creating Hatchet worker");
@@ -15,9 +16,10 @@ async function main() {
       deadlineCheck,
       calendarFetchUser,
       deadlineCheckUser,
+      deadlineNotifyUser,
       scheduleCheck,
       scheduleCheckUser,
-      telegramSender,
+      telegramSendMessage,
     ],
   });
 

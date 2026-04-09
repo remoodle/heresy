@@ -4,7 +4,7 @@ import { calendarEvents, sentReminders, users } from "../../db/schema";
 import { type CalendarEvent } from "../../library/calendar";
 import { buildReminderMessage, trackDeadlineReminders } from "../../library/deadline-reminders";
 import { hatchet } from "../hatchet-client";
-import { telegramSender } from "./telegram-sender";
+import { deadlineNotifyUser } from "./deadline-notify-user";
 
 type Input = {
   userId: number;
@@ -78,7 +78,7 @@ export const deadlineCheckUser = hatchet.task<Input>({
       reminderCount: pending.length,
     });
 
-    await telegramSender.runNoWait({
+    await deadlineNotifyUser.runNoWait({
       chatId: input.telegramId,
       message,
       reminders: pending.map((reminder) => ({
