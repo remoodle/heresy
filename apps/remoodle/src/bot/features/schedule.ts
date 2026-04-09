@@ -1,5 +1,6 @@
-import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
+import { Composer, InlineKeyboard } from "grammy";
+import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
@@ -10,7 +11,6 @@ import {
   DEFAULT_SCHEDULE_FILTERS,
 } from "../../library/schedule";
 import { scheduleCallback, scheduleViewCallback, menuCallback } from "../callback-data";
-import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 

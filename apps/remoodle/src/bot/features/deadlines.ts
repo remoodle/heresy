@@ -1,12 +1,12 @@
-import { Composer } from "grammy";
 import { eq } from "drizzle-orm";
+import { Composer } from "grammy";
+import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
 import { buildDeadlinesMessage } from "../../library/deadline-reminders";
 import { deadlinesCallback } from "../callback-data";
 import { buildBackToMenuKeyboard } from "../keyboards/menu";
-import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 

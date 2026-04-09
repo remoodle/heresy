@@ -1,11 +1,11 @@
-import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
+import { Composer, InlineKeyboard } from "grammy";
+import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
 import { coursesCallback, toggleCourseCallback, menuCallback } from "../callback-data";
 import { buildBackToMenuKeyboard } from "../keyboards/menu";
-import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 

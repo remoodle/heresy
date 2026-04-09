@@ -1,6 +1,6 @@
-import type { AppType } from "../../../calendar/server/index";
 import { hc } from "hono/client";
 import { DetailedError, parseResponse } from "hono/client";
+import type { AppType } from "../../../calendar/server/index";
 import { config } from "../config";
 
 const calendarClient = hc<AppType>(config.calendarApi.url, {

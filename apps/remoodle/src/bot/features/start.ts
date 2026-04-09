@@ -1,11 +1,12 @@
-import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
+import { Composer, InlineKeyboard } from "grammy";
+import type { Context } from "../context";
+import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { config } from "../../config";
+import { validateRemoodleConnectToken } from "../../library/calendar-api";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
-import { validateRemoodleConnectToken } from "../../library/calendar-api";
 import {
   menuCallback,
   updateCalendarCallback,
@@ -15,7 +16,6 @@ import {
   deadlinesSettingsCallback,
 } from "../callback-data";
 import { buildMenuKeyboard } from "../keyboards/menu";
-import type { Context } from "../context";
 
 const CALENDAR_APP_URL = `${config.calendarApi.url || "https://calendar.remoodle.app"}/account`;
 

@@ -1,12 +1,12 @@
-import { Bot, MemorySessionStorage, session } from "grammy";
 import { hydrate } from "@grammyjs/hydrate";
+import { Bot, MemorySessionStorage, session } from "grammy";
 import type { Context, SessionData } from "./context";
-import { startFeature } from "./features/start";
-import { deadlinesFeature } from "./features/deadlines";
-import { settingsFeature } from "./features/settings";
-import { coursesFeature } from "./features/courses";
-import { scheduleFeature } from "./features/schedule";
 import { logger } from "../library/logger";
+import { coursesFeature } from "./features/courses";
+import { deadlinesFeature } from "./features/deadlines";
+import { scheduleFeature } from "./features/schedule";
+import { settingsFeature } from "./features/settings";
+import { startFeature } from "./features/start";
 
 export function createBot(token: string) {
   const bot = new Bot<Context>(token);

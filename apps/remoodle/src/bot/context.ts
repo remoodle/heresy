@@ -1,5 +1,5 @@
-import type { Context as GrammyContext, SessionFlavor } from "grammy";
 import type { HydrateFlavor } from "@grammyjs/hydrate";
+import type { Context as GrammyContext, SessionFlavor } from "grammy";
 
 export type SessionData = {
   awaitingCalendarUrl?: boolean;

@@ -1,9 +1,12 @@
-import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
+import { Composer, InlineKeyboard } from "grammy";
+import type { Context } from "../context";
+import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { durationToMs, humanizeDuration } from "../../library/dates";
+import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
+import { DEFAULT_SCHEDULE_FILTERS, type ScheduleFilters } from "../../library/schedule";
 import {
   settingsCallback,
   deadlinesSettingsCallback,
@@ -17,9 +20,6 @@ import {
   connectCalendarCallback,
   menuCallback,
 } from "../callback-data";
-import { DEFAULT_SCHEDULE_FILTERS, type ScheduleFilters } from "../../library/schedule";
-import { config } from "../../config";
-import type { Context } from "../context";
 
 export const composer = new Composer<Context>();
 
