@@ -54,6 +54,7 @@ const props = defineProps<{
   group: string;
   filters: ScheduleFilter | undefined;
   events: CalendarEvent[];
+  buttonClass?: string;
 }>();
 
 const startValue = ref(today(getLocalTimeZone())) as Ref<DateValue>;
@@ -224,7 +225,10 @@ const getICalFile = (): void => {
 <template>
   <Dialog v-model:open="open" @update:open="open = $event">
     <DialogTrigger as-child>
-      <Button size="sm" variant="outline">Export</Button>
+      <Button size="sm" variant="outline" :class="props.buttonClass">
+        <CalendarIcon class="h-3.5 w-3.5" />
+        Export
+      </Button>
     </DialogTrigger>
     <DialogScrollContent class="max-w-lg rounded-2xl">
       <DialogHeader>

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import { Moon, Sun } from "lucide-vue-next";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +19,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 
 const props = defineProps<{
   name?: string | null;
@@ -101,6 +104,41 @@ function openAccount() {
             <DropdownMenuItem @click="openAccount">
               <Icon icon="lucide:user-round" class="size-4" />
               Account
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator />
+
+          <div
+            class="flex items-center justify-between gap-3 px-2 py-2 text-sm"
+          >
+            <span class="text-muted-foreground">Theme</span>
+
+            <ThemeSwitcher v-slot="{ theme, toggleTheme }">
+              <Button
+                variant="outline"
+                size="icon"
+                class="size-8"
+                @click="toggleTheme"
+              >
+                <Sun v-if="theme === 'light'" class="h-4 w-4" />
+                <Moon v-else class="h-4 w-4" />
+              </Button>
+            </ThemeSwitcher>
+          </div>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuGroup>
+            <DropdownMenuItem as-child>
+              <a
+                href="https://github.com/remoodle/heresy"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Icon icon="mdi:github" class="size-4" />
+                GitHub
+              </a>
             </DropdownMenuItem>
           </DropdownMenuGroup>
 

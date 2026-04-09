@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
+import { Moon, Sun } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import GroupSelect from "@/components/GroupSelect.vue";
@@ -50,6 +51,8 @@ const canSavePrimaryGroup = computed(
     !!groups.value?.includes(selectedGroup.value),
 );
 
+const hasUnsavedPrimaryGroup = computed(() => canSavePrimaryGroup.value);
+
 async function savePrimaryGroup() {
   if (!canSavePrimaryGroup.value) return;
   await setPrimaryGroup.mutateAsync(selectedGroup.value);
@@ -92,7 +95,18 @@ async function signOut() {
         </div>
 
         <div class="flex items-center gap-2">
-          <ThemeSwitcher />
+          <ThemeSwitcher v-slot="{ theme, toggleTheme }">
+            <Button
+              variant="outline"
+              size="sm"
+              class="px-2.5"
+              @click="toggleTheme"
+            >
+              <Sun v-if="theme === 'light'" class="h-4 w-4" />
+              <Moon v-else class="h-4 w-4" />
+            </Button>
+          </ThemeSwitcher>
+
           <Button variant="outline" size="sm" @click="router.push('/schedule')">
             Back to schedule
           </Button>
@@ -106,7 +120,8 @@ async function signOut() {
         <div class="flex flex-col gap-2">
           <p class="text-lg font-semibold tracking-tight">Primary group</p>
           <p class="text-sm text-muted-foreground">
-            This group is used by ReMoodle for your schedule features.
+            Your calendar uses one saved primary group across the app and
+            ReMoodle integration.
           </p>
         </div>
 
@@ -139,6 +154,20 @@ async function signOut() {
               </span>
             </p>
           </div>
+
+          <div
+            v-if="hasUnsavedPrimaryGroup"
+            class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100"
+          >
+            Save your primary group before connecting or reconnecting ReMoodle.
+            Until you save it, the app and bot will keep using
+            <span class="font-medium">{{
+              profile?.primaryGroup || "no group"
+            }}</span>
+            instead of
+            <span class="font-medium">{{ selectedGroup }}</span>
+            .
+          </div>
         </div>
       </section>
 
@@ -150,6 +179,7 @@ async function signOut() {
           <p class="text-sm text-muted-foreground">
             Generate a short code, then send it to
             <span class="font-mono text-foreground">@remoodle_bot</span>.
+            Reconnect after changing your primary group.
           </p>
         </div>
 

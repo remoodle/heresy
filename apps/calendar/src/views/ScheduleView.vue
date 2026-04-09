@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { Icon } from "@iconify/vue";
+import { CalendarDays } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
-import { watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { useRouter } from "vue-router";
 import AccountMenu from "@/components/AccountMenu.vue";
 import AuthDialog from "@/components/AuthDialog.vue";
 import ExportToIcal from "@/components/ExportToIcal.vue";
-import GroupSelect from "@/components/GroupSelect.vue";
 import Schedule from "@/components/Schedule.vue";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,9 +22,9 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useSchedule } from "@/composables/use-schedule";
 import { useSessionQuery, useClearSession } from "@/lib/api/session";
+import { useSetPrimaryGroup, useUserProfileQuery } from "@/lib/api/user";
 import { authClient } from "@/lib/auth-client";
 import { useAppStore } from "@/stores/app";
 
@@ -38,10 +38,54 @@ const { groupSchedule, allGroups, groupCourses } = useSchedule(
 );
 
 const { data: session } = useSessionQuery();
+const { data: profile, isPending: profilePending } = useUserProfileQuery();
+const setPrimaryGroup = useSetPrimaryGroup();
 const clearSession = useClearSession();
+const hasTriedPrimaryGroupMigration = ref(false);
+const pendingPrimaryGroup = ref("");
+
+async function migratePrimaryGroup(primaryGroup: string) {
+  try {
+    pendingPrimaryGroup.value = primaryGroup;
+    await setPrimaryGroup.mutateAsync(primaryGroup);
+  } catch {
+    hasTriedPrimaryGroupMigration.value = false;
+  } finally {
+    if (pendingPrimaryGroup.value === primaryGroup) {
+      pendingPrimaryGroup.value = "";
+    }
+  }
+}
 
 watchEffect(() => {
-  if (allGroups.value && !allGroups.value.includes(group.value)) {
+  const primaryGroup =
+    pendingPrimaryGroup.value || profile.value?.primaryGroup || "";
+  const storedGroup = group.value;
+
+  if (primaryGroup && group.value !== primaryGroup) {
+    group.value = primaryGroup;
+    return;
+  }
+
+  if (
+    session.value?.data &&
+    !profilePending.value &&
+    !primaryGroup &&
+    storedGroup &&
+    allGroups.value?.includes(storedGroup) &&
+    !setPrimaryGroup.isPending.value &&
+    !hasTriedPrimaryGroupMigration.value
+  ) {
+    hasTriedPrimaryGroupMigration.value = true;
+    void migratePrimaryGroup(storedGroup);
+    return;
+  }
+
+  if (
+    group.value &&
+    allGroups.value &&
+    !allGroups.value.includes(group.value)
+  ) {
     group.value = "";
   }
 });
@@ -69,18 +113,35 @@ async function signOut() {
   clearSession();
   await router.replace("/");
 }
+
+function openAccountSettings() {
+  router.push("/account");
+}
 </script>
 
 <template>
-  <SidebarProvider>
-    <Sidebar collapsible="offcanvas" class="border-r-0">
-      <SidebarHeader class="gap-3 p-3">
+  <SidebarProvider
+    :style="{ '--sidebar-width': '18rem' }"
+    class="h-svh overflow-hidden bg-background"
+  >
+    <Sidebar variant="inset" collapsible="offcanvas">
+      <SidebarHeader class="gap-4 p-3">
         <div class="flex items-center gap-2 px-1">
           <span class="text-sm font-semibold tracking-tight"
             >ReMoodle Calendar</span
           >
         </div>
-        <GroupSelect v-model="group" :all-groups="allGroups || []" />
+
+        <template v-if="group && filters[group]">
+          <div class="px-1">
+            <ExportToIcal
+              :events="groupSchedule"
+              :group="group"
+              :filters="filters[group]"
+              button-class="w-full justify-between"
+            />
+          </div>
+        </template>
       </SidebarHeader>
 
       <SidebarContent>
@@ -88,22 +149,22 @@ async function signOut() {
           <SidebarGroup>
             <SidebarGroupLabel>Event Types</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div class="flex flex-col gap-1 px-1">
+              <div class="flex flex-col px-1">
                 <label
                   v-for="key in ['lecture', 'practice', 'learn'] as const"
                   :key="key"
-                  class="flex cursor-pointer items-center gap-3 rounded-lg border border-sidebar-border px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent"
+                  class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent"
                   @click.prevent="
                     filters[group]!.eventTypes[key] =
                       !filters[group]!.eventTypes[key]
                   "
                 >
                   <div
-                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-colors"
+                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
                     :class="
                       filters[group]!.eventTypes[key]
                         ? 'border-primary bg-primary'
-                        : ''
+                        : 'border-input'
                     "
                   >
                     <Icon
@@ -121,22 +182,22 @@ async function signOut() {
           <SidebarGroup>
             <SidebarGroupLabel>Event Formats</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div class="flex flex-col gap-1 px-1">
+              <div class="flex flex-col px-1">
                 <label
                   v-for="key in ['online', 'offline'] as const"
                   :key="key"
-                  class="flex cursor-pointer items-center gap-3 rounded-lg border border-sidebar-border px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent"
+                  class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent"
                   @click.prevent="
                     filters[group]!.eventFormats[key] =
                       !filters[group]!.eventFormats[key]
                   "
                 >
                   <div
-                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-colors"
+                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
                     :class="
                       filters[group]!.eventFormats[key]
                         ? 'border-primary bg-primary'
-                        : ''
+                        : 'border-input'
                     "
                   >
                     <Icon
@@ -154,19 +215,19 @@ async function signOut() {
           <SidebarGroup>
             <SidebarGroupLabel>Courses</SidebarGroupLabel>
             <SidebarGroupContent>
-              <div class="flex flex-col gap-1 px-1">
+              <div class="flex flex-col px-1">
                 <label
                   v-for="course in groupCourses"
                   :key="course"
-                  class="flex cursor-pointer items-center gap-3 rounded-lg border border-sidebar-border px-2 py-2 text-sm transition-colors hover:bg-sidebar-accent"
+                  class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent"
                   @click.prevent="toggleCourse(course)"
                 >
                   <div
-                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-input transition-colors"
+                    class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
                     :class="
                       isCourseIncluded(course)
                         ? 'border-primary bg-primary'
-                        : ''
+                        : 'border-input'
                     "
                   >
                     <Icon
@@ -183,12 +244,11 @@ async function signOut() {
         </template>
 
         <div v-else class="px-2 py-6 text-center text-xs text-muted-foreground">
-          Select a group to see filters
+          Choose your primary group to load your schedule
         </div>
       </SidebarContent>
 
       <SidebarFooter class="gap-3 p-3">
-        <SidebarSeparator class="-mx-0" />
         <template v-if="session?.data">
           <AccountMenu
             :name="session.data.user.name"
@@ -196,34 +256,15 @@ async function signOut() {
             @sign-out="signOut"
           />
         </template>
-        <div class="flex flex-wrap items-center gap-2">
-          <ThemeSwitcher />
-          <a
-            href="https://github.com/remoodle/heresy"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex h-7 w-7 items-center justify-center rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground"
-          >
-            <Icon icon="mdi:github" class="h-4 w-4" />
-          </a>
-        </div>
       </SidebarFooter>
     </Sidebar>
 
-    <SidebarInset class="flex h-screen flex-col overflow-hidden">
-      <header
-        class="flex h-[41px] shrink-0 items-center justify-between border-b px-3 py-2"
-      >
-        <SidebarTrigger />
-        <div class="flex items-center gap-2">
-          <template v-if="group && filters && filters[group]">
-            <ExportToIcal
-              :events="groupSchedule"
-              :group="group"
-              :filters="filters[group]"
-            />
-          </template>
-
+    <SidebarInset class="min-h-svh overflow-hidden bg-background">
+      <header class="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger class="-ml-1" />
+        <div class="mx-2 h-4 w-px bg-border" />
+        <span class="text-sm font-medium">Schedule</span>
+        <div class="ml-auto flex items-center gap-2">
           <template v-if="!session?.data">
             <AuthDialog>
               <Button variant="ghost" size="sm" class="text-muted-foreground"
@@ -231,10 +272,18 @@ async function signOut() {
               >
             </AuthDialog>
           </template>
+          <Button
+            v-if="group"
+            variant="ghost"
+            size="sm"
+            @click="openAccountSettings"
+          >
+            {{ group }}
+          </Button>
         </div>
       </header>
 
-      <div class="min-h-0 flex-1 overflow-hidden p-2">
+      <div class="min-h-0 flex-1 overflow-hidden">
         <Schedule
           class="h-full w-full"
           :events="groupSchedule"

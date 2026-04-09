@@ -40,6 +40,8 @@ function buildMenuMessage(user: {
 
   if (user.calendarAccountLinked && user.group) {
     parts.push(`📆 Schedule group: ${user.group}`);
+  } else if (user.calendarAccountLinked) {
+    parts.push("⚠️ Schedule: save a primary group in Calendar and reconnect");
   }
 
   parts.push(`🔔 Thresholds: ${formatted}`);
@@ -235,7 +237,7 @@ feature.on("message:text", async (ctx, next) => {
 
     const groupMsg = connectResult.group
       ? `📆 Your group: <b>${connectResult.group}</b>`
-      : "⚠️ No primary group set in Calendar app. Set it there and reconnect to use /schedule.";
+      : "⚠️ No saved primary group found in Calendar. Save it in calendar.remoodle.app/account, then reconnect here to enable /schedule.";
 
     await ctx.reply(`✅ Calendar account connected!\n\n${groupMsg}\n\n${buildMenuMessage(user!)}`, {
       parse_mode: "HTML",
