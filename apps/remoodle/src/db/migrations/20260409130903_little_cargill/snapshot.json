@@ -1,7 +1,7 @@
 {
   "version": "7",
   "dialect": "sqlite",
-  "id": "84520be9-6326-4b60-80cd-cc2e704558ac",
+  "id": "6b75c1a6-bdc5-4df3-822f-e6aa0b3742f2",
   "prevIds": [
     "2fc7ae8a-68d2-4ebe-8401-ea433c6c74fd"
   ],
@@ -232,7 +232,7 @@
       "type": "text",
       "notNull": true,
       "autoincrement": false,
-      "default": null,
+      "default": "'{\"eventTypes\":{\"lecture\":true,\"practice\":true,\"learn\":true},\"eventFormats\":{\"online\":true,\"offline\":true}}'",
       "generated": null,
       "name": "schedule_filters",
       "entityType": "columns",

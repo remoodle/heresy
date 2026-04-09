@@ -24,10 +24,10 @@ export const users = sqliteTable("users", {
       eventFormats: { online: boolean; offline: boolean };
     }>()
     .notNull()
-    .$defaultFn(() => ({
+    .default({
       eventTypes: { lecture: true, practice: true, learn: true },
       eventFormats: { online: true, offline: true },
-    })),
+    }),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),

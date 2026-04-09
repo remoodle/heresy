@@ -3,7 +3,7 @@ ALTER TABLE `users` ADD `calendar_account_linked` integer DEFAULT false NOT NULL
 ALTER TABLE `users` ADD `deadlines_enabled` integer DEFAULT true NOT NULL;--> statement-breakpoint
 ALTER TABLE `users` ADD `schedule_enabled` integer DEFAULT false NOT NULL;--> statement-breakpoint
 ALTER TABLE `users` ADD `excluded_courses` text DEFAULT '[]' NOT NULL;--> statement-breakpoint
-ALTER TABLE `users` ADD `schedule_filters` text NOT NULL;--> statement-breakpoint
+ALTER TABLE `users` ADD `schedule_filters` text DEFAULT '{"eventTypes":{"lecture":true,"practice":true,"learn":true},"eventFormats":{"online":true,"offline":true}}' NOT NULL;--> statement-breakpoint
 PRAGMA foreign_keys=OFF;--> statement-breakpoint
 CREATE TABLE `__new_users` (
 	`id` integer PRIMARY KEY AUTOINCREMENT,
@@ -15,7 +15,7 @@ CREATE TABLE `__new_users` (
 	`deadlines_enabled` integer DEFAULT true NOT NULL,
 	`schedule_enabled` integer DEFAULT false NOT NULL,
 	`excluded_courses` text DEFAULT '[]' NOT NULL,
-	`schedule_filters` text NOT NULL,
+	`schedule_filters` text DEFAULT '{"eventTypes":{"lecture":true,"practice":true,"learn":true},"eventFormats":{"online":true,"offline":true}}' NOT NULL,
 	`created_at` integer NOT NULL
 );
 --> statement-breakpoint
