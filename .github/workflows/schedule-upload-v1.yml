@@ -19,7 +19,7 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          cd src/tools/schedule-parser/v1
+          cd tools/schedule-parser/v1
           pip install -r requirements-minimal.txt
 
       - name: Create output directory
@@ -27,7 +27,7 @@ jobs:
 
       - name: Parse schedule files
         run: |
-          cd src/tools/schedule-parser/v1
+          cd tools/schedule-parser/v1
           python parse.py
         env:
           SCHEDULE_INPUT_DIR: ${{ github.workspace }}/external/aitu/schedule

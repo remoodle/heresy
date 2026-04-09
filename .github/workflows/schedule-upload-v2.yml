@@ -25,7 +25,7 @@ jobs:
 
       - name: Install PHP dependencies
         run: |
-          cd src/tools/schedule-parser/v2
+          cd tools/schedule-parser/v2
           composer install
 
       - name: Create output directory
@@ -33,7 +33,7 @@ jobs:
 
       - name: Parse schedule files
         run: |
-          cd src/tools/schedule-parser/v2
+          cd tools/schedule-parser/v2
           php command.php ${{ inputs.duToken }} ${{ github.workspace }}/external/aitu/schedule ${{ github.workspace }}/output/main.json
 
       - name: List generated files
