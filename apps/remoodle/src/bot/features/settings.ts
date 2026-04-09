@@ -88,7 +88,7 @@ function buildDeadlinesKeyboard(activeThresholds: string[], deadlinesEnabled: bo
 
   keyboard
     .row()
-    .text("Update Calendar URL", updateCalendarCallback.pack({}))
+    .text("Update Calendar URL", updateCalendarCallback.pack({ from: "deadlines_settings" }))
     .row()
     .text("Back ←", settingsCallback.pack({}));
 
@@ -237,9 +237,7 @@ function buildScheduleSettingsKeyboard(
 
 function buildScheduleSettingsMessage(scheduleEnabled: boolean, group: string | null): string {
   let msg = "<b>📆 Schedule Settings</b>\n\n";
-  msg += group
-    ? `Group: <b>${group}</b>\n`
-    : "Group: not set\n";
+  msg += group ? `Group: <b>${group}</b>\n` : "Group: not set\n";
   msg += "\nConfigure event types, formats, and notifications.";
   if (!group) {
     msg +=

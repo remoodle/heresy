@@ -12,6 +12,7 @@ import {
   connectCalendarCallback,
   setupCallback,
   scheduleSettingsCallback,
+  deadlinesSettingsCallback,
 } from "../callback-data";
 import { buildMenuKeyboard } from "../keyboards/menu";
 import type { Context } from "../context";
@@ -51,7 +52,7 @@ function buildMenuMessage(user: {
 
 function buildSetupKeyboard() {
   return new InlineKeyboard()
-    .text("📅 Add Moodle calendar URL", updateCalendarCallback.pack({}))
+    .text("📅 Add Moodle calendar URL", updateCalendarCallback.pack({ from: "setup" }))
     .row()
     .text("🔗 Connect Calendar account", connectCalendarCallback.pack({ from: "setup" }));
 }
@@ -59,6 +60,15 @@ function buildSetupKeyboard() {
 function buildSetupMessage() {
   return `👋 Welcome to ReMoodle!\n\nHow would you like to set up?\n\n📅 <b>Moodle calendar URL</b> — track assignment deadlines\n🔗 <b>Calendar account</b> — view your class schedule`;
 }
+
+function buildUpdateCalendarKeyboard(from: "setup" | "deadlines_settings") {
+  return new InlineKeyboard().text(
+    "Back ←",
+    from === "deadlines_settings" ? deadlinesSettingsCallback.pack({}) : setupCallback.pack({}),
+  );
+}
+
+const CALENDAR_URL_PROMPT = `Send your Moodle calendar URL:\n\n<a href="https://docs.remoodle.app/guide/moodle-calendar-url">Where to get it?</a>`;
 
 function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings") {
   return new InlineKeyboard().text(
@@ -94,11 +104,12 @@ feature.command("start", async (ctx) => {
 
 feature.command("update", async (ctx) => {
   ctx.session.awaitingCalendarUrl = true;
-  await ctx.reply("Send your Moodle calendar URL:");
+  await ctx.reply(CALENDAR_URL_PROMPT, { parse_mode: "HTML" });
 });
 
 feature.callbackQuery(menuCallback.filter(), async (ctx) => {
   ctx.session.awaitingRemoodleToken = false;
+  ctx.session.awaitingCalendarUrl = false;
   const telegramId = ctx.from.id;
   const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
@@ -116,6 +127,7 @@ feature.callbackQuery(menuCallback.filter(), async (ctx) => {
 
 feature.callbackQuery(setupCallback.filter(), async (ctx) => {
   ctx.session.awaitingRemoodleToken = false;
+  ctx.session.awaitingCalendarUrl = false;
   await ctx.editMessageText(buildSetupMessage(), {
     parse_mode: "HTML",
     reply_markup: buildSetupKeyboard(),
@@ -124,11 +136,16 @@ feature.callbackQuery(setupCallback.filter(), async (ctx) => {
 });
 
 feature.callbackQuery(updateCalendarCallback.filter(), async (ctx) => {
+  const { from } = updateCalendarCallback.unpack(ctx.callbackQuery.data) as {
+    from: "setup" | "deadlines_settings";
+  };
   ctx.session.awaitingCalendarUrl = true;
+  ctx.session.awaitingRemoodleToken = false;
+  const keyboard = buildUpdateCalendarKeyboard(from);
   try {
-    await ctx.editMessageText("Send your Moodle calendar URL:");
+    await ctx.editMessageText(CALENDAR_URL_PROMPT, { parse_mode: "HTML", reply_markup: keyboard });
   } catch {
-    await ctx.reply("Send your Moodle calendar URL:");
+    await ctx.reply(CALENDAR_URL_PROMPT, { parse_mode: "HTML", reply_markup: keyboard });
   }
   await ctx.answerCallbackQuery();
 });
@@ -138,6 +155,7 @@ feature.callbackQuery(connectCalendarCallback.filter(), async (ctx) => {
     from: "setup" | "schedule_settings";
   };
   ctx.session.awaitingRemoodleToken = true;
+  ctx.session.awaitingCalendarUrl = false;
   try {
     await ctx.editMessageText(buildConnectCalendarMessage(), {
       parse_mode: "HTML",
