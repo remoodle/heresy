@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.0](https://github.com/remoodle/heresy/compare/remoodle-v0.11.1...remoodle-v0.12.0) (2026-04-09)
+
+
+### Features
+
+* connect calendar and remoodle ([e3f23f4](https://github.com/remoodle/heresy/commit/e3f23f4640a84533708d195551f9cff4b17c6b0c))
+* update migrations ([a9049ac](https://github.com/remoodle/heresy/commit/a9049acacf28b3037a215be927160d473e1caa10))
+
 ## [0.11.1](https://github.com/remoodle/heresy/compare/remoodle-v0.11.0...remoodle-v0.11.1) (2026-04-08)
 
 
