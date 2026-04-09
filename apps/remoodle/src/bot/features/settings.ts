@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { durationToMs, humanizeDuration } from "../../library/dates";

@@ -1,4 +1,4 @@
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { sentReminders } from "../../db/schema";
 import { hatchet } from "../hatchet-client";
 import { telegramSendMessage } from "./telegram-send-message";

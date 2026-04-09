@@ -1,5 +1,5 @@
 import { and, eq, notInArray, sql } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { calendarEvents } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
 import { hatchet } from "../hatchet-client";

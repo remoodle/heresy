@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { calendarEvents, sentReminders, users } from "../../db/schema";
 import { type CalendarEvent } from "../../library/calendar";
 import { buildReminderMessage, trackDeadlineReminders } from "../../library/deadline-reminders";

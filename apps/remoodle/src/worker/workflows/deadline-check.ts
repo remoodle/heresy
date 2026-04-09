@@ -1,4 +1,4 @@
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { hatchet } from "../hatchet-client";
 import { calendarFetchUser } from "./calendar-fetch-user";

@@ -1,5 +1,5 @@
 import { and, eq, isNotNull } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { hatchet } from "../hatchet-client";
 import { scheduleCheckUser } from "./schedule-check-user";

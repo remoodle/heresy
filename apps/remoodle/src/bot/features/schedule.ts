@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from "grammy";
 import { eq } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
 import {

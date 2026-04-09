@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import { eq } from "drizzle-orm";
-import { db } from "../../db/index";
+import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
 import { buildDeadlinesMessage } from "../../library/deadline-reminders";
