@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/remoodle/heresy/compare/remoodle-v0.14.0...remoodle-v0.14.1) (2026-04-09)
+
+
+### Miscellaneous Chores
+
+* add dev scripts ([a5a66f6](https://github.com/remoodle/heresy/commit/a5a66f6f949ae54ce73fc2342c2cffbe0c9d8879))
+
 ## [0.14.0](https://github.com/remoodle/heresy/compare/remoodle-v0.13.0...remoodle-v0.14.0) (2026-04-09)
 
 
