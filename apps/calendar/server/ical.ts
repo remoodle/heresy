@@ -6,9 +6,17 @@ type ScheduleItem = ScheduleData[string][number];
 export function generateIcal(
   items: ScheduleItem[],
   now: Date = new Date(),
-  options?: { combineAdjacentPairs?: boolean },
+  options?: {
+    combineAdjacentPairs?: boolean;
+    rangeStart?: Date;
+    rangeEnd?: Date;
+  },
 ): string {
   const sourceItems = options?.combineAdjacentPairs ? mergeAdjacentScheduleItems(items) : items;
 
-  return generateScheduleIcal(sourceItems, now, { eventTimeFormat: "utc" });
+  return generateScheduleIcal(sourceItems, now, {
+    eventTimeFormat: "utc",
+    rangeStart: options?.rangeStart,
+    rangeEnd: options?.rangeEnd,
+  });
 }

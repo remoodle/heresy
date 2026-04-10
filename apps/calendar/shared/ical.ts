@@ -139,6 +139,14 @@ function formatDateAsLocalDateTime(date: Date): string {
   );
 }
 
+function formatDateAsUtcDate(date: Date): string {
+  return formatUtcDate(date);
+}
+
+function formatEndOfDayUtcDate(date: Date): string {
+  return formatUtcDateFromParts(date.getFullYear(), date.getMonth() + 1, date.getDate(), 23, 59);
+}
+
 function getZonedDateParts(date: Date, timeZone: string) {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -395,9 +403,15 @@ export function mergeAdjacentCalendarEvents<T extends MergeableCalendarEvent>(ev
 export function generateScheduleIcal(
   items: IcalScheduleItem[],
   now: Date = new Date(),
-  options?: { eventTimeFormat?: "local" | "utc" },
+  options?: {
+    eventTimeFormat?: "local" | "utc";
+    rangeStart?: Date;
+    rangeEnd?: Date;
+  },
 ) {
   const eventTimeFormat = options?.eventTimeFormat ?? "local";
+  const rangeStart = options?.rangeStart ?? now;
+  const rangeEnd = options?.rangeEnd;
   const lines =
     eventTimeFormat === "utc"
       ? createUtcCalendarHeader("-//ReMoodle Calendar//EN", "Schedule")
@@ -408,7 +422,7 @@ export function generateScheduleIcal(
     const endParsed = parseScheduleTime(item.end);
     const weekdayNum = WEEKDAY_ORDER[startParsed.weekday] ?? 1;
     const rruleDay = RRULE_DAY[startParsed.weekday] ?? "MO";
-    const firstDay = getNextWeekdayInTimeZone(weekdayNum, now);
+    const firstDay = getNextWeekdayInTimeZone(weekdayNum, rangeStart);
     const dtstart =
       eventTimeFormat === "utc"
         ? formatUtcDateFromParts(
@@ -463,7 +477,7 @@ export function generateScheduleIcal(
             dtstart,
             dtend,
             dtstamp: formatUtcDate(now),
-            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}${rangeEnd ? `;UNTIL=${formatEndOfDayUtcDate(rangeEnd)}` : ""}`,
           })
         : createCalendarEventLines({
             uid: `${item.id}@calendar`,
@@ -473,7 +487,7 @@ export function generateScheduleIcal(
             dtstart,
             dtend,
             dtstamp: formatUtcDate(now),
-            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}${rangeEnd ? `;UNTIL=${formatEndOfDayUtcDate(rangeEnd)}` : ""}`,
           })),
     );
   }
@@ -492,30 +506,41 @@ export function generateCalendarEventsIcal(
   for (const event of events) {
     const eventStart = parseCalendarEventDateTime(event.start);
     const parsedEnd = event.end ? parseCalendarEventDateTime(event.end) : null;
-    const end =
+    const eventEnd =
       parsedEnd && !Number.isNaN(parsedEnd.getTime())
         ? parsedEnd
         : new Date(eventStart.getTime() + 50 * 60 * 1000);
-    const durationMs = Math.max(end.getTime() - eventStart.getTime(), 60_000);
-    const current = new Date(eventStart);
+    const durationMs = Math.max(eventEnd.getTime() - eventStart.getTime(), 60_000);
+    const firstOccurrence = new Date(eventStart);
 
-    while (current < rangeStart) {
-      current.setDate(current.getDate() + 7);
+    while (firstOccurrence < rangeStart) {
+      firstOccurrence.setDate(firstOccurrence.getDate() + 7);
     }
 
-    for (; current <= endDate; current.setDate(current.getDate() + 7)) {
-      const currentEnd = new Date(current.getTime() + durationMs);
-      lines.push(
-        ...createCalendarEventLines({
-          uid: `${event.id}-${current.toISOString()}`,
-          summary: event.title,
-          description: event.description,
-          location: event.location,
-          dtstart: formatDateAsLocalDateTime(current),
-          dtend: formatDateAsLocalDateTime(currentEnd),
-        }),
-      );
+    if (firstOccurrence > endDate) {
+      continue;
     }
+
+    const firstOccurrenceEnd = new Date(firstOccurrence.getTime() + durationMs);
+    const byDay =
+      RRULE_DAY[
+        ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
+          firstOccurrence.getDay()
+        ] ?? "Monday"
+      ];
+
+    lines.push(
+      ...createCalendarEventLines({
+        uid: `${event.id}@calendar-export`,
+        summary: event.title,
+        description: event.description,
+        location: event.location,
+        dtstart: formatDateAsLocalDateTime(firstOccurrence),
+        dtend: formatDateAsLocalDateTime(firstOccurrenceEnd),
+        dtstamp: formatDateAsUtcDate(new Date()),
+        rrule: `FREQ=WEEKLY;BYDAY=${byDay};UNTIL=${formatEndOfDayUtcDate(endDate)}`,
+      }),
+    );
   }
 
   lines.push("END:VCALENDAR");

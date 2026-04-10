@@ -113,8 +113,17 @@ const route = app
     }
 
     const tokenFilters = (tokenRow.filters ?? {}) as ScheduleFilter;
+    const rangeStart = tokenFilters.ical?.startDate
+      ? new Date(`${tokenFilters.ical.startDate}T00:00:00`)
+      : undefined;
+    const rangeEnd = tokenFilters.ical?.endDate
+      ? new Date(`${tokenFilters.ical.endDate}T00:00:00`)
+      : undefined;
+
     const ical = generateIcal(items, new Date(), {
       combineAdjacentPairs: tokenFilters.ical?.combineAdjacentPairs,
+      rangeStart,
+      rangeEnd,
     });
 
     return new Response(ical, {
