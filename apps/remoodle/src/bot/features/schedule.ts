@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
-import { Composer, InlineKeyboard } from "grammy";
+import { Composer, InputFile, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
+import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
@@ -9,8 +10,18 @@ import {
   buildWeeklyScheduleMessage,
   applyScheduleFilters,
   DEFAULT_SCHEDULE_FILTERS,
+  getUniqueRooms,
+  getScheduleForDay,
+  getDayName,
+  sanitizeRoomFilename,
 } from "../../library/schedule";
-import { scheduleCallback, scheduleViewCallback, menuCallback } from "../callback-data";
+import {
+  scheduleCallback,
+  scheduleViewCallback,
+  menuCallback,
+  roomPhotoCallback,
+  closeMessageCallback,
+} from "../callback-data";
 
 export const composer = new Composer<Context>();
 
@@ -23,21 +34,36 @@ async function fetchScheduleMessage(
   excludedCourses: string[],
   scheduleFilters: typeof DEFAULT_SCHEDULE_FILTERS,
   view: ScheduleView,
-): Promise<string> {
+): Promise<{ message: string; rooms: string[] }> {
   const items = await fetchGroupSchedule(group);
   const filtered = applyScheduleFilters(items, scheduleFilters, excludedCourses);
-  return view === "week"
-    ? buildWeeklyScheduleMessage(filtered, new Date(), group)
-    : buildTodayScheduleMessage(filtered, new Date(), group);
+  const now = new Date();
+  const message =
+    view === "week"
+      ? buildWeeklyScheduleMessage(filtered, now, group)
+      : buildTodayScheduleMessage(filtered, now, group);
+  const visibleItems = view === "week" ? filtered : getScheduleForDay(filtered, getDayName(now));
+  const rooms = getUniqueRooms(visibleItems);
+  return { message, rooms };
 }
 
-function buildScheduleKeyboard(view: ScheduleView) {
+function buildScheduleKeyboard(view: ScheduleView, rooms: string[]) {
   const keyboard = new InlineKeyboard();
 
   if (view === "today") {
     keyboard.text("This week →", scheduleViewCallback.pack({ view: "week" }));
   } else {
     keyboard.text("← Today", scheduleViewCallback.pack({ view: "today" }));
+  }
+
+  if (rooms.length > 0) {
+    for (let i = 0; i < rooms.length; i += 3) {
+      const rowRooms = rooms.slice(i, i + 3);
+      keyboard.row();
+      for (const room of rowRooms) {
+        keyboard.text(`📍 ${room}`, roomPhotoCallback.pack({ room }));
+      }
+    }
   }
 
   keyboard.row().text("Back ←", menuCallback.pack({}));
@@ -66,9 +92,9 @@ feature.command("schedule", async (ctx) => {
 
   await ctx.replyWithChatAction("typing");
 
-  let message: string;
+  let result: { message: string; rooms: string[] };
   try {
-    message = await fetchScheduleMessage(
+    result = await fetchScheduleMessage(
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
@@ -79,9 +105,9 @@ feature.command("schedule", async (ctx) => {
     return;
   }
 
-  await ctx.reply(message, {
+  await ctx.reply(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard("today"),
+    reply_markup: buildScheduleKeyboard("today", result.rooms),
   });
 });
 
@@ -104,9 +130,9 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
 
   await ctx.answerCallbackQuery();
 
-  let message: string;
+  let result: { message: string; rooms: string[] };
   try {
-    message = await fetchScheduleMessage(
+    result = await fetchScheduleMessage(
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
@@ -114,14 +140,14 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
     );
   } catch {
     await ctx.editMessageText("Failed to fetch schedule.", {
-      reply_markup: buildScheduleKeyboard("today"),
+      reply_markup: buildScheduleKeyboard("today", []),
     });
     return;
   }
 
-  await ctx.editMessageText(message, {
+  await ctx.editMessageText(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard("today"),
+    reply_markup: buildScheduleKeyboard("today", result.rooms),
   });
 });
 
@@ -146,9 +172,9 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
 
   await ctx.answerCallbackQuery();
 
-  let message: string;
+  let result: { message: string; rooms: string[] };
   try {
-    message = await fetchScheduleMessage(
+    result = await fetchScheduleMessage(
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
@@ -156,15 +182,45 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
     );
   } catch {
     await ctx.editMessageText("Failed to fetch schedule.", {
-      reply_markup: buildScheduleKeyboard(view),
+      reply_markup: buildScheduleKeyboard(view, []),
     });
     return;
   }
 
-  await ctx.editMessageText(message, {
+  await ctx.editMessageText(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard(view),
+    reply_markup: buildScheduleKeyboard(view, result.rooms),
   });
+});
+
+feature.callbackQuery(roomPhotoCallback.filter(), async (ctx) => {
+  const { room } = roomPhotoCallback.unpack(ctx.callbackQuery.data) as { room: string };
+  const url = `${config.roomsCdnUrl}/${sanitizeRoomFilename(room)}.png`;
+
+  await ctx.answerCallbackQuery();
+
+  const closeKeyboard = new InlineKeyboard().text("✕ Close", closeMessageCallback.pack({}));
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const buffer = Buffer.from(await res.arrayBuffer());
+    await ctx.replyWithPhoto(new InputFile(buffer, `${sanitizeRoomFilename(room)}.png`), {
+      caption: `📍 ${room}`,
+      reply_markup: closeKeyboard,
+    });
+  } catch {
+    await ctx.reply(`📍 ${room}\n\nNo photo available.`, {
+      reply_markup: closeKeyboard,
+    });
+  }
+});
+
+feature.callbackQuery(closeMessageCallback.filter(), async (ctx) => {
+  await ctx.answerCallbackQuery();
+  await ctx.deleteMessage();
 });
 
 export { composer as scheduleFeature };

@@ -39,6 +39,16 @@ function extractTime(timeStr: string): string {
   return parts.length === 2 ? parts[1]! : timeStr;
 }
 
+const ROOM_CODE_PATTERN = /C1\.\d+\.\d+[A-Z]*/;
+
+export function extractRoomCode(location: string): string | null {
+  return location.match(ROOM_CODE_PATTERN)?.[0] ?? null;
+}
+
+export function sanitizeRoomFilename(room: string): string {
+  return room.replace(/[/\\?%*:|"<>.\s]/g, "-");
+}
+
 function formatScheduleItem(item: CalendarScheduleItem): string {
   const start = extractTime(item.start);
   const end = extractTime(item.end);
@@ -49,6 +59,21 @@ function formatScheduleItem(item: CalendarScheduleItem): string {
   return [`<b>${start} – ${end}</b>  ${typeLabel}`, item.courseName, `📍 ${locationStr}`].join(
     "\n",
   );
+}
+
+export function getUniqueRooms(items: CalendarScheduleItem[]): string[] {
+  const seen = new Set<string>();
+  const rooms: string[] = [];
+  for (const item of items) {
+    if (!item.isOnline) {
+      const code = extractRoomCode(item.location);
+      if (code && !seen.has(code)) {
+        seen.add(code);
+        rooms.push(code);
+      }
+    }
+  }
+  return rooms;
 }
 
 export function applyScheduleFilters(

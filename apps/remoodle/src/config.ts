@@ -11,6 +11,7 @@ export const env = cleanEnv(process.env, {
   DATABASE_URL: str({ default: "./remoodle.db" }),
   CALENDAR_API_URL: str({ default: "" }),
   CALENDAR_INTERNAL_TOKEN: str({ default: "" }),
+  CABGEN_CDN_URL: str({ default: "https://cabgen.remoodle.app" }),
 });
 
 export const config = {
@@ -27,6 +28,7 @@ export const config = {
     url: env.CALENDAR_API_URL,
     internalToken: env.CALENDAR_INTERNAL_TOKEN,
   },
+  roomsCdnUrl: env.CABGEN_CDN_URL,
   reminders: {
     defaultThresholds: ["P1D", "PT3H"],
     maxThresholds: 10,
