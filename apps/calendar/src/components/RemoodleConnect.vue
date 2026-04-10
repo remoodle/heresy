@@ -2,11 +2,7 @@
 import { Icon } from "@iconify/vue";
 import { ref, computed } from "vue";
 import { Button } from "@/components/ui/button";
-import {
-  useUserProfileQuery,
-  useSetPrimaryGroup,
-  useGenerateRemoodleToken,
-} from "@/lib/api/user";
+import { useUserProfileQuery, useSetPrimaryGroup, useGenerateRemoodleToken } from "@/lib/api/user";
 
 const props = defineProps<{
   currentGroup: string;
@@ -21,8 +17,7 @@ const codeExpiry = ref<Date | null>(null);
 const copied = ref(false);
 
 const isPrimaryGroup = computed(
-  () =>
-    !!props.currentGroup && profile.value?.primaryGroup === props.currentGroup,
+  () => !!props.currentGroup && profile.value?.primaryGroup === props.currentGroup,
 );
 
 async function handleSetPrimary() {
@@ -64,15 +59,8 @@ async function copyCode() {
         :disabled="isPrimaryGroup || setPrimaryGroup.isPending.value"
         @click="handleSetPrimary"
       >
-        <Icon
-          :icon="isPrimaryGroup ? 'lucide:check' : 'lucide:star'"
-          class="size-3.5 shrink-0"
-        />
-        {{
-          isPrimaryGroup
-            ? `${currentGroup} is your group`
-            : `Set ${currentGroup} as my group`
-        }}
+        <Icon :icon="isPrimaryGroup ? 'lucide:check' : 'lucide:star'" class="size-3.5 shrink-0" />
+        {{ isPrimaryGroup ? `${currentGroup} is your group` : `Set ${currentGroup} as my group` }}
       </Button>
     </div>
 
@@ -91,10 +79,7 @@ async function copyCode() {
             class="ml-2 shrink-0 text-muted-foreground transition-colors hover:text-foreground"
             @click="copyCode"
           >
-            <Icon
-              :icon="copied ? 'lucide:check' : 'lucide:copy'"
-              class="size-4"
-            />
+            <Icon :icon="copied ? 'lucide:check' : 'lucide:copy'" class="size-4" />
           </button>
         </div>
         <p class="text-[11px] text-muted-foreground">

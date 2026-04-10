@@ -11,27 +11,27 @@ const isRemote = () =>
 
 const getCredentials = () => {
   const prod = {
-    driver: 'd1-http',
+    driver: "d1-http",
     dbCredentials: {
       ...crawledDbHelper.withCfCredentials(
         process.env.CLOUDFLARE_ACCOUNT_ID,
         process.env.CLOUDFLARE_D1_TOKEN,
       ).proxyCredentials,
-    }
-  }
+    },
+  };
 
   const dev = {
     dbCredentials: {
-      url: crawledDbHelper.sqliteLocalFileCredentials.url
-    }
-  }
+      url: crawledDbHelper.sqliteLocalFileCredentials.url,
+    },
+  };
 
   return isRemote() ? prod : dev;
-}
+};
 
 export default defineConfig({
   schema: "./server/db/schema.ts",
   out: "./server/db/migrations",
   dialect: "sqlite",
-  ...getCredentials()
+  ...getCredentials(),
 });

@@ -29,13 +29,11 @@ export const useSetPrimaryGroup = () => {
           json: { primaryGroup },
         }),
       ),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: userProfileQueryKey }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: userProfileQueryKey }),
   });
 };
 
 export const useGenerateRemoodleToken = () =>
   useMutation({
-    mutationFn: async () =>
-      parseResponse(client.api.user["remoodle-token"].$post()),
+    mutationFn: async () => parseResponse(client.api.user["remoodle-token"].$post()),
   });

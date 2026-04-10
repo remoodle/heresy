@@ -8,9 +8,7 @@ export function createAuth(env: Env) {
   const microsoftProvider = {
     clientId: env.MICROSOFT_CLIENT_ID,
     tenantId: "common",
-    ...(env.MICROSOFT_CLIENT_SECRET
-      ? { clientSecret: env.MICROSOFT_CLIENT_SECRET }
-      : {}),
+    ...(env.MICROSOFT_CLIENT_SECRET ? { clientSecret: env.MICROSOFT_CLIENT_SECRET } : {}),
   };
 
   return betterAuth({

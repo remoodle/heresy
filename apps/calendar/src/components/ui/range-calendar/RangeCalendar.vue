@@ -18,9 +18,7 @@ import {
   RangeCalendarPrevButton,
 } from ".";
 
-const props = defineProps<
-  RangeCalendarRootProps & { class?: HTMLAttributes["class"] }
->();
+const props = defineProps<RangeCalendarRootProps & { class?: HTMLAttributes["class"] }>();
 
 const emits = defineEmits<RangeCalendarRootEmits>();
 

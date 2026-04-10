@@ -114,15 +114,7 @@ function formatUtcDateFromParts(
   minutes: number,
 ): string {
   const utcDate = new Date(
-    Date.UTC(
-      year,
-      month - 1,
-      day,
-      hours,
-      minutes - CALENDAR_TIME_ZONE_OFFSET_MINUTES,
-      0,
-      0,
-    ),
+    Date.UTC(year, month - 1, day, hours, minutes - CALENDAR_TIME_ZONE_OFFSET_MINUTES, 0, 0),
   );
   return formatUtcDate(utcDate);
 }
@@ -311,10 +303,7 @@ function parseCalendarEventDateTime(value: string): Date {
   return new Date(year!, (month ?? 1) - 1, day!, hour ?? 0, minute ?? 0, 0, 0);
 }
 
-function canMergeScheduleItems(
-  current: MergeableScheduleItem,
-  next: MergeableScheduleItem,
-) {
+function canMergeScheduleItems(current: MergeableScheduleItem, next: MergeableScheduleItem) {
   const currentStart = parseScheduleTime(current.start);
   const currentEnd = parseScheduleTime(current.end);
   const nextStart = parseScheduleTime(next.start);
@@ -330,9 +319,7 @@ function canMergeScheduleItems(
   return gap >= 0 && gap <= SLOT_BREAK_THRESHOLD_MINUTES;
 }
 
-export function mergeAdjacentScheduleItems<T extends MergeableScheduleItem>(
-  items: T[],
-) {
+export function mergeAdjacentScheduleItems<T extends MergeableScheduleItem>(items: T[]) {
   if (items.length < 2) return items;
 
   const sortedItems = [...items].sort((a, b) => {
@@ -361,10 +348,7 @@ export function mergeAdjacentScheduleItems<T extends MergeableScheduleItem>(
   return merged;
 }
 
-function canMergeCalendarEvents(
-  current: MergeableCalendarEvent,
-  next: MergeableCalendarEvent,
-) {
+function canMergeCalendarEvents(current: MergeableCalendarEvent, next: MergeableCalendarEvent) {
   if (!current.start || !current.end || !next.start || !next.end) return false;
   if (current.title !== next.title) return false;
   if (current.description !== next.description) return false;
@@ -381,9 +365,7 @@ function canMergeCalendarEvents(
   return gap >= 0 && gap <= SLOT_BREAK_THRESHOLD_MINUTES;
 }
 
-export function mergeAdjacentCalendarEvents<T extends MergeableCalendarEvent>(
-  events: T[],
-) {
+export function mergeAdjacentCalendarEvents<T extends MergeableCalendarEvent>(events: T[]) {
   if (events.length < 2) return events;
 
   const sortedEvents = [...events].sort((a, b) => {
@@ -430,41 +412,40 @@ export function generateScheduleIcal(
     const dtstart =
       eventTimeFormat === "utc"
         ? formatUtcDateFromParts(
-          firstDay.year,
-          firstDay.month,
-          firstDay.day,
-          startParsed.hours,
-          startParsed.minutes,
-        )
+            firstDay.year,
+            firstDay.month,
+            firstDay.day,
+            startParsed.hours,
+            startParsed.minutes,
+          )
         : formatLocalDateTime(
-          firstDay.year,
-          firstDay.month,
-          firstDay.day,
-          startParsed.hours,
-          startParsed.minutes,
-        );
+            firstDay.year,
+            firstDay.month,
+            firstDay.day,
+            startParsed.hours,
+            startParsed.minutes,
+          );
     const endDay =
       endParsed.hours < startParsed.hours ||
-        (endParsed.hours === startParsed.hours &&
-          endParsed.minutes <= startParsed.minutes)
+      (endParsed.hours === startParsed.hours && endParsed.minutes <= startParsed.minutes)
         ? addDays(firstDay.year, firstDay.month, firstDay.day, 1)
         : firstDay;
     const dtend =
       eventTimeFormat === "utc"
         ? formatUtcDateFromParts(
-          endDay.year,
-          endDay.month,
-          endDay.day,
-          endParsed.hours,
-          endParsed.minutes,
-        )
+            endDay.year,
+            endDay.month,
+            endDay.day,
+            endParsed.hours,
+            endParsed.minutes,
+          )
         : formatLocalDateTime(
-          endDay.year,
-          endDay.month,
-          endDay.day,
-          endParsed.hours,
-          endParsed.minutes,
-        );
+            endDay.year,
+            endDay.month,
+            endDay.day,
+            endParsed.hours,
+            endParsed.minutes,
+          );
     const description = [
       item.teacher ? `Teacher: ${item.teacher}` : "",
       item.type ? `Type: ${item.type}` : "",
@@ -475,25 +456,25 @@ export function generateScheduleIcal(
     lines.push(
       ...(eventTimeFormat === "utc"
         ? createUtcCalendarEventLines({
-          uid: `${item.id}@calendar`,
-          summary: item.courseName,
-          description,
-          location: item.isOnline ? "Online" : item.location,
-          dtstart,
-          dtend,
-          dtstamp: formatUtcDate(now),
-          rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
-        })
+            uid: `${item.id}@calendar`,
+            summary: item.courseName,
+            description,
+            location: item.isOnline ? "Online" : item.location,
+            dtstart,
+            dtend,
+            dtstamp: formatUtcDate(now),
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+          })
         : createCalendarEventLines({
-          uid: `${item.id}@calendar`,
-          summary: item.courseName,
-          description,
-          location: item.isOnline ? "Online" : item.location,
-          dtstart,
-          dtend,
-          dtstamp: formatUtcDate(now),
-          rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
-        })),
+            uid: `${item.id}@calendar`,
+            summary: item.courseName,
+            description,
+            location: item.isOnline ? "Online" : item.location,
+            dtstart,
+            dtend,
+            dtstamp: formatUtcDate(now),
+            rrule: `FREQ=WEEKLY;BYDAY=${rruleDay}`,
+          })),
     );
   }
 
@@ -506,10 +487,7 @@ export function generateCalendarEventsIcal(
   rangeStart: Date,
   endDate: Date,
 ) {
-  const lines = createCalendarHeader(
-    "-//ReMoodle//Calendar Export//EN",
-    "Schedule Export",
-  );
+  const lines = createCalendarHeader("-//ReMoodle//Calendar Export//EN", "Schedule Export");
 
   for (const event of events) {
     const eventStart = parseCalendarEventDateTime(event.start);

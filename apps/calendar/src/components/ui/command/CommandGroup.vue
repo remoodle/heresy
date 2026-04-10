@@ -19,9 +19,7 @@ const delegatedProps = reactiveOmit(props, "class");
 const { allGroups, filterState } = useCommand();
 const id = useId();
 
-const isRender = computed(() =>
-  !filterState.search ? true : filterState.filtered.groups.has(id),
-);
+const isRender = computed(() => (!filterState.search ? true : filterState.filtered.groups.has(id)));
 
 provideCommandGroupContext({ id });
 onMounted(() => {
@@ -40,10 +38,7 @@ onUnmounted(() => {
     :class="cn('overflow-hidden p-1 text-foreground', props.class)"
     :hidden="isRender ? undefined : true"
   >
-    <ListboxGroupLabel
-      v-if="heading"
-      class="px-2 py-1.5 text-xs font-medium text-muted-foreground"
-    >
+    <ListboxGroupLabel v-if="heading" class="px-2 py-1.5 text-xs font-medium text-muted-foreground">
       {{ heading }}
     </ListboxGroupLabel>
     <slot />

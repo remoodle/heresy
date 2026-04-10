@@ -6,11 +6,7 @@ import type { ExtraEnv } from "../env-extra";
 import type { ScheduleData, ScheduleFilter } from "./types.d";
 import { createAuth } from "./auth";
 import { createDb } from "./db";
-import {
-  icalTokens,
-  user as userTable,
-  remoodleConnectTokens,
-} from "./db/schema";
+import { icalTokens, user as userTable, remoodleConnectTokens } from "./db/schema";
 import { generateIcal } from "./ical";
 
 type Bindings = ExtraEnv & Env;
@@ -34,10 +30,8 @@ function applyFilters(items: ScheduleData[string], f: ScheduleFilter) {
 
     const isLearn = item.teacher.startsWith("https://learn");
     if (isLearn && !f.eventTypes.learn) return false;
-    if (!isLearn && item.type === "lecture" && !f.eventTypes.lecture)
-      return false;
-    if (!isLearn && item.type === "practice" && !f.eventTypes.practice)
-      return false;
+    if (!isLearn && item.type === "lecture" && !f.eventTypes.lecture) return false;
+    if (!isLearn && item.type === "practice" && !f.eventTypes.practice) return false;
 
     if (item.isOnline && !f.eventFormats.online) return false;
     if (!item.isOnline && !f.eventFormats.offline) return false;
@@ -170,18 +164,13 @@ const route = app
     const db = createDb(c.env.DB);
 
     // Delete any existing tokens for this user (one active at a time)
-    await db
-      .delete(remoodleConnectTokens)
-      .where(eq(remoodleConnectTokens.userId, session.user.id));
+    await db.delete(remoodleConnectTokens).where(eq(remoodleConnectTokens.userId, session.user.id));
 
     // Generate a short human-friendly code with RE_ prefix
     const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     const token =
       "RE_" +
-      Array.from(
-        { length: 6 },
-        () => chars[Math.floor(Math.random() * chars.length)],
-      ).join("");
+      Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -210,12 +199,7 @@ const route = app
     const [tokenRow] = await db
       .select()
       .from(icalTokens)
-      .where(
-        and(
-          eq(icalTokens.userId, session.user.id),
-          eq(icalTokens.group, group),
-        ),
-      )
+      .where(and(eq(icalTokens.userId, session.user.id), eq(icalTokens.group, group)))
       .limit(1);
 
     if (!tokenRow) {
@@ -246,12 +230,7 @@ const route = app
     const [existing] = await db
       .select()
       .from(icalTokens)
-      .where(
-        and(
-          eq(icalTokens.userId, session.user.id),
-          eq(icalTokens.group, body.group),
-        ),
-      )
+      .where(and(eq(icalTokens.userId, session.user.id), eq(icalTokens.group, body.group)))
       .limit(1);
 
     const token = crypto.randomUUID();
@@ -291,12 +270,7 @@ const route = app
     const [existing] = await db
       .select()
       .from(icalTokens)
-      .where(
-        and(
-          eq(icalTokens.userId, session.user.id),
-          eq(icalTokens.group, body.group),
-        ),
-      )
+      .where(and(eq(icalTokens.userId, session.user.id), eq(icalTokens.group, body.group)))
       .limit(1);
 
     if (!existing) {
@@ -326,16 +300,12 @@ const route = app
 
     if (!tokenRow || tokenRow.expiresAt < new Date()) {
       if (tokenRow) {
-        await db
-          .delete(remoodleConnectTokens)
-          .where(eq(remoodleConnectTokens.id, tokenRow.id));
+        await db.delete(remoodleConnectTokens).where(eq(remoodleConnectTokens.id, tokenRow.id));
       }
       throw new HTTPException(404, { message: "Token not found or expired" });
     }
 
-    await db
-      .delete(remoodleConnectTokens)
-      .where(eq(remoodleConnectTokens.id, tokenRow.id));
+    await db.delete(remoodleConnectTokens).where(eq(remoodleConnectTokens.id, tokenRow.id));
 
     const [u] = await db
       .select({
@@ -372,10 +342,7 @@ const route = app
 app.onError((error, ctx) => {
   const status = error instanceof HTTPException ? error.status : 500;
   console.error(error);
-  return ctx.json(
-    { status, message: error.message, stack: error.stack },
-    status,
-  );
+  return ctx.json({ status, message: error.message, stack: error.stack }, status);
 });
 
 export type AppType = typeof route;

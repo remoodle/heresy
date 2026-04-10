@@ -1,5 +1,0 @@
-onlyBuiltDependencies:
-  - "@hatchet-dev/typescript-sdk"
-  - better-sqlite3
-  - esbuild
-  - protobufjs

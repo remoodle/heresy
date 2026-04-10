@@ -9,11 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  useIcalTokenQuery,
-  useUpsertIcalToken,
-  useUpdateIcalFilters,
-} from "@/lib/api/ical";
+import { useIcalTokenQuery, useUpsertIcalToken, useUpdateIcalFilters } from "@/lib/api/ical";
 import type { ScheduleFilter } from "@/lib/types";
 
 const props = defineProps<{ group: string; filters: ScheduleFilter }>();
@@ -23,8 +19,7 @@ const copied = ref(false);
 
 const { data: tokenData, isPending } = useIcalTokenQuery(() => props.group);
 const { mutate: generate, isPending: generating } = useUpsertIcalToken();
-const { mutate: updateFilters, isPending: updatingFilters } =
-  useUpdateIcalFilters();
+const { mutate: updateFilters, isPending: updatingFilters } = useUpdateIcalFilters();
 
 const busy = () => generating.value || updatingFilters.value;
 
@@ -43,12 +38,10 @@ async function copy() {
     </DialogTrigger>
     <DialogContent class="max-w-80 rounded-2xl md:max-w-sm">
       <DialogHeader>
-        <DialogTitle class="text-left text-xl font-bold"
-          >iCal Subscription</DialogTitle
-        >
+        <DialogTitle class="text-left text-xl font-bold">iCal Subscription</DialogTitle>
         <DialogDescription class="text-left">
-          Paste this URL into Google Calendar, Apple Calendar, or any app that
-          supports calendar subscriptions. It stays in sync automatically.
+          Paste this URL into Google Calendar, Apple Calendar, or any app that supports calendar
+          subscriptions. It stays in sync automatically.
         </DialogDescription>
       </DialogHeader>
 
@@ -56,9 +49,7 @@ async function copy() {
         <div class="text-sm font-medium">{{ group }}</div>
 
         <template v-if="isPending || busy()">
-          <div
-            class="flex h-8 items-center justify-center rounded-md border border-input bg-muted"
-          >
+          <div class="flex h-8 items-center justify-center rounded-md border border-input bg-muted">
             <span class="text-xs text-muted-foreground">Loading...</span>
           </div>
         </template>
@@ -75,9 +66,7 @@ async function copy() {
             </Button>
           </div>
           <div class="flex items-center justify-between">
-            <p class="text-xs text-muted-foreground">
-              Sync your current filters to this URL.
-            </p>
+            <p class="text-xs text-muted-foreground">Sync your current filters to this URL.</p>
             <Button
               variant="ghost"
               size="sm"
@@ -90,11 +79,7 @@ async function copy() {
           </div>
         </template>
         <template v-else>
-          <Button
-            variant="outline"
-            :disabled="busy()"
-            @click="generate({ group, filters })"
-          >
+          <Button variant="outline" :disabled="busy()" @click="generate({ group, filters })">
             Generate link
           </Button>
           <p class="text-xs text-muted-foreground">

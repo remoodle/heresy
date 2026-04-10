@@ -4,10 +4,7 @@ import { useGroupsQuery, useGroupScheduleQuery } from "@/lib/api";
 import { dayjs } from "@/lib/dayjs";
 import type { ScheduleFilter, ScheduleItem } from "@/lib/types";
 
-export function useSchedule(
-  group: () => string,
-  filters: () => Record<string, ScheduleFilter>,
-) {
+export function useSchedule(group: () => string, filters: () => Record<string, ScheduleFilter>) {
   const currentGroup = computed(() => group());
   const currentFilters = computed(() => filters());
 
@@ -47,12 +44,7 @@ export function useSchedule(
       return new Date();
     }
 
-    return targetDate
-      .hour(Number(hours))
-      .minute(Number(minutes))
-      .second(0)
-      .millisecond(0)
-      .toDate();
+    return targetDate.hour(Number(hours)).minute(Number(minutes)).second(0).millisecond(0).toDate();
   };
 
   const convertToDateTime = (date: Date): string => {
@@ -83,66 +75,61 @@ export function useSchedule(
       return [];
     }
 
-    const filteredSchedule = currentGroupSchedule.filter(
-      (item: ScheduleItem) => {
-        if (!userGroupFilters) {
-          return true;
-        }
-
-        if (userGroupFilters.excludedCourses.length > 0) {
-          if (userGroupFilters.excludedCourses.includes(item.courseName)) {
-            return false;
-          }
-        }
-
-        if (
-          !userGroupFilters.eventTypes.learn &&
-          !userGroupFilters.eventTypes.lecture &&
-          !userGroupFilters.eventTypes.practice
-        ) {
-          return true;
-        }
-
-        if (!userGroupFilters.eventTypes.learn) {
-          if (item.teacher.startsWith("https://learn")) {
-            return false;
-          }
-        }
-
-        if (!userGroupFilters.eventTypes.lecture) {
-          if (item.type === "lecture") {
-            return false;
-          }
-        }
-
-        if (!userGroupFilters.eventTypes.practice) {
-          if (item.type === "practice") {
-            return false;
-          }
-        }
-
-        if (
-          !userGroupFilters.eventFormats.offline &&
-          !userGroupFilters.eventFormats.online
-        ) {
-          return true;
-        }
-
-        if (!userGroupFilters.eventFormats.offline) {
-          if (item.location !== "online") {
-            return false;
-          }
-        }
-
-        if (!userGroupFilters.eventFormats.online) {
-          if (item.location === "online") {
-            return false;
-          }
-        }
-
+    const filteredSchedule = currentGroupSchedule.filter((item: ScheduleItem) => {
+      if (!userGroupFilters) {
         return true;
-      },
-    );
+      }
+
+      if (userGroupFilters.excludedCourses.length > 0) {
+        if (userGroupFilters.excludedCourses.includes(item.courseName)) {
+          return false;
+        }
+      }
+
+      if (
+        !userGroupFilters.eventTypes.learn &&
+        !userGroupFilters.eventTypes.lecture &&
+        !userGroupFilters.eventTypes.practice
+      ) {
+        return true;
+      }
+
+      if (!userGroupFilters.eventTypes.learn) {
+        if (item.teacher.startsWith("https://learn")) {
+          return false;
+        }
+      }
+
+      if (!userGroupFilters.eventTypes.lecture) {
+        if (item.type === "lecture") {
+          return false;
+        }
+      }
+
+      if (!userGroupFilters.eventTypes.practice) {
+        if (item.type === "practice") {
+          return false;
+        }
+      }
+
+      if (!userGroupFilters.eventFormats.offline && !userGroupFilters.eventFormats.online) {
+        return true;
+      }
+
+      if (!userGroupFilters.eventFormats.offline) {
+        if (item.location !== "online") {
+          return false;
+        }
+      }
+
+      if (!userGroupFilters.eventFormats.online) {
+        if (item.location === "online") {
+          return false;
+        }
+      }
+
+      return true;
+    });
 
     // Convert the schedule to CalendarEvent format (also for the previous and next week)
     const resultSchedule: CalendarEvent[] = filteredSchedule.map((item) => {
@@ -160,10 +147,7 @@ export function useSchedule(
 
       const newEvent = {
         id: item.id,
-        title:
-          item.courseName.length > 30
-            ? item.courseName.slice(0, 26) + "..."
-            : item.courseName,
+        title: item.courseName.length > 30 ? item.courseName.slice(0, 26) + "..." : item.courseName,
         description: `${item.teacher.startsWith("https://learn") ? "learn.astanait.edu.kz" : item.teacher}  |  ${item.location.toUpperCase()}  |  ${item.type}\n`,
       };
 

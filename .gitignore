@@ -1,8 +1,11 @@
 .DS_Store
 
 .turbo
+.vite
+.vite-hooks
 
 node_modules
+coverage
 
 .dev.vars
 .wrangler/
@@ -15,5 +18,6 @@ data/
 .idea/
 
 *.db
+*.tsbuildinfo
 
 .github/scripts/schedule-parser/vendor/*

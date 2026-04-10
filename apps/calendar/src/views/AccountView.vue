@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { Icon } from "@iconify/vue";
-import { Moon, Sun } from "lucide-vue-next";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import AccountMenu from "@/components/AccountMenu.vue";
 import GroupSelect from "@/components/GroupSelect.vue";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ThemeSwitcher } from "@/components/ui/theme-switcher";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
 import { useGroupsQuery } from "@/lib/api";
 import { useClearSession, useSessionQuery } from "@/lib/api/session";
-import {
-  useGenerateRemoodleToken,
-  useSetPrimaryGroup,
-  useUserProfileQuery,
-} from "@/lib/api/user";
+import { useGenerateRemoodleToken, useSetPrimaryGroup, useUserProfileQuery } from "@/lib/api/user";
 import { authClient } from "@/lib/auth-client";
 
 const router = useRouter();
@@ -52,6 +58,7 @@ const canSavePrimaryGroup = computed(
 );
 
 const hasUnsavedPrimaryGroup = computed(() => canSavePrimaryGroup.value);
+const currentPrimaryGroup = computed(() => profile.value?.primaryGroup || "not set");
 
 async function savePrimaryGroup() {
   if (!canSavePrimaryGroup.value) return;
@@ -77,159 +84,183 @@ async function copyCode() {
 async function signOut() {
   await authClient.signOut();
   clearSession();
-  await router.replace("/login");
+  await router.replace("/");
 }
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
-    <header class="border-b">
-      <div
-        class="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3"
-      >
-        <div>
-          <p class="text-sm font-semibold tracking-tight">Account</p>
-          <p class="text-xs text-muted-foreground">
-            {{ session?.data?.user.email }}
-          </p>
+  <SidebarProvider
+    :style="{ '--sidebar-width': '18rem' }"
+    class="h-svh overflow-hidden bg-background"
+  >
+    <Sidebar variant="inset" collapsible="offcanvas">
+      <SidebarHeader class="gap-4 p-3">
+        <div class="flex items-center gap-2 px-1">
+          <span class="text-sm font-semibold tracking-tight">ReMoodle Calendar</span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <ThemeSwitcher v-slot="{ theme, toggleTheme }">
-            <Button
-              variant="outline"
-              size="sm"
-              class="px-2.5"
-              @click="toggleTheme"
-            >
-              <Sun v-if="theme === 'light'" class="h-4 w-4" />
-              <Moon v-else class="h-4 w-4" />
-            </Button>
-          </ThemeSwitcher>
+        <div class="space-y-1 px-1">
+          <p class="text-sm font-medium">Account</p>
+          <p class="text-xs text-muted-foreground">
+            {{ session?.data?.user.email || "Manage your calendar settings" }}
+          </p>
+        </div>
+      </SidebarHeader>
 
-          <Button variant="outline" size="sm" @click="router.push('/schedule')">
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Saved group</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div class="px-1">
+              <div
+                class="rounded-xl border border-sidebar-border/70 bg-sidebar-accent/40 px-3 py-3"
+              >
+                <p class="text-sm font-medium">{{ currentPrimaryGroup }}</p>
+                <p class="mt-1 text-xs leading-relaxed text-muted-foreground">
+                  This is the default group used in the schedule and ReMoodle sync.
+                </p>
+              </div>
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel>Integration</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <div class="space-y-3 px-1 text-sm text-muted-foreground">
+              <p>Save a primary group first, then generate a short connection code.</p>
+              <p>
+                Send the code to
+                <span class="font-mono text-foreground">@remoodle_bot</span>
+                to reconnect your calendar.
+              </p>
+            </div>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+
+      <SidebarFooter class="gap-3 p-3">
+        <template v-if="session?.data">
+          <AccountMenu
+            :name="session.data.user.name"
+            :email="session.data.user.email"
+            @sign-out="signOut"
+          />
+        </template>
+      </SidebarFooter>
+    </Sidebar>
+
+    <SidebarInset class="overflow-hidden bg-background">
+      <header class="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger class="-ml-1" />
+        <div class="mx-2 h-4 w-px bg-border" />
+        <span class="text-sm font-medium">Account</span>
+        <div class="ml-auto flex items-center gap-2">
+          <Button variant="ghost" size="sm" @click="router.push('/schedule')">
+            <Icon icon="lucide:arrow-left" class="mr-2 h-4 w-4" />
             Back to schedule
           </Button>
-          <Button variant="ghost" size="sm" @click="signOut">Sign out</Button>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <main class="mx-auto flex max-w-4xl flex-col gap-6 px-4 py-6">
-      <section class="rounded-2xl border bg-card p-5 shadow-sm">
-        <div class="flex flex-col gap-2">
-          <p class="text-lg font-semibold tracking-tight">Primary group</p>
-          <p class="text-sm text-muted-foreground">
-            Your calendar uses one saved primary group across the app and
-            ReMoodle integration.
-          </p>
-        </div>
+      <main class="min-h-0 flex-1 overflow-auto">
+        <div class="mx-auto flex w-full max-w-4xl flex-col px-4 py-6 sm:px-6">
+          <div class="overflow-hidden rounded-2xl border bg-card/30">
+            <section class="border-b px-5 py-5 sm:px-6">
+              <div class="flex flex-col gap-2">
+                <p class="text-lg font-semibold tracking-tight">Primary group</p>
+                <p class="text-sm text-muted-foreground">
+                  Keep one saved group across the schedule, exports, and ReMoodle integration.
+                </p>
+              </div>
 
-        <Separator class="my-5" />
+              <div class="mt-5 flex flex-col gap-4">
+                <div class="max-w-sm">
+                  <GroupSelect v-model="selectedGroup" :all-groups="groups ?? []" />
+                </div>
 
-        <div class="flex flex-col gap-4">
-          <div class="max-w-sm">
-            <GroupSelect v-model="selectedGroup" :all-groups="groups ?? []" />
+                <div class="flex flex-wrap items-center gap-3">
+                  <Button
+                    :disabled="!canSavePrimaryGroup || setPrimaryGroup.isPending.value"
+                    @click="savePrimaryGroup"
+                  >
+                    <Icon icon="lucide:save" class="mr-2 h-4 w-4" />
+                    {{ setPrimaryGroup.isPending.value ? "Saving..." : "Save primary group" }}
+                  </Button>
+
+                  <p class="text-sm text-muted-foreground">
+                    Current:
+                    <span class="font-medium text-foreground">
+                      {{ currentPrimaryGroup }}
+                    </span>
+                  </p>
+                </div>
+
+                <div
+                  v-if="hasUnsavedPrimaryGroup"
+                  class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100"
+                >
+                  Save your primary group before reconnecting ReMoodle. Until then, the app will
+                  keep using
+                  <span class="font-medium">{{ profile?.primaryGroup || "no group" }}</span>
+                  instead of
+                  <span class="font-medium">{{ selectedGroup }}</span>
+                  .
+                </div>
+              </div>
+            </section>
+
+            <section class="px-5 py-5 sm:px-6">
+              <div class="flex flex-col gap-2">
+                <p class="text-lg font-semibold tracking-tight">Connect to ReMoodle</p>
+                <p class="text-sm text-muted-foreground">
+                  Generate a short code and send it to
+                  <span class="font-mono text-foreground">@remoodle_bot</span>
+                  . Reconnect after changing your primary group.
+                </p>
+              </div>
+
+              <div class="mt-5 flex flex-col gap-4">
+                <template v-if="generatedCode">
+                  <div
+                    class="flex items-center justify-between rounded-xl border border-dashed bg-muted/40 px-4 py-3"
+                  >
+                    <span class="font-mono text-xl font-semibold tracking-[0.2em]">
+                      {{ generatedCode }}
+                    </span>
+
+                    <Button variant="ghost" size="icon" @click="copyCode">
+                      <Icon :icon="copied ? 'lucide:check' : 'lucide:copy'" class="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-3">
+                    <Button
+                      variant="outline"
+                      :disabled="generateToken.isPending.value"
+                      @click="generateCode"
+                    >
+                      Regenerate code
+                    </Button>
+                    <p class="text-sm text-muted-foreground">Valid for 10 minutes.</p>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <Button
+                    class="w-fit"
+                    :disabled="generateToken.isPending.value"
+                    @click="generateCode"
+                  >
+                    <Icon icon="lucide:link" class="mr-2 h-4 w-4" />
+                    {{ generateToken.isPending.value ? "Generating..." : "Generate code" }}
+                  </Button>
+                </template>
+              </div>
+            </section>
           </div>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <Button
-              :disabled="
-                !canSavePrimaryGroup || setPrimaryGroup.isPending.value
-              "
-              @click="savePrimaryGroup"
-            >
-              <Icon icon="lucide:save" class="mr-2 h-4 w-4" />
-              {{
-                setPrimaryGroup.isPending.value
-                  ? "Saving..."
-                  : "Save primary group"
-              }}
-            </Button>
-
-            <p class="text-sm text-muted-foreground">
-              Current:
-              <span class="font-medium text-foreground">
-                {{ profile?.primaryGroup || "not set" }}
-              </span>
-            </p>
-          </div>
-
-          <div
-            v-if="hasUnsavedPrimaryGroup"
-            class="rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-950 dark:text-amber-100"
-          >
-            Save your primary group before connecting or reconnecting ReMoodle.
-            Until you save it, the app and bot will keep using
-            <span class="font-medium">{{
-              profile?.primaryGroup || "no group"
-            }}</span>
-            instead of
-            <span class="font-medium">{{ selectedGroup }}</span>
-            .
-          </div>
         </div>
-      </section>
-
-      <section class="rounded-2xl border bg-card p-5 shadow-sm">
-        <div class="flex flex-col gap-2">
-          <p class="text-lg font-semibold tracking-tight">
-            Connect to ReMoodle
-          </p>
-          <p class="text-sm text-muted-foreground">
-            Generate a short code, then send it to
-            <span class="font-mono text-foreground">@remoodle_bot</span>.
-            Reconnect after changing your primary group.
-          </p>
-        </div>
-
-        <Separator class="my-5" />
-
-        <div class="flex flex-col gap-4">
-          <template v-if="generatedCode">
-            <div
-              class="flex items-center justify-between rounded-xl border border-dashed bg-muted/40 px-4 py-3"
-            >
-              <span class="font-mono text-xl font-semibold tracking-[0.2em]">
-                {{ generatedCode }}
-              </span>
-
-              <Button variant="ghost" size="icon" @click="copyCode">
-                <Icon
-                  :icon="copied ? 'lucide:check' : 'lucide:copy'"
-                  class="h-4 w-4"
-                />
-              </Button>
-            </div>
-
-            <div class="flex flex-wrap items-center gap-3">
-              <Button
-                variant="outline"
-                :disabled="generateToken.isPending.value"
-                @click="generateCode"
-              >
-                Regenerate code
-              </Button>
-              <p class="text-sm text-muted-foreground">Valid for 10 minutes.</p>
-            </div>
-          </template>
-
-          <template v-else>
-            <Button
-              class="w-fit"
-              :disabled="generateToken.isPending.value"
-              @click="generateCode"
-            >
-              <Icon icon="lucide:link" class="mr-2 h-4 w-4" />
-              {{
-                generateToken.isPending.value
-                  ? "Generating..."
-                  : "Generate code"
-              }}
-            </Button>
-          </template>
-        </div>
-      </section>
-    </main>
-  </div>
+      </main>
+    </SidebarInset>
+  </SidebarProvider>
 </template>

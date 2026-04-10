@@ -14,11 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 
 const props = defineProps<{
@@ -80,9 +76,7 @@ function openAccount() {
           class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-2xl"
         >
           <DropdownMenuLabel class="p-1 font-normal">
-            <div
-              class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-left"
-            >
+            <div class="flex items-center gap-3 rounded-xl px-2 py-1.5 text-left">
               <Avatar class="size-8 rounded-lg">
                 <AvatarFallback class="rounded-lg">
                   {{ initials }}
@@ -109,18 +103,11 @@ function openAccount() {
 
           <DropdownMenuSeparator />
 
-          <div
-            class="flex items-center justify-between gap-3 px-2 py-2 text-sm"
-          >
+          <div class="flex items-center justify-between gap-3 px-2 py-2 text-sm">
             <span class="text-muted-foreground">Theme</span>
 
             <ThemeSwitcher v-slot="{ theme, toggleTheme }">
-              <Button
-                variant="outline"
-                size="icon"
-                class="size-8"
-                @click="toggleTheme"
-              >
+              <Button variant="outline" size="icon" class="size-8" @click="toggleTheme">
                 <Sun v-if="theme === 'light'" class="h-4 w-4" />
                 <Moon v-else class="h-4 w-4" />
               </Button>

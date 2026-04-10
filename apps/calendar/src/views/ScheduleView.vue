@@ -58,8 +58,7 @@ async function migratePrimaryGroup(primaryGroup: string) {
 }
 
 watchEffect(() => {
-  const primaryGroup =
-    pendingPrimaryGroup.value || profile.value?.primaryGroup || "";
+  const primaryGroup = pendingPrimaryGroup.value || profile.value?.primaryGroup || "";
   const storedGroup = group.value;
 
   if (primaryGroup && group.value !== primaryGroup) {
@@ -81,11 +80,7 @@ watchEffect(() => {
     return;
   }
 
-  if (
-    group.value &&
-    allGroups.value &&
-    !allGroups.value.includes(group.value)
-  ) {
+  if (group.value && allGroups.value && !allGroups.value.includes(group.value)) {
     group.value = "";
   }
 });
@@ -127,9 +122,7 @@ function openAccountSettings() {
     <Sidebar variant="inset" collapsible="offcanvas">
       <SidebarHeader class="gap-4 p-3">
         <div class="flex items-center gap-2 px-1">
-          <span class="text-sm font-semibold tracking-tight"
-            >ReMoodle Calendar</span
-          >
+          <span class="text-sm font-semibold tracking-tight">ReMoodle Calendar</span>
         </div>
 
         <template v-if="group && filters[group]">
@@ -155,16 +148,13 @@ function openAccountSettings() {
                   :key="key"
                   class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent"
                   @click.prevent="
-                    filters[group]!.eventTypes[key] =
-                      !filters[group]!.eventTypes[key]
+                    filters[group]!.eventTypes[key] = !filters[group]!.eventTypes[key]
                   "
                 >
                   <div
                     class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
                     :class="
-                      filters[group]!.eventTypes[key]
-                        ? 'border-primary bg-primary'
-                        : 'border-input'
+                      filters[group]!.eventTypes[key] ? 'border-primary bg-primary' : 'border-input'
                     "
                   >
                     <Icon
@@ -188,8 +178,7 @@ function openAccountSettings() {
                   :key="key"
                   class="flex cursor-pointer items-center gap-2.5 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-sidebar-accent"
                   @click.prevent="
-                    filters[group]!.eventFormats[key] =
-                      !filters[group]!.eventFormats[key]
+                    filters[group]!.eventFormats[key] = !filters[group]!.eventFormats[key]
                   "
                 >
                   <div
@@ -224,11 +213,7 @@ function openAccountSettings() {
                 >
                   <div
                     class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
-                    :class="
-                      isCourseIncluded(course)
-                        ? 'border-primary bg-primary'
-                        : 'border-input'
-                    "
+                    :class="isCourseIncluded(course) ? 'border-primary bg-primary' : 'border-input'"
                   >
                     <Icon
                       v-if="isCourseIncluded(course)"
@@ -267,28 +252,17 @@ function openAccountSettings() {
         <div class="ml-auto flex items-center gap-2">
           <template v-if="!session?.data">
             <AuthDialog>
-              <Button variant="ghost" size="sm" class="text-muted-foreground"
-                >Sign in</Button
-              >
+              <Button variant="ghost" size="sm" class="text-muted-foreground">Sign in</Button>
             </AuthDialog>
           </template>
-          <Button
-            v-if="group"
-            variant="ghost"
-            size="sm"
-            @click="openAccountSettings"
-          >
+          <Button v-if="group" variant="ghost" size="sm" @click="openAccountSettings">
             {{ group }}
           </Button>
         </div>
       </header>
 
       <div class="min-h-0 flex-1 overflow-hidden">
-        <Schedule
-          class="h-full w-full"
-          :events="groupSchedule"
-          :theme="appStore.theme"
-        />
+        <Schedule class="h-full w-full" :events="groupSchedule" :theme="appStore.theme" />
       </div>
     </SidebarInset>
   </SidebarProvider>

@@ -39,19 +39,13 @@ const {
     </DialogTrigger>
     <DialogContent class="max-w-80 rounded-2xl md:max-w-sm">
       <DialogHeader class="space-y-0">
-        <DialogTitle
-          class="text-left text-base font-medium text-muted-foreground"
-        >
+        <DialogTitle class="text-left text-base font-medium text-muted-foreground">
           Use your @astanait.edu.kz account
         </DialogTitle>
       </DialogHeader>
 
       <div class="flex flex-col gap-3 pt-1">
-        <Button
-          variant="outline"
-          :disabled="isPending"
-          @click="() => signInWithMicrosoft()"
-        >
+        <Button variant="outline" :disabled="isPending" @click="() => signInWithMicrosoft()">
           <Icon icon="mdi:microsoft" class="mr-2 h-5 w-5" />
           {{ isPending ? "Redirecting..." : "Continue with Microsoft" }}
         </Button>

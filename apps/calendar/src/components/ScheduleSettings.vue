@@ -68,17 +68,11 @@ const filters = defineModel<ScheduleFilter>({ required: true });
         <Badge
           v-for="course in props.courses"
           :key="course"
-          :variant="
-            !filters.excludedCourses.includes(course)
-              ? 'default'
-              : 'destructive'
-          "
+          :variant="!filters.excludedCourses.includes(course) ? 'default' : 'destructive'"
           class="cursor-pointer"
           @click="
             filters.excludedCourses.includes(course)
-              ? (filters.excludedCourses = filters.excludedCourses.filter(
-                  (c) => c !== course,
-                ))
+              ? (filters.excludedCourses = filters.excludedCourses.filter((c) => c !== course))
               : filters.excludedCourses.push(course)
           "
         >

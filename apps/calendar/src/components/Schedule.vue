@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { CalendarEvent } from "@schedule-x/calendar";
 import "@schedule-x/theme-shadcn/dist/index.css";
-import {
-  createCalendar,
-  createViewWeek,
-  createViewMonthAgenda,
-} from "@schedule-x/calendar";
+import { createCalendar, createViewWeek, createViewMonthAgenda } from "@schedule-x/calendar";
 import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { createCurrentTimePlugin } from "@schedule-x/current-time";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
@@ -26,11 +22,7 @@ const selectedDate =
     ? dayjs().add(1, "day").format("YYYY-MM-DD").toString()
     : dayjs().format("YYYY-MM-DD").toString();
 
-const minDate = dayjs()
-  .weekday(1)
-  .startOf("day")
-  .format("YYYY-MM-DD")
-  .toString();
+const minDate = dayjs().weekday(1).startOf("day").format("YYYY-MM-DD").toString();
 const maxDate = dayjs().weekday(7).endOf("day").format("YYYY-MM-DD").toString();
 
 const eventsServicePlugin = createEventsServicePlugin();

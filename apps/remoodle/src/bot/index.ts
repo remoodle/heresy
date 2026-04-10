@@ -4,7 +4,7 @@ import { createBot } from "./bot";
 
 const bot = createBot(config.telegram.token);
 
-bot.start({
+void bot.start({
   onStart: (info) => {
     logger.bot.info({ username: info.username }, "Bot started");
   },

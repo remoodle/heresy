@@ -1,13 +1,7 @@
-import { defineConfig } from "tsdown";
+import { defineConfig } from "vite-plus/pack";
 
 export default defineConfig({
-  entry: {
-    "bot/index": "src/bot/index.ts",
-    "worker/index": "src/worker/index.ts",
-    "db/migrate": "src/db/migrate.ts",
-  },
-  format: "esm",
-  outDir: "dist",
-  outExtensions: () => ({ js: ".mjs" }),
+  entry: ["src/**/*.ts", "!src/**/*.spec.ts"],
+  exports: true,
   onSuccess: "cp -r src/db/migrations dist/db/migrations",
 });

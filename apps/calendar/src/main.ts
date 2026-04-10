@@ -1,8 +1,5 @@
 import "./assets/main.css";
-import {
-  VueQueryPlugin,
-  type VueQueryPluginOptions,
-} from "@tanstack/vue-query";
+import { VueQueryPlugin, type VueQueryPluginOptions } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
 import { createApp } from "vue";
 import App from "./App.vue";
