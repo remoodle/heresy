@@ -3,6 +3,7 @@
   "name": "aitumap",
   "version": "0.2.0",
   "private": false,
+  "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "@chakra-ui/icons": "^2.0.17",
     "@chakra-ui/react": "^2.4.9",

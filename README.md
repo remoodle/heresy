@@ -4,7 +4,12 @@ A Vite+ monorepo.
 
 ## Workspace
 
-Only `apps/*` is part of the active workspace right now. `contrib`, `docs`, `junk`, and `tools` are intentionally left outside the workspace.
+The active workspace includes `apps/*` and `docs`. `contrib`, `junk`, and `tools` are intentionally left outside the workspace.
+
+In particular:
+
+- `docs` is managed by pnpm as part of the workspace.
+- `contrib/aitumap` remains a standalone project outside the workspace.
 
 ## Commands
 
