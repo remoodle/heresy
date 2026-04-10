@@ -11,8 +11,9 @@
     "format": "oxfmt --write ."
   },
   "devDependencies": {
+    "oxc-minify": "catalog:",
     "oxfmt": "^0.44.0",
-    "vitepress": "^2.0.0-alpha.16",
+    "vitepress": "catalog:",
     "wrangler": "^4"
   }
 }

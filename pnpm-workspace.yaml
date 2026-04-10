@@ -2,13 +2,12 @@ packages:
   - "apps/*"
   - "docs"
 
-catalogMode: prefer
-
 catalog:
   "@types/node": ^24
   dotenv: ^17
   hono: ^4
   npm-run-all2: ^8
+  oxc-minify: ^0.124.0
   oxfmt: ^0.44.0
   oxlint: ^1.59.0
   tsdown: ^0.20.3
@@ -16,8 +15,11 @@ catalog:
   typescript: ^5
   vite: npm:@voidzero-dev/vite-plus-core@latest
   vite-plus: latest
+  vitepress: 2.0.0-alpha.17
   vitest: npm:@voidzero-dev/vite-plus-test@latest
   wrangler: ^4
+
+catalogMode: prefer
 
 overrides:
   vite: "catalog:"
