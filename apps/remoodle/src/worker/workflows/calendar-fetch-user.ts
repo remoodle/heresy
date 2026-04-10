@@ -28,29 +28,31 @@ export const calendarFetchUser = hatchet.task<Input>({
     try {
       const events = await fetchCalendarEvents(input.calendarUrl);
 
-      await db
-        .insert(calendarEvents)
-        .values(
-          events.map((event) => ({
-            userId: input.userId,
-            eventId: event.uid,
-            summary: event.summary,
-            timestampMs: event.timestampMs,
-            categories: event.courseName,
-            description: event.description,
-            fetchedAt: new Date(),
-          })),
-        )
-        .onConflictDoUpdate({
-          target: [calendarEvents.userId, calendarEvents.eventId],
-          set: {
-            summary: sql`excluded.summary`,
-            timestampMs: sql`excluded.timestamp_ms`,
-            categories: sql`excluded.categories`,
-            description: sql`excluded.description`,
-            fetchedAt: sql`excluded.fetched_at`,
-          },
-        });
+      if (events.length > 0) {
+        await db
+          .insert(calendarEvents)
+          .values(
+            events.map((event) => ({
+              userId: input.userId,
+              eventId: event.uid,
+              summary: event.summary,
+              timestampMs: event.timestampMs,
+              categories: event.courseName,
+              description: event.description,
+              fetchedAt: new Date(),
+            })),
+          )
+          .onConflictDoUpdate({
+            target: [calendarEvents.userId, calendarEvents.eventId],
+            set: {
+              summary: sql`excluded.summary`,
+              timestampMs: sql`excluded.timestamp_ms`,
+              categories: sql`excluded.categories`,
+              description: sql`excluded.description`,
+              fetchedAt: sql`excluded.fetched_at`,
+            },
+          });
+      }
 
       const currentIds = events.map((e) => e.uid);
       const deleteWhere =
