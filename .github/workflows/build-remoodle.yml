@@ -3,7 +3,7 @@ name: Build remoodle
 on:
   push:
     branches:
-      - main
+      - trunk
     paths:
       - "apps/remoodle/**"
   workflow_dispatch:
