@@ -1,8 +1,9 @@
 import type { CalendarEvent } from "@schedule-x/calendar";
+import { Temporal } from "temporal-polyfill";
 import { computed } from "vue";
 import { useGroupsQuery, useGroupScheduleQuery } from "@/lib/api";
-import { dayjs } from "@/lib/dayjs";
 import type { ScheduleFilter, ScheduleItem } from "@/lib/types";
+import { CALENDAR_TIME_ZONE } from "../../shared/ical";
 
 export function useSchedule(group: () => string, filters: () => Record<string, ScheduleFilter>) {
   const currentGroup = computed(() => group());
@@ -11,56 +12,55 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
   const { data: allGroups } = useGroupsQuery();
   const { data: schedule } = useGroupScheduleQuery(() => currentGroup.value);
 
-  const getTargetDateByDay = (day: string): Date => {
-    const [dayName, time] = day.split(" ");
+  const daysMap: Record<string, number> = {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+    Sunday: 7,
+  };
 
-    const daysMap: { [key: string]: number } = {
-      Sunday: 0,
-      Monday: 1,
-      Tuesday: 2,
-      Wednesday: 3,
-      Thursday: 4,
-      Friday: 5,
-      Saturday: 6,
-    };
+  const getScheduleWeekStart = (): Temporal.PlainDate => {
+    const today = Temporal.Now.plainDateISO(CALENDAR_TIME_ZONE);
+
+    return today.dayOfWeek === 7
+      ? today.add({ days: 1 })
+      : today.subtract({ days: today.dayOfWeek - 1 });
+  };
+
+  const getTargetDateByDay = (day: string): Temporal.ZonedDateTime => {
+    const [dayName, time] = day.split(" ");
+    const fallback = Temporal.Now.zonedDateTimeISO(CALENDAR_TIME_ZONE).with({
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0,
+    });
 
     if (!time || !dayName) {
-      return new Date();
+      return fallback;
     }
 
-    const now = dayjs();
     const targetWeekday = daysMap[dayName];
 
     if (!targetWeekday) {
-      return new Date();
+      return fallback;
     }
 
-    const targetDate = now.weekday(targetWeekday);
+    try {
+      const targetDate = getScheduleWeekStart().add({ days: targetWeekday - 1 });
+      const plainTime = Temporal.PlainTime.from(time);
 
-    const [hours, minutes] = time.split(":");
-
-    if (!hours || !minutes) {
-      console.error("Invalid time", hours, minutes);
-      return new Date();
+      return targetDate.toZonedDateTime({
+        timeZone: CALENDAR_TIME_ZONE,
+        plainTime,
+      });
+    } catch (error) {
+      console.error("Invalid schedule time", day, error);
+      return fallback;
     }
-
-    return targetDate.hour(Number(hours)).minute(Number(minutes)).second(0).millisecond(0).toDate();
-  };
-
-  const convertToDateTime = (date: Date): string => {
-    // Format 'Y-m-d HH:mm'
-    return date
-      .toLocaleString("sv-SE", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })
-      .replace(" ", "T")
-      .slice(0, 16)
-      .replace("T", " ");
   };
 
   const groupSchedule = computed((): CalendarEvent[] => {
@@ -151,11 +151,8 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
         description: `${item.teacher.startsWith("https://learn") ? "learn.astanait.edu.kz" : item.teacher}  |  ${item.location.toUpperCase()}  |  ${item.type}\n`,
       };
 
-      const startBaseDate = getTargetDateByDay(item.start);
-      const start = convertToDateTime(startBaseDate);
-      const end = convertToDateTime(
-        new Date(new Date(start).setMinutes(startBaseDate.getMinutes() + 50)),
-      );
+      const start = getTargetDateByDay(item.start);
+      const end = start.add({ minutes: 50 });
 
       return {
         ...newEvent,
@@ -195,7 +192,6 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
     groupSchedule,
     allGroups,
     getTargetDateByDay,
-    convertToDateTime,
     groupCourses,
   };
 }

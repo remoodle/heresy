@@ -3,6 +3,17 @@ packages:
   - "docs"
 
 catalog:
+  "@schedule-x/calendar": ^4.4.0
+  "@schedule-x/calendar-controls": ^4.4.0
+  "@schedule-x/current-time": ^4.4.0
+  "@schedule-x/date-picker": 4.2.0
+  "@schedule-x/event-modal": ^4.4.0
+  "@schedule-x/event-recurrence": ^4.4.0
+  "@schedule-x/events-service": ^4.4.0
+  "@schedule-x/ical": ^4.4.0
+  "@schedule-x/theme-default": ^4.4.0
+  "@schedule-x/theme-shadcn": ^4.4.0
+  "@schedule-x/vue": ^4.1.0
   "@types/node": ^24
   dotenv: ^17
   drizzle-kit: 1.0.0-beta.20
@@ -12,6 +23,7 @@ catalog:
   oxc-minify: ^0.124.0
   oxfmt: ^0.44.0
   oxlint: ^1.59.0
+  temporal-polyfill: 0.3.0
   tsdown: ^0.20.3
   tsx: ^4.21.0
   typescript: ^5

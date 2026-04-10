@@ -8,6 +8,7 @@ import {
   today,
 } from "@internationalized/date";
 import { CalendarIcon, Download } from "lucide-vue-next";
+import { Temporal } from "temporal-polyfill";
 import { ref, computed, watch, type Ref } from "vue";
 import {
   AlertDialog,
@@ -59,6 +60,29 @@ const copied = ref(false);
 const combineAdjacentPairs = ref(false);
 
 const busy = computed(() => generating.value || updatingFilters.value);
+
+function toCalendarEventDateTime(value: CalendarEvent["start"] | CalendarEvent["end"]) {
+  if (!value) return undefined;
+  if (typeof value === "string") return value;
+
+  if (value instanceof Temporal.ZonedDateTime) {
+    return `${value.toPlainDate().toString()} ${value.toPlainTime().toString({ smallestUnit: "minute" })}`;
+  }
+
+  if (value instanceof Temporal.PlainDate) {
+    return `${value.toString()} 00:00`;
+  }
+
+  return undefined;
+}
+
+const normalizedEvents = computed(() =>
+  props.events.map((event) => ({
+    ...event,
+    start: toCalendarEventDateTime(event.start),
+    end: toCalendarEventDateTime(event.end),
+  })),
+);
 
 function toStoredDate(value: DateValue) {
   return value.toString();
@@ -162,8 +186,8 @@ const getIcsString = () => {
   const start = startValue.value.toDate(getLocalTimeZone());
   const end = value.value.toDate(getLocalTimeZone());
   const sourceEvents = combineAdjacentPairs.value
-    ? mergeAdjacentCalendarEvents(props.events)
-    : props.events;
+    ? mergeAdjacentCalendarEvents(normalizedEvents.value)
+    : normalizedEvents.value;
 
   return generateCalendarEventsIcal(
     sourceEvents

@@ -6,24 +6,24 @@ import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { createCurrentTimePlugin } from "@schedule-x/current-time";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createEventRecurrencePlugin } from "@schedule-x/event-recurrence";
-import { createEventsServicePlugin } from "@schedule-x/event-recurrence";
+import { createEventsServicePlugin } from "@schedule-x/events-service";
 import { ScheduleXCalendar } from "@schedule-x/vue";
 import { ZoomInPlugin } from "@starredev/schedule-x-plugins";
+import { Temporal } from "temporal-polyfill";
 import { watchEffect } from "vue";
-import { dayjs } from "@/lib/dayjs";
+import { CALENDAR_TIME_ZONE } from "../../shared/ical";
 
 const props = defineProps<{
   events: CalendarEvent[];
   theme: "light" | "dark";
 }>();
 
-const selectedDate =
-  new Date().getDay() === 0
-    ? dayjs().add(1, "day").format("YYYY-MM-DD").toString()
-    : dayjs().format("YYYY-MM-DD").toString();
-
-const minDate = dayjs().weekday(1).startOf("day").format("YYYY-MM-DD").toString();
-const maxDate = dayjs().weekday(7).endOf("day").format("YYYY-MM-DD").toString();
+const today = Temporal.Now.plainDateISO(CALENDAR_TIME_ZONE);
+const weekStart =
+  today.dayOfWeek === 7 ? today.add({ days: 1 }) : today.subtract({ days: today.dayOfWeek - 1 });
+const selectedDate = today.dayOfWeek === 7 ? today.add({ days: 1 }) : today;
+const minDate = weekStart;
+const maxDate = weekStart.add({ days: 6 });
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControlsPlugin = createCalendarControlsPlugin();
@@ -87,8 +87,8 @@ const calendarApp = createCalendar({
   events: props.events,
   locale: "en-GB",
   selectedDate,
-  minDate: minDate,
-  maxDate: maxDate,
+  minDate,
+  maxDate,
   isResponsive: true,
   dayBoundaries: {
     start: "08:00",

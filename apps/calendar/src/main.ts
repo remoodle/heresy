@@ -1,3 +1,4 @@
+import "temporal-polyfill/global";
 import "./assets/main.css";
 import { VueQueryPlugin, type VueQueryPluginOptions } from "@tanstack/vue-query";
 import { createPinia } from "pinia";
