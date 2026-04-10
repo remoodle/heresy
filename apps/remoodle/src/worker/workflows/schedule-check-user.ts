@@ -6,8 +6,8 @@ import {
   DEFAULT_SCHEDULE_FILTERS,
   type ScheduleFilters,
 } from "../../library/schedule";
-import { sendTelegramMessage } from "../../library/telegram";
 import { hatchet } from "../hatchet-client";
+import { telegramSendMessage } from "./telegram-send-message";
 
 type Input = {
   telegramId: number;
@@ -42,7 +42,7 @@ export const scheduleCheckUser = hatchet.task<Input>({
 
     const message = buildScheduleMessage(items, tomorrow, input.group);
 
-    await sendTelegramMessage(input.telegramId, message);
+    await telegramSendMessage.run({ chatId: input.telegramId, message });
 
     await ctx.logger.info("sent schedule notification", {
       telegramId: input.telegramId,
