@@ -5,7 +5,7 @@ RUN corepack enable
 
 FROM base AS builder
 WORKDIR /workspace
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/remoodle/package.json ./apps/remoodle/package.json
 RUN pnpm install --frozen-lockfile
 COPY . .
