@@ -18,7 +18,7 @@ On the dashboard, find the **Calendar** widget on the right side. At the bottom,
 
 On the Calendar page, click the **"Export calendar"** button in the top-right corner.
 
-![Import or export calendars page with Export calendar button highlighted](/images/step-2-import-export.png)
+![Import or export calendars page with Export calendar button](/images/step-2-import-export.png)
 
 ## Step 4 — Get the Calendar URL
 
