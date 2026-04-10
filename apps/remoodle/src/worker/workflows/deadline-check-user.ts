@@ -80,9 +80,9 @@ export const deadlineCheckUser = hatchet.task<Input>({
 
     await deadlineNotifyUser.runNoWait({
       chatId: input.telegramId,
+      userId: input.userId,
       message,
       reminders: pending.map((reminder) => ({
-        userId: input.userId,
         eventId: reminder.eventId,
         triggeredAt: reminder.triggeredAt.getTime(),
       })),

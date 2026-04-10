@@ -4,13 +4,13 @@ import { hatchet } from "../hatchet-client";
 import { telegramSendMessage } from "./telegram-send-message";
 
 type Reminder = {
-  userId: number;
   eventId: string;
   triggeredAt: number;
 };
 
 type Input = {
   chatId: number;
+  userId: number;
   message: string;
   reminders: Reminder[];
 };
@@ -25,6 +25,7 @@ export const deadlineNotifyUser = hatchet.task<Input>({
       .insert(sentReminders)
       .values(
         input.reminders.map((reminder) => ({
+          userId: input.userId,
           ...reminder,
           triggeredAt: new Date(reminder.triggeredAt),
         })),
