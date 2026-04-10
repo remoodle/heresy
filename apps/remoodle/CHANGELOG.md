@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.4](https://github.com/remoodle/heresy/compare/remoodle-v0.14.3...remoodle-v0.14.4) (2026-04-10)
+
+
+### Code Refactoring
+
+* **worker:** update telegram rate limits ([428cd16](https://github.com/remoodle/heresy/commit/428cd16f3021a20db93493ab84a95d28ecbb601e))
+
 ## [0.14.3](https://github.com/remoodle/heresy/compare/remoodle-v0.14.2...remoodle-v0.14.3) (2026-04-10)
 
 
