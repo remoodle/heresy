@@ -8,6 +8,9 @@ on:
         description: "DU auth bearer token"
         type: string
 
+permissions:
+  actions: write
+
 jobs:
   parse-and-upload:
     runs-on: ubuntu-latest
@@ -51,3 +54,8 @@ jobs:
           echo "Uploading parsed schedule files to R2..."
 
           rclone sync ./output remoodle:calendar-schedule -v
+
+      - name: Trigger cabgen workflow
+        run: gh workflow run cabgen-upload.yml --ref ${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -12,6 +12,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
+      - name: Fetch cabinets from R2
+        run: |
+          rclone copy remoodle:calendar-schedule/main.json ./main.json
+          jq '[.[].[] | .location | select(. != null and . != "" and . != "online")] | unique | sort' ./main.json > tools/cabgen/cabinets.json
+          echo "Extracted $(jq length tools/cabgen/cabinets.json) cabinets"
+
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -47,10 +58,5 @@ jobs:
 
           ls -la tools/cabgen/screenshots
 
-      - name: Setup rclone
-        uses: AnimMouse/setup-rclone@v1
-        with:
-          rclone_config: ${{ secrets.RCLONE_CONFIG }}
-
       - name: Upload screenshots to R2 bucket
-        run: rclone sync ./tools/cabgen/screenshots remoodle:cabgen -v
+        run: rclone sync ./tools/cabgen/screenshots remoodle:cabgen -v --transfers=32 --checkers=16 --multi-thread-streams=4
