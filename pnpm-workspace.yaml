@@ -5,6 +5,8 @@ packages:
 catalog:
   "@types/node": ^24
   dotenv: ^17
+  drizzle-kit: 1.0.0-beta.20
+  drizzle-orm: 1.0.0-beta.20
   hono: ^4
   npm-run-all2: ^8
   oxc-minify: ^0.124.0

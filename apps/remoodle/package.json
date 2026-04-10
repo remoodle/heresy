@@ -26,7 +26,7 @@
     "callback-data": "^1.1.1",
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
-    "drizzle-orm": "1.0.0-beta.21",
+    "drizzle-orm": "catalog:",
     "envalid": "^8.1.1",
     "grammy": "^1.38.3",
     "hono": "^4.12.5",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "drizzle-kit": "1.0.0-beta.21",
+    "drizzle-kit": "catalog:",
     "npm-run-all2": "catalog:",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
