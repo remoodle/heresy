@@ -259,7 +259,7 @@ function openAccountSettings() {
       </SidebarFooter>
     </Sidebar>
 
-    <SidebarInset class="min-h-svh overflow-hidden bg-background">
+    <SidebarInset class="overflow-hidden bg-background">
       <header class="flex h-12 shrink-0 items-center gap-2 border-b px-4">
         <SidebarTrigger class="-ml-1" />
         <div class="mx-2 h-4 w-px bg-border" />
