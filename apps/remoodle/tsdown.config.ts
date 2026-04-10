@@ -1,7 +1,7 @@
-import { defineConfig } from "vite-plus/pack";
+import { defineConfig } from "tsdown";
 
 export default defineConfig({
   entry: ["src/**/*.ts", "!src/**/*.spec.ts"],
-  exports: true,
+  exports: false,
   onSuccess: "cp -r src/db/migrations dist/db/migrations",
 });
