@@ -19,7 +19,7 @@ jobs:
 
       - name: Fetch cabinets from R2
         run: |
-          rclone copy remoodle:calendar-schedule/main.json ./main.json || true
+          rclone copyto remoodle:calendar-schedule/main.json ./main.json || true
           if [ -f ./main.json ] && [ -s ./main.json ]; then
             jq '[.[].[] | .location | strings | select(. != "" and . != "online")] | unique | sort' ./main.json > tools/cabgen/cabinets.json
             echo "Extracted $(jq length tools/cabgen/cabinets.json) cabinets from R2"
