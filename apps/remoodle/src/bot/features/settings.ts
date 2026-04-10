@@ -19,6 +19,7 @@ import {
   updateCalendarCallback,
   connectCalendarCallback,
   menuCallback,
+  accountCallback,
 } from "../callback-data";
 
 export const composer = new Composer<Context>();
@@ -32,11 +33,33 @@ function buildSettingsKeyboard() {
     .text("📋 Deadlines", deadlinesSettingsCallback.pack({}))
     .text("📆 Schedule", scheduleSettingsCallback.pack({}))
     .row()
+    .text("👤 Account", accountCallback.pack({}))
+    .row()
     .text("Back ←", menuCallback.pack({}));
 }
 
 function buildSettingsMessage() {
   return "<b>⚙️ Settings</b>\n\nChoose a category to configure:";
+}
+
+function buildAccountKeyboard() {
+  return new InlineKeyboard().text("Back ←", settingsCallback.pack({}));
+}
+
+function buildAccountMessage(user: {
+  id: number;
+  telegramId: number;
+  calendarUrl: string;
+  calendarAccountLinked: boolean;
+  group: string | null;
+}): string {
+  let msg = "<b>👤 Account</b>\n\n";
+  msg += `User ID: <code>${user.id}</code>\n`;
+  msg += `Telegram ID: <code>${user.telegramId}</code>\n\n`;
+  msg += `Moodle calendar: ${user.calendarUrl ? "✅ connected" : "not set"}\n`;
+  msg += `Calendar account: ${user.calendarAccountLinked ? "✅ connected" : "not set"}\n`;
+  msg += `Group: ${user.group ? `<b>${user.group}</b>` : "not set"}`;
+  return msg;
 }
 
 feature.command("settings", async (ctx) => {
@@ -58,6 +81,31 @@ feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
   await ctx.editMessageText(buildSettingsMessage(), {
     parse_mode: "HTML",
     reply_markup: buildSettingsKeyboard(),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(accountCallback.filter(), async (ctx) => {
+  const rows = await db
+    .select({
+      id: users.id,
+      telegramId: users.telegramId,
+      calendarUrl: users.calendarUrl,
+      calendarAccountLinked: users.calendarAccountLinked,
+      group: users.group,
+    })
+    .from(users)
+    .where(eq(users.telegramId, ctx.from.id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  await ctx.editMessageText(buildAccountMessage(rows[0]!), {
+    parse_mode: "HTML",
+    reply_markup: buildAccountKeyboard(),
   });
   await ctx.answerCallbackQuery();
 });
