@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.3](https://github.com/remoodle/heresy/compare/remoodle-v0.14.2...remoodle-v0.14.3) (2026-04-10)
+
+
+### Bug Fixes
+
+* update insert logic ([dd5c59a](https://github.com/remoodle/heresy/commit/dd5c59a3bb90fad5cf81395aea357b4a3c846cbb))
+
 ## [0.14.2](https://github.com/remoodle/heresy/compare/remoodle-v0.14.1...remoodle-v0.14.2) (2026-04-09)
 
 
