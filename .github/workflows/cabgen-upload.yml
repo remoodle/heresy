@@ -1,0 +1,56 @@
+name: "[cabgen] Generate screenshots and upload to R2"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.15.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"
+          cache-dependency-path: tools/cabgen/pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: tools/cabgen
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        working-directory: tools/cabgen
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Generate cabinet screenshots
+        working-directory: tools/cabgen
+        run: pnpm start
+        env:
+          CI: "true"
+
+      - name: Verify generated screenshots
+        run: |
+          if [ ! -d tools/cabgen/screenshots ] || [ -z "$(ls -A tools/cabgen/screenshots)" ]; then
+            echo "No screenshots were generated"
+            exit 1
+          fi
+
+          ls -la tools/cabgen/screenshots
+
+      - name: Setup rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
+      - name: Upload screenshots to R2 bucket
+        run: rclone sync ./tools/cabgen/screenshots remoodle:cabgen -v
