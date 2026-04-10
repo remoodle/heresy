@@ -13,6 +13,8 @@ import {
   getUniqueRooms,
   getScheduleForDay,
   getDayName,
+  mergeAdjacentScheduleItems,
+  normalizeScheduleFilters,
   sanitizeRoomFilename,
 } from "../../library/schedule";
 import {
@@ -36,13 +38,15 @@ async function fetchScheduleMessage(
   view: ScheduleView,
 ): Promise<{ message: string; rooms: string[] }> {
   const items = await fetchGroupSchedule(group);
-  const filtered = applyScheduleFilters(items, scheduleFilters, excludedCourses);
+  const filters = normalizeScheduleFilters(scheduleFilters);
+  const filtered = applyScheduleFilters(items, filters, excludedCourses);
+  const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
   const now = new Date();
   const message =
     view === "week"
-      ? buildWeeklyScheduleMessage(filtered, now, group)
-      : buildTodayScheduleMessage(filtered, now, group);
-  const visibleItems = view === "week" ? filtered : getScheduleForDay(filtered, getDayName(now));
+      ? buildWeeklyScheduleMessage(merged, now, group)
+      : buildTodayScheduleMessage(merged, now, group);
+  const visibleItems = view === "week" ? merged : getScheduleForDay(merged, getDayName(now));
   const rooms = getUniqueRooms(visibleItems);
   return { message, rooms };
 }

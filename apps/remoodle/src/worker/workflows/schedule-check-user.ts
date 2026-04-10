@@ -4,6 +4,8 @@ import {
   getDayName,
   applyScheduleFilters,
   DEFAULT_SCHEDULE_FILTERS,
+  mergeAdjacentScheduleItems,
+  normalizeScheduleFilters,
   type ScheduleFilters,
 } from "../../library/schedule";
 import { hatchet } from "../hatchet-client";
@@ -21,8 +23,11 @@ export const scheduleCheckUser = hatchet.task<Input>({
   executionTimeout: "2m",
   fn: async (input, ctx) => {
     const allItems = await fetchGroupSchedule(input.group);
-    const filters = input.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS;
-    const items = applyScheduleFilters(allItems, filters, input.excludedCourses);
+    const filters = normalizeScheduleFilters(input.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS);
+    const filteredItems = applyScheduleFilters(allItems, filters, input.excludedCourses);
+    const items = filters.combineAdjacentPairs
+      ? mergeAdjacentScheduleItems(filteredItems)
+      : filteredItems;
 
     // Send tomorrow's schedule (this workflow runs at 8pm)
     const tomorrow = new Date();

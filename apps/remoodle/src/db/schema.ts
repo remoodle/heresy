@@ -22,11 +22,13 @@ export const users = sqliteTable("users", {
     .$type<{
       eventTypes: { lecture: boolean; practice: boolean; learn: boolean };
       eventFormats: { online: boolean; offline: boolean };
+      combineAdjacentPairs?: boolean;
     }>()
     .notNull()
     .default({
       eventTypes: { lecture: true, practice: true, learn: true },
       eventFormats: { online: true, offline: true },
+      combineAdjacentPairs: true,
     }),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()

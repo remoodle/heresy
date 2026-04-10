@@ -6,7 +6,7 @@ import { db } from "../../db";
 import { calendarEvents, sentReminders, users } from "../../db/schema";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
-import { DEFAULT_SCHEDULE_FILTERS, type ScheduleFilters } from "../../library/schedule";
+import { normalizeScheduleFilters, type ScheduleFilters } from "../../library/schedule";
 import {
   settingsCallback,
   deadlinesSettingsCallback,
@@ -16,6 +16,7 @@ import {
   toggleScheduleCallback,
   toggleScheduleTypeCallback,
   toggleScheduleFormatCallback,
+  toggleScheduleMergeCallback,
   updateCalendarCallback,
   connectCalendarCallback,
   menuCallback,
@@ -362,6 +363,13 @@ function buildScheduleSettingsKeyboard(
       toggleScheduleFormatCallback.pack({ key: "offline" }),
     );
 
+  keyboard
+    .row()
+    .text(
+      `${filters.combineAdjacentPairs ? "✅" : "☐"} Combine adjacent pairs`,
+      toggleScheduleMergeCallback.pack({}),
+    );
+
   if (!hasGroup) {
     keyboard
       .row()
@@ -376,9 +384,14 @@ function buildScheduleSettingsKeyboard(
   return keyboard;
 }
 
-function buildScheduleSettingsMessage(scheduleEnabled: boolean, group: string | null): string {
+function buildScheduleSettingsMessage(
+  scheduleEnabled: boolean,
+  group: string | null,
+  filters: ScheduleFilters,
+): string {
   let msg = "<b>📆 Schedule Settings</b>\n\n";
   msg += group ? `Group: <b>${group}</b>\n` : "Group: not set\n";
+  msg += `Merge adjacent pairs: ${filters.combineAdjacentPairs ? "✅ On" : "☐ Off"}\n`;
   msg += "\nConfigure event types, formats, and notifications.";
   if (!group) {
     msg +=
@@ -395,11 +408,14 @@ feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
     return;
   }
   const user = rows[0]!;
-  const filters = user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS;
-  await ctx.editMessageText(buildScheduleSettingsMessage(user.scheduleEnabled, user.group), {
-    parse_mode: "HTML",
-    reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
-  });
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
+  await ctx.editMessageText(
+    buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+    },
+  );
   await ctx.answerCallbackQuery();
 });
 
@@ -422,8 +438,8 @@ feature.callbackQuery(toggleScheduleCallback.filter(), async (ctx) => {
   const updated = !user.scheduleEnabled;
   await db.update(users).set({ scheduleEnabled: updated }).where(eq(users.telegramId, ctx.from.id));
 
-  const filters = user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS;
-  await ctx.editMessageText(buildScheduleSettingsMessage(updated, user.group), {
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
+  await ctx.editMessageText(buildScheduleSettingsMessage(updated, user.group, filters), {
     parse_mode: "HTML",
     reply_markup: buildScheduleSettingsKeyboard(updated, !!user.group, filters),
   });
@@ -438,7 +454,7 @@ feature.callbackQuery(toggleScheduleTypeCallback.filter(), async (ctx) => {
     return;
   }
   const user = rows[0]!;
-  const filters = { ...(user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS) };
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
   filters.eventTypes = {
     ...filters.eventTypes,
     [key]: !filters.eventTypes[key as keyof typeof filters.eventTypes],
@@ -446,10 +462,13 @@ feature.callbackQuery(toggleScheduleTypeCallback.filter(), async (ctx) => {
 
   await db.update(users).set({ scheduleFilters: filters }).where(eq(users.telegramId, ctx.from.id));
 
-  await ctx.editMessageText(buildScheduleSettingsMessage(user.scheduleEnabled, user.group), {
-    parse_mode: "HTML",
-    reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
-  });
+  await ctx.editMessageText(
+    buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+    },
+  );
   await ctx.answerCallbackQuery();
 });
 
@@ -461,7 +480,7 @@ feature.callbackQuery(toggleScheduleFormatCallback.filter(), async (ctx) => {
     return;
   }
   const user = rows[0]!;
-  const filters = { ...(user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS) };
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
   filters.eventFormats = {
     ...filters.eventFormats,
     [key]: !filters.eventFormats[key as keyof typeof filters.eventFormats],
@@ -469,10 +488,35 @@ feature.callbackQuery(toggleScheduleFormatCallback.filter(), async (ctx) => {
 
   await db.update(users).set({ scheduleFilters: filters }).where(eq(users.telegramId, ctx.from.id));
 
-  await ctx.editMessageText(buildScheduleSettingsMessage(user.scheduleEnabled, user.group), {
-    parse_mode: "HTML",
-    reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
-  });
+  await ctx.editMessageText(
+    buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+    },
+  );
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(toggleScheduleMergeCallback.filter(), async (ctx) => {
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+  const user = rows[0]!;
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
+  filters.combineAdjacentPairs = !filters.combineAdjacentPairs;
+
+  await db.update(users).set({ scheduleFilters: filters }).where(eq(users.telegramId, ctx.from.id));
+
+  await ctx.editMessageText(
+    buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+    },
+  );
   await ctx.answerCallbackQuery();
 });
 

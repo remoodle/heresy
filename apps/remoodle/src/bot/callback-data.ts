@@ -19,6 +19,7 @@ export const coursesCallback = createCallbackData("courses", {});
 export const toggleCourseCallback = createCallbackData("toggle_course", { idx: String });
 export const toggleScheduleTypeCallback = createCallbackData("toggle_sched_type", { key: String });
 export const toggleScheduleFormatCallback = createCallbackData("toggle_sched_fmt", { key: String });
+export const toggleScheduleMergeCallback = createCallbackData("toggle_sched_merge", {});
 export const accountCallback = createCallbackData("account", {});
 export const deleteAccountCallback = createCallbackData("delete_account", {});
 export const confirmDeleteAccountCallback = createCallbackData("confirm_delete_account", {

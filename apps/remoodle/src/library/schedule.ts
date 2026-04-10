@@ -12,11 +12,13 @@ type CalendarScheduleItem = {
 export type ScheduleFilters = {
   eventTypes: { lecture: boolean; practice: boolean; learn: boolean };
   eventFormats: { online: boolean; offline: boolean };
+  combineAdjacentPairs?: boolean;
 };
 
 export const DEFAULT_SCHEDULE_FILTERS: ScheduleFilters = {
   eventTypes: { lecture: true, practice: true, learn: true },
   eventFormats: { online: true, offline: true },
+  combineAdjacentPairs: true,
 };
 
 const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -47,6 +49,92 @@ export function extractRoomCode(location: string): string | null {
 
 export function sanitizeRoomFilename(room: string): string {
   return room.replace(/[/\\?%*:|"<>.\s]/g, "-");
+}
+
+const SLOT_BREAK_THRESHOLD_MINUTES = 15;
+
+function parseScheduleTime(timeStr: string): {
+  weekday: string;
+  hours: number;
+  minutes: number;
+} {
+  const parts = timeStr.split(" ");
+  if (parts.length === 2) {
+    const weekday = parts[0]!;
+    const [hours, minutes] = parts[1]!.split(":").map(Number);
+    return { weekday, hours: hours!, minutes: minutes! };
+  }
+
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return { weekday: "Monday", hours: hours!, minutes: minutes! };
+}
+
+function toMinutes(time: { hours: number; minutes: number }) {
+  return time.hours * 60 + time.minutes;
+}
+
+function canMergeScheduleItems(current: CalendarScheduleItem, next: CalendarScheduleItem) {
+  const currentStart = parseScheduleTime(current.start);
+  const currentEnd = parseScheduleTime(current.end);
+  const nextStart = parseScheduleTime(next.start);
+
+  if (currentStart.weekday !== nextStart.weekday) return false;
+  if (current.courseName !== next.courseName) return false;
+  if (current.teacher !== next.teacher) return false;
+  if (current.type !== next.type) return false;
+  if (current.location !== next.location) return false;
+  if (current.isOnline !== next.isOnline) return false;
+
+  const gap = toMinutes(nextStart) - toMinutes(currentEnd);
+  return gap >= 0 && gap <= SLOT_BREAK_THRESHOLD_MINUTES;
+}
+
+export function mergeAdjacentScheduleItems(items: CalendarScheduleItem[]): CalendarScheduleItem[] {
+  if (items.length < 2) return items;
+
+  const sortedItems = [...items].sort((a, b) => {
+    const aStart = parseScheduleTime(a.start);
+    const bStart = parseScheduleTime(b.start);
+    const aWeekdayIndex = WEEK_DAY_ORDER.indexOf(aStart.weekday);
+    const bWeekdayIndex = WEEK_DAY_ORDER.indexOf(bStart.weekday);
+    const weekdayDiff =
+      (aWeekdayIndex === -1 ? 99 : aWeekdayIndex) - (bWeekdayIndex === -1 ? 99 : bWeekdayIndex);
+
+    if (weekdayDiff !== 0) return weekdayDiff;
+    return toMinutes(aStart) - toMinutes(bStart);
+  });
+
+  const merged: CalendarScheduleItem[] = [];
+
+  for (const item of sortedItems) {
+    const previous = merged[merged.length - 1];
+
+    if (!previous || !canMergeScheduleItems(previous, item)) {
+      merged.push({ ...item });
+      continue;
+    }
+
+    previous.end = item.end;
+  }
+
+  return merged;
+}
+
+export function normalizeScheduleFilters(
+  filters?: Partial<ScheduleFilters> | null,
+): ScheduleFilters {
+  return {
+    eventTypes: {
+      ...DEFAULT_SCHEDULE_FILTERS.eventTypes,
+      ...filters?.eventTypes,
+    },
+    eventFormats: {
+      ...DEFAULT_SCHEDULE_FILTERS.eventFormats,
+      ...filters?.eventFormats,
+    },
+    combineAdjacentPairs:
+      filters?.combineAdjacentPairs ?? DEFAULT_SCHEDULE_FILTERS.combineAdjacentPairs,
+  };
 }
 
 function formatScheduleItem(item: CalendarScheduleItem): string {
