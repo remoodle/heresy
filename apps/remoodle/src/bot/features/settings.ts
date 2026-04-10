@@ -3,7 +3,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { config } from "../../config";
 import { db } from "../../db";
-import { users } from "../../db/schema";
+import { calendarEvents, sentReminders, users } from "../../db/schema";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { DEFAULT_SCHEDULE_FILTERS, type ScheduleFilters } from "../../library/schedule";
@@ -20,6 +20,8 @@ import {
   connectCalendarCallback,
   menuCallback,
   accountCallback,
+  deleteAccountCallback,
+  confirmDeleteAccountCallback,
 } from "../callback-data";
 
 export const composer = new Composer<Context>();
@@ -43,7 +45,24 @@ function buildSettingsMessage() {
 }
 
 function buildAccountKeyboard() {
-  return new InlineKeyboard().text("Back ←", settingsCallback.pack({}));
+  return new InlineKeyboard()
+    .text("🗑 Delete account", deleteAccountCallback.pack({}))
+    .row()
+    .text("Back ←", settingsCallback.pack({}));
+}
+
+function buildDeleteAccountKeyboard() {
+  return new InlineKeyboard()
+    .text("✅ Yes, delete", confirmDeleteAccountCallback.pack({ confirmed: "yes" }))
+    .text("Cancel", confirmDeleteAccountCallback.pack({ confirmed: "no" }));
+}
+
+function buildDeleteAccountMessage() {
+  return (
+    "<b>⚠️ Delete account</b>\n\n" +
+    "This will permanently remove your account, saved calendar events, and reminder history.\n\n" +
+    "Are you sure?"
+  );
 }
 
 function buildAccountMessage(user: {
@@ -108,6 +127,80 @@ feature.callbackQuery(accountCallback.filter(), async (ctx) => {
     reply_markup: buildAccountKeyboard(),
   });
   await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(deleteAccountCallback.filter(), async (ctx) => {
+  const rows = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.telegramId, ctx.from.id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  await ctx.editMessageText(buildDeleteAccountMessage(), {
+    parse_mode: "HTML",
+    reply_markup: buildDeleteAccountKeyboard(),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
+  const { confirmed } = confirmDeleteAccountCallback.unpack(ctx.callbackQuery.data) as {
+    confirmed: "yes" | "no";
+  };
+
+  if (confirmed === "no") {
+    const rows = await db
+      .select({
+        id: users.id,
+        telegramId: users.telegramId,
+        calendarUrl: users.calendarUrl,
+        calendarAccountLinked: users.calendarAccountLinked,
+        group: users.group,
+      })
+      .from(users)
+      .where(eq(users.telegramId, ctx.from.id))
+      .limit(1);
+
+    if (rows.length === 0) {
+      await ctx.answerCallbackQuery("Not registered.");
+      return;
+    }
+
+    await ctx.editMessageText(buildAccountMessage(rows[0]!), {
+      parse_mode: "HTML",
+      reply_markup: buildAccountKeyboard(),
+    });
+    await ctx.answerCallbackQuery();
+    return;
+  }
+
+  const rows = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(eq(users.telegramId, ctx.from.id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  const userId = rows[0]!.id;
+
+  await db.delete(sentReminders).where(eq(sentReminders.userId, userId));
+  await db.delete(calendarEvents).where(eq(calendarEvents.userId, userId));
+  await db.delete(users).where(eq(users.id, userId));
+
+  ctx.session.awaitingCalendarUrl = false;
+  ctx.session.awaitingRemoodleToken = false;
+
+  await ctx.editMessageText("✅ Account deleted. Send /start to set up ReMoodle again.");
+  await ctx.answerCallbackQuery({ text: "Account deleted." });
 });
 
 // ─── Deadlines settings ───────────────────────────────────────────────────────
