@@ -6,7 +6,6 @@
   "scripts": {
     "ready": "vp fmt && vp lint && vp run -r test && vp run -r build",
     "check": "vp lint && vp run -r test && vp run -r build",
-    "prepare": "vp config",
     "format": "vp fmt",
     "lint": "vp lint",
     "type-check": "vp run -r type-check",
