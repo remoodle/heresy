@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.15.0](https://github.com/remoodle/heresy/compare/remoodle-v0.14.4...remoodle-v0.15.0) (2026-04-10)
+
+
+### Features
+
+* **bot:** add account page ([4652141](https://github.com/remoodle/heresy/commit/46521412ace4cffb9bd6a7b7715c8a0580603066))
+* **bot:** integrate cabgen ([a1b4c30](https://github.com/remoodle/heresy/commit/a1b4c30701f82bab534103f186fac4fd583c9dbb))
+
+
+### Bug Fixes
+
+* **worker:** user proper telegram workflow ([29b978f](https://github.com/remoodle/heresy/commit/29b978f3219675650d85771aa4f7d370b6e90860))
+
 ## [0.14.4](https://github.com/remoodle/heresy/compare/remoodle-v0.14.3...remoodle-v0.14.4) (2026-04-10)
 
 
