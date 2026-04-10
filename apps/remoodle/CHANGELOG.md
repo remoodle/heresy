@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.15.1](https://github.com/remoodle/heresy/compare/remoodle-v0.15.0...remoodle-v0.15.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* fix leftovers ([cea7e5d](https://github.com/remoodle/heresy/commit/cea7e5db28aa5e883757223e60e2b3c53a30ae97))
+* update Dockerfile ([e7f19f9](https://github.com/remoodle/heresy/commit/e7f19f94d285c0b9f7fde223e7a90c54af7a084a))
+
+
+### Miscellaneous Chores
+
+* migrate to vite-plus ([fc51105](https://github.com/remoodle/heresy/commit/fc5110528ac715b0f20826fb3b9ffc5ba38c0242))
+
 ## [0.15.0](https://github.com/remoodle/heresy/compare/remoodle-v0.14.4...remoodle-v0.15.0) (2026-04-10)
 
 
