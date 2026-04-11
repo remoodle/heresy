@@ -32,6 +32,28 @@ const WEEK_DAY_ORDER = [
   "Sunday",
 ];
 
+export function getRemainingDaysOfWeek(date: Date): string[] {
+  const todayName = getDayName(date);
+  const todayIndex = WEEK_DAY_ORDER.indexOf(todayName);
+
+  if (todayIndex === -1) {
+    return WEEK_DAY_ORDER;
+  }
+
+  return WEEK_DAY_ORDER.slice(todayIndex + 1);
+}
+
+export function getScheduleForDays(
+  items: CalendarScheduleItem[],
+  dayNames: string[],
+): CalendarScheduleItem[] {
+  return dayNames.flatMap((dayName) => getScheduleForDay(items, dayName));
+}
+
+export function hasRemainingClassesThisWeek(items: CalendarScheduleItem[], date: Date): boolean {
+  return getScheduleForDays(items, getRemainingDaysOfWeek(date)).length > 0;
+}
+
 export function getDayName(date: Date): string {
   return DAY_NAMES[date.getDay()]!;
 }
@@ -269,21 +291,9 @@ export function buildWeeklyScheduleMessage(
   date: Date,
   group: string,
 ): string {
-  const todayName = getDayName(date);
-  const todayItems = getScheduleForDay(items, todayName);
-  const orderedDays = WEEK_DAY_ORDER.filter((day) => day !== todayName);
+  const orderedDays = getRemainingDaysOfWeek(date);
 
   let msg = `📆 <b>Schedule — ${group}</b>\n\n`;
-
-  msg += `<b>Today</b>\n`;
-  if (todayItems.length === 0) {
-    msg += "No classes today.\n\n";
-  } else {
-    for (const item of todayItems) {
-      msg += `${formatScheduleItem(item)}\n\n`;
-    }
-  }
-
   msg += "<b>This week</b>\n";
 
   const sections: string[] = [];
@@ -302,7 +312,39 @@ export function buildWeeklyScheduleMessage(
   }
 
   if (sections.length === 0) {
-    msg += "No classes this week.";
+    msg += "No more classes this week.";
+  } else {
+    msg += sections.join("\n\n");
+  }
+
+  return msg.trim();
+}
+
+export function buildNextWeekScheduleMessage(
+  items: CalendarScheduleItem[],
+  _date: Date,
+  group: string,
+): string {
+  let msg = `📆 <b>Schedule — ${group}</b>\n\n`;
+  msg += "<b>Next week</b>\n";
+
+  const sections: string[] = [];
+  for (const dayName of WEEK_DAY_ORDER) {
+    const dayItems = getScheduleForDay(items, dayName);
+    if (dayItems.length === 0) {
+      continue;
+    }
+
+    const lines = [`<b>${dayName}</b>`];
+    for (const item of dayItems) {
+      lines.push(formatScheduleItem(item));
+    }
+
+    sections.push(lines.join("\n"));
+  }
+
+  if (sections.length === 0) {
+    msg += "No classes next week.";
   } else {
     msg += sections.join("\n\n");
   }

@@ -16,6 +16,7 @@ export const scheduleViewCallback = createCallbackData("schedule_view", { view: 
 export const updateCalendarCallback = createCallbackData("update_calendar", { from: String });
 export const connectCalendarCallback = createCallbackData("connect_calendar", { from: String });
 export const coursesCallback = createCallbackData("courses", {});
+export const aboutCallback = createCallbackData("about", {});
 export const toggleCourseCallback = createCallbackData("toggle_course", { idx: String });
 export const toggleScheduleTypeCallback = createCallbackData("toggle_sched_type", { key: String });
 export const toggleScheduleFormatCallback = createCallbackData("toggle_sched_fmt", { key: String });

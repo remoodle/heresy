@@ -4,10 +4,18 @@ import type { Context } from "../context";
 import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { validateRemoodleConnectToken } from "../../library/calendar-api";
-import { durationToMs, humanizeDuration } from "../../library/dates";
+import { fetchCalendarEvents } from "../../library/calendar";
+import { validateRemoodleConnectToken, fetchGroupSchedule } from "../../library/calendar-api";
+import {
+  applyScheduleFilters,
+  getDayName,
+  getScheduleForDay,
+  mergeAdjacentScheduleItems,
+  normalizeScheduleFilters,
+} from "../../library/schedule";
 import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
 import {
+  aboutCallback,
   menuCallback,
   updateCalendarCallback,
   connectCalendarCallback,
@@ -19,35 +27,110 @@ import { buildMenuKeyboard } from "../keyboards/menu";
 
 const CALENDAR_APP_URL = `${config.calendarApi.url || "https://calendar.remoodle.app"}/account`;
 
-function buildMenuMessage(user: {
-  thresholds: string[];
+type MenuUser = {
   group: string | null;
   calendarUrl: string;
   calendarAccountLinked: boolean;
-}): string {
-  const formatted =
-    user.thresholds.length === 0
-      ? "none"
-      : [...user.thresholds]
-          .sort((a, b) => durationToMs(a) - durationToMs(b))
-          .map(humanizeDuration)
-          .join(", ");
+  excludedCourses: string[];
+  scheduleFilters?: {
+    eventTypes: { lecture: boolean; practice: boolean; learn: boolean };
+    eventFormats: { online: boolean; offline: boolean };
+    combineAdjacentPairs?: boolean;
+  } | null;
+};
 
-  const parts: string[] = ["👋 You're registered with ReMoodle."];
+async function buildMenuMessage(user: MenuUser): Promise<string> {
+  const parts: string[] = ["👋 ReMoodle is ready"];
 
-  if (user.calendarUrl) {
-    parts.push("📅 Moodle calendar: connected");
+  const summary = await buildMenuSummary(user);
+  if (summary) {
+    parts.push(summary);
+  } else if (user.calendarAccountLinked && !user.group) {
+    parts.push("⚠️ Save a primary group in Calendar, then reconnect.");
+  } else if (!user.calendarUrl) {
+    parts.push("⚠️ Add your Moodle calendar URL in Settings to enable deadlines.");
   }
 
-  if (user.calendarAccountLinked && user.group) {
-    parts.push(`📆 Schedule group: ${user.group}`);
-  } else if (user.calendarAccountLinked) {
-    parts.push("⚠️ Schedule: save a primary group in Calendar and reconnect");
+  return parts.join("\n\n");
+}
+
+async function buildMenuSummary(user: MenuUser): Promise<string | null> {
+  const [deadlinesCount, classesCount] = await Promise.all([
+    getTodayDeadlinesCount(user),
+    getTodayClassesCount(user),
+  ]);
+
+  if (deadlinesCount !== null && classesCount !== null) {
+    return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} and ${classesCount} class${classesCount === 1 ? "" : "es"} for today`;
   }
 
-  parts.push(`🔔 Thresholds: ${formatted}`);
+  if (deadlinesCount !== null) {
+    return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} for today`;
+  }
 
-  return parts.join("\n");
+  if (classesCount !== null) {
+    return `You have ${classesCount} class${classesCount === 1 ? "" : "es"} for today`;
+  }
+
+  return null;
+}
+
+function getAlmatyDateKey(value: number | Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Almaty",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(value);
+}
+
+async function getTodayDeadlinesCount(user: Pick<MenuUser, "calendarUrl" | "excludedCourses">) {
+  if (!user.calendarUrl) {
+    return null;
+  }
+
+  try {
+    const todayKey = getAlmatyDateKey(Date.now());
+    const events = await fetchCalendarEvents(user.calendarUrl);
+    return events.filter(
+      (event) =>
+        event.timestampMs > Date.now() &&
+        getAlmatyDateKey(event.timestampMs) === todayKey &&
+        !user.excludedCourses.includes(event.courseName ?? ""),
+    ).length;
+  } catch {
+    return null;
+  }
+}
+
+async function getTodayClassesCount(
+  user: Pick<MenuUser, "group" | "excludedCourses" | "scheduleFilters">,
+) {
+  if (!user.group) {
+    return null;
+  }
+
+  try {
+    const items = await fetchGroupSchedule(user.group);
+    const filters = normalizeScheduleFilters(user.scheduleFilters);
+    const filtered = applyScheduleFilters(items, filters, user.excludedCourses);
+    const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
+    return getScheduleForDay(merged, getDayName(new Date())).length;
+  } catch {
+    return null;
+  }
+}
+
+function buildAboutMessage() {
+  return [
+    "<b>About ReMoodle</b>",
+    "",
+    "ReMoodle helps AITU students keep up with deadlines and schedule",
+    "",
+    'Calendar: <a href="https://calendar.remoodle.app/">calendar.remoodle.app/account</a>',
+    'Map: <a href="https://aitumap.remoodle.app/">aitumap.remoodle.app</a>',
+    'Docs: <a href="https://docs.remoodle.app/">docs.remoodle.app</a>',
+  ].join("\n");
 }
 
 function buildSetupKeyboard() {
@@ -92,7 +175,9 @@ feature.command("start", async (ctx) => {
 
   if (existing.length > 0) {
     const user = existing[0]!;
-    await ctx.reply(buildMenuMessage(user), { reply_markup: buildMenuKeyboard() });
+    await ctx.reply(await buildMenuMessage(user), {
+      reply_markup: buildMenuKeyboard(),
+    });
     return;
   }
 
@@ -119,8 +204,16 @@ feature.callbackQuery(menuCallback.filter(), async (ctx) => {
   }
 
   const user = rows[0]!;
-  await ctx.editMessageText(buildMenuMessage(user), {
+  await ctx.editMessageText(await buildMenuMessage(user), {
     reply_markup: buildMenuKeyboard(),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(aboutCallback.filter(), async (ctx) => {
+  await ctx.editMessageText(buildAboutMessage(), {
+    parse_mode: "HTML",
+    reply_markup: new InlineKeyboard().text("Back ←", menuCallback.pack({})),
   });
   await ctx.answerCallbackQuery();
 });
@@ -204,7 +297,7 @@ feature.on("message:text", async (ctx, next) => {
       thresholds: user!.thresholds,
     });
 
-    await ctx.reply(`✅ Calendar URL saved!\n\n${buildMenuMessage(user!)}`, {
+    await ctx.reply(`✅ Calendar URL saved!\n\n${await buildMenuMessage(user!)}`, {
       reply_markup: buildMenuKeyboard(),
     });
     return;
@@ -257,10 +350,13 @@ feature.on("message:text", async (ctx, next) => {
       ? `📆 Your group: <b>${connectResult.group}</b>`
       : "⚠️ No saved primary group found in Calendar. Save it in calendar.remoodle.app/account, then reconnect here to enable /schedule.";
 
-    await ctx.reply(`✅ Calendar account connected!\n\n${groupMsg}\n\n${buildMenuMessage(user!)}`, {
-      parse_mode: "HTML",
-      reply_markup: buildMenuKeyboard(),
-    });
+    await ctx.reply(
+      `✅ Calendar account connected!\n\n${groupMsg}\n\n${await buildMenuMessage(user!)}`,
+      {
+        parse_mode: "HTML",
+        reply_markup: buildMenuKeyboard(),
+      },
+    );
     return;
   }
 

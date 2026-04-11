@@ -8,11 +8,15 @@ import { fetchGroupSchedule } from "../../library/calendar-api";
 import {
   buildTodayScheduleMessage,
   buildWeeklyScheduleMessage,
+  buildNextWeekScheduleMessage,
   applyScheduleFilters,
   DEFAULT_SCHEDULE_FILTERS,
   getUniqueRooms,
   getScheduleForDay,
+  getScheduleForDays,
   getDayName,
+  getRemainingDaysOfWeek,
+  hasRemainingClassesThisWeek,
   mergeAdjacentScheduleItems,
   normalizeScheduleFilters,
   sanitizeRoomFilename,
@@ -29,35 +33,53 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-type ScheduleView = "today" | "week";
+type ScheduleView = "today" | "week" | "next_week";
 
 async function fetchScheduleMessage(
   group: string,
   excludedCourses: string[],
   scheduleFilters: typeof DEFAULT_SCHEDULE_FILTERS,
   view: ScheduleView,
-): Promise<{ message: string; rooms: string[] }> {
+): Promise<{ message: string; rooms: string[]; hasThisWeek: boolean }> {
   const items = await fetchGroupSchedule(group);
   const filters = normalizeScheduleFilters(scheduleFilters);
   const filtered = applyScheduleFilters(items, filters, excludedCourses);
   const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
   const now = new Date();
+  const hasThisWeek = hasRemainingClassesThisWeek(merged, now);
   const message =
     view === "week"
       ? buildWeeklyScheduleMessage(merged, now, group)
-      : buildTodayScheduleMessage(merged, now, group);
-  const visibleItems = view === "week" ? merged : getScheduleForDay(merged, getDayName(now));
+      : view === "next_week"
+        ? buildNextWeekScheduleMessage(merged, now, group)
+        : buildTodayScheduleMessage(merged, now, group);
+  const visibleItems =
+    view === "today"
+      ? getScheduleForDay(merged, getDayName(now))
+      : view === "week"
+        ? getScheduleForDays(merged, getRemainingDaysOfWeek(now))
+        : merged;
   const rooms = getUniqueRooms(visibleItems);
-  return { message, rooms };
+  return { message, rooms, hasThisWeek };
 }
 
-function buildScheduleKeyboard(view: ScheduleView, rooms: string[]) {
+function buildScheduleKeyboard(view: ScheduleView, rooms: string[], hasThisWeek: boolean) {
   const keyboard = new InlineKeyboard();
 
   if (view === "today") {
-    keyboard.text("This week →", scheduleViewCallback.pack({ view: "week" }));
+    if (hasThisWeek) {
+      keyboard.text("This week →", scheduleViewCallback.pack({ view: "week" }));
+    }
+    keyboard.text("Next week →", scheduleViewCallback.pack({ view: "next_week" }));
+  } else if (view === "week") {
+    keyboard
+      .text("← Today", scheduleViewCallback.pack({ view: "today" }))
+      .text("Next week →", scheduleViewCallback.pack({ view: "next_week" }));
   } else {
     keyboard.text("← Today", scheduleViewCallback.pack({ view: "today" }));
+    if (hasThisWeek) {
+      keyboard.text("← This week", scheduleViewCallback.pack({ view: "week" }));
+    }
   }
 
   if (rooms.length > 0) {
@@ -74,7 +96,7 @@ function buildScheduleKeyboard(view: ScheduleView, rooms: string[]) {
   return keyboard;
 }
 
-feature.command("schedule", async (ctx) => {
+async function replyWithScheduleView(ctx: Context, view: ScheduleView) {
   if (!ctx.from?.id) {
     return;
   }
@@ -96,13 +118,13 @@ feature.command("schedule", async (ctx) => {
 
   await ctx.replyWithChatAction("typing");
 
-  let result: { message: string; rooms: string[] };
+  let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
-      "today",
+      view,
     );
   } catch {
     await ctx.reply("Failed to fetch schedule. Try again later.");
@@ -111,8 +133,16 @@ feature.command("schedule", async (ctx) => {
 
   await ctx.reply(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard("today", result.rooms),
+    reply_markup: buildScheduleKeyboard(view, result.rooms, result.hasThisWeek),
   });
+}
+
+feature.command("today", async (ctx) => {
+  await replyWithScheduleView(ctx, "today");
+});
+
+feature.command("schedule", async (ctx) => {
+  await replyWithScheduleView(ctx, "next_week");
 });
 
 feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
@@ -134,7 +164,7 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
 
   await ctx.answerCallbackQuery();
 
-  let result: { message: string; rooms: string[] };
+  let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
       user.group,
@@ -144,14 +174,14 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
     );
   } catch {
     await ctx.editMessageText("Failed to fetch schedule.", {
-      reply_markup: buildScheduleKeyboard("today", []),
+      reply_markup: buildScheduleKeyboard("today", [], false),
     });
     return;
   }
 
   await ctx.editMessageText(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard("today", result.rooms),
+    reply_markup: buildScheduleKeyboard("today", result.rooms, result.hasThisWeek),
   });
 });
 
@@ -176,7 +206,7 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
 
   await ctx.answerCallbackQuery();
 
-  let result: { message: string; rooms: string[] };
+  let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
       user.group,
@@ -186,14 +216,14 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
     );
   } catch {
     await ctx.editMessageText("Failed to fetch schedule.", {
-      reply_markup: buildScheduleKeyboard(view, []),
+      reply_markup: buildScheduleKeyboard(view, [], false),
     });
     return;
   }
 
   await ctx.editMessageText(result.message, {
     parse_mode: "HTML",
-    reply_markup: buildScheduleKeyboard(view, result.rooms),
+    reply_markup: buildScheduleKeyboard(view, result.rooms, result.hasThisWeek),
   });
 });
 

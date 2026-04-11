@@ -78,9 +78,9 @@ function buildAccountMessage(user: {
   let msg = "<b>👤 Account</b>\n\n";
   msg += `User ID: <code>${user.id}</code>\n`;
   msg += `Telegram ID: <code>${user.telegramId}</code>\n\n`;
-  msg += `Moodle calendar: ${user.calendarUrl ? "✅ connected" : "not set"}\n`;
-  msg += `Calendar account: ${user.calendarAccountLinked ? "✅ connected" : "not set"}\n`;
-  msg += `Group: ${user.group ? `<b>${user.group}</b>` : "not set"}`;
+  msg += `Group: ${user.group ? `<b>${user.group}</b>` : "not set"}\n\n`;
+  msg += `Moodle calendar: ${user.calendarUrl ? "✅" : "not set"}\n`;
+  msg += `Calendar account: ${user.calendarAccountLinked ? "✅" : "not set"}\n`;
   return msg;
 }
 
