@@ -12,16 +12,20 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType(["private", "group", "supergroup"]);
 
-async function fetchDeadlinesMessage(calendarUrl: string, excludedCourses: string[]) {
+async function fetchDeadlinesMessage(
+  calendarUrl: string,
+  excludedCourses: string[],
+  daysLimit?: number,
+) {
   const events = await fetchCalendarEvents(calendarUrl);
   const filtered =
     excludedCourses.length > 0
       ? events.filter((e) => !excludedCourses.includes(e.courseName ?? ""))
       : events;
-  return buildDeadlinesMessage(filtered);
+  return buildDeadlinesMessage(filtered, daysLimit);
 }
 
-feature.command(["deadlines", "d"], async (ctx) => {
+feature.command(["deadlines", "d", "ds"], async (ctx) => {
   const telegramId = ctx.from?.id;
   if (!telegramId) {
     return;
@@ -43,9 +47,12 @@ feature.command(["deadlines", "d"], async (ctx) => {
 
   await ctx.replyWithChatAction("typing");
 
+  const command = ctx.msg?.text.match(/^\/([a-z0-9_]+)/i)?.[1]?.toLowerCase();
+  const daysLimit = command === "ds" ? 2 : undefined;
+
   let message: string;
   try {
-    message = await fetchDeadlinesMessage(user.calendarUrl, user.excludedCourses);
+    message = await fetchDeadlinesMessage(user.calendarUrl, user.excludedCourses, daysLimit);
   } catch {
     await ctx.reply("Failed to fetch your calendar. Check your URL with /update.");
     return;

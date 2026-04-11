@@ -1,11 +1,22 @@
 import { config } from "../config";
 import { logger } from "../library/logger";
+import { createShortCache } from "../library/short-cache";
 import { createBot } from "./bot";
+import { BOT_COMMANDS } from "./commands";
 
-const bot = createBot(config.telegram.token);
+async function main() {
+  const shortCache = createShortCache("short-cache", logger.bot);
+  const bot = createBot(config.telegram.token, shortCache);
 
-void bot.start({
-  onStart: (info) => {
-    logger.bot.info({ username: info.username }, "Bot started");
-  },
+  await bot.api.setMyCommands(BOT_COMMANDS);
+
+  await bot.start({
+    onStart: (info) => {
+      logger.bot.info({ username: info.username }, "Bot started");
+    },
+  });
+}
+
+void main().catch((err) => {
+  logger.bot.error({ error: err }, "Failed to start bot");
 });

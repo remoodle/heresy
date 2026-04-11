@@ -47,6 +47,7 @@ Start over with a smaller scope and treat **schedule** as the main thing first.
 
 ## Data / architecture notes
 
+- [x] Add optional short-lived Redis cache in `apps/remoodle` for schedule fetches.
 - [ ] Keep notification settings in `apps/remoodle`.
 - [ ] Keep schedule/custom event rendering and iCal export logic in `apps/calendar`.
 - [ ] Ensure stable IDs/keys exist so bot notification rules can reference schedule events reliably.

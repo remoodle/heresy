@@ -2,13 +2,14 @@ import { hydrate } from "@grammyjs/hydrate";
 import { Bot, MemorySessionStorage, session } from "grammy";
 import type { Context, SessionData } from "./context";
 import { logger } from "../library/logger";
+import type { ShortCache } from "../library/short-cache";
 import { coursesFeature } from "./features/courses";
 import { deadlinesFeature } from "./features/deadlines";
 import { scheduleFeature } from "./features/schedule";
 import { settingsFeature } from "./features/settings";
 import { startFeature } from "./features/start";
 
-export function createBot(token: string) {
+export function createBot(token: string, shortCache: ShortCache) {
   const bot = new Bot<Context>(token);
 
   bot.use(
@@ -20,6 +21,11 @@ export function createBot(token: string) {
   );
 
   bot.use(hydrate());
+
+  bot.use(async (ctx, next) => {
+    ctx.shortCache = shortCache;
+    await next();
+  });
 
   bot.use(startFeature);
   bot.use(deadlinesFeature);

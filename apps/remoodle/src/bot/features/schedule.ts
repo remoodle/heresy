@@ -4,7 +4,6 @@ import type { Context } from "../context";
 import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { fetchGroupSchedule } from "../../library/calendar-api";
 import {
   buildTodayScheduleMessage,
   buildWeeklyScheduleMessage,
@@ -28,6 +27,7 @@ import {
   roomPhotoCallback,
   closeMessageCallback,
 } from "../callback-data";
+import { fetchCachedGroupSchedule } from "../schedule-cache";
 
 export const composer = new Composer<Context>();
 
@@ -36,12 +36,13 @@ const feature = composer.chatType("private");
 type ScheduleView = "today" | "week" | "next_week";
 
 async function fetchScheduleMessage(
+  ctx: Context,
   group: string,
   excludedCourses: string[],
   scheduleFilters: typeof DEFAULT_SCHEDULE_FILTERS,
   view: ScheduleView,
 ): Promise<{ message: string; rooms: string[]; hasThisWeek: boolean }> {
-  const items = await fetchGroupSchedule(group);
+  const items = await fetchCachedGroupSchedule(ctx, group);
   const filters = normalizeScheduleFilters(scheduleFilters);
   const filtered = applyScheduleFilters(items, filters, excludedCourses);
   const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
@@ -121,6 +122,7 @@ async function replyWithScheduleView(ctx: Context, view: ScheduleView) {
   let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
+      ctx,
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
@@ -167,6 +169,7 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
   let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
+      ctx,
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,
@@ -209,6 +212,7 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
   let result: { message: string; rooms: string[]; hasThisWeek: boolean };
   try {
     result = await fetchScheduleMessage(
+      ctx,
       user.group,
       user.excludedCourses,
       user.scheduleFilters ?? DEFAULT_SCHEDULE_FILTERS,

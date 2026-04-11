@@ -3,15 +3,15 @@ import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
-import { fetchGroupSchedule } from "../../library/calendar-api";
 import { coursesCallback, toggleCourseCallback, settingsCallback } from "../callback-data";
+import { fetchCachedGroupSchedule } from "../schedule-cache";
 
 export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
-async function getGroupCourses(group: string): Promise<string[]> {
-  const items = await fetchGroupSchedule(group);
+async function getGroupCourses(ctx: Context, group: string): Promise<string[]> {
+  const items = await fetchCachedGroupSchedule(ctx, group);
   const names = items.map((i) => i.courseName).filter(Boolean);
   return Array.from(new Set(names)).sort();
 }
@@ -69,7 +69,7 @@ feature.command("courses", async (ctx) => {
 
   let courses: string[];
   try {
-    courses = await getGroupCourses(user.group);
+    courses = await getGroupCourses(ctx, user.group);
   } catch {
     await ctx.reply("📋 <b>Courses</b>\n\nFailed to fetch schedule. Try again later.", {
       parse_mode: "HTML",
@@ -106,7 +106,7 @@ feature.callbackQuery(coursesCallback.filter(), async (ctx) => {
 
   let courses: string[];
   try {
-    courses = await getGroupCourses(user.group);
+    courses = await getGroupCourses(ctx, user.group);
   } catch {
     await ctx.answerCallbackQuery("Failed to fetch schedule.");
     return;
@@ -137,7 +137,7 @@ feature.callbackQuery(toggleCourseCallback.filter(), async (ctx) => {
 
   let courses: string[];
   try {
-    courses = await getGroupCourses(user.group);
+    courses = await getGroupCourses(ctx, user.group);
   } catch {
     await ctx.answerCallbackQuery("Failed to fetch schedule.");
     return;

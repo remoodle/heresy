@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: valkey/valkey:8-alpine
+    container_name: ${REDIS_CONTAINER_NAME:-heresy-redis}
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:

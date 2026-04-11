@@ -10,8 +10,6 @@ const calendarClient = hc<AppType>(config.calendarApi.url, {
   },
 });
 
-const scheduleRoute = calendarClient.api.internal.schedule[":group"];
-
 export async function validateRemoodleConnectToken(token: string) {
   try {
     return await parseResponse(
@@ -33,7 +31,7 @@ export async function validateRemoodleConnectToken(token: string) {
 export async function fetchGroupSchedule(group: string) {
   try {
     return await parseResponse(
-      scheduleRoute.$get({
+      calendarClient.api.internal.schedule[":group"].$get({
         param: { group },
       }),
     );

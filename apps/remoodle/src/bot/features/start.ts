@@ -5,7 +5,7 @@ import { config } from "../../config";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
-import { validateRemoodleConnectToken, fetchGroupSchedule } from "../../library/calendar-api";
+import { validateRemoodleConnectToken } from "../../library/calendar-api";
 import {
   applyScheduleFilters,
   getDayName,
@@ -24,6 +24,7 @@ import {
   deadlinesSettingsCallback,
 } from "../callback-data";
 import { buildMenuKeyboard } from "../keyboards/menu";
+import { fetchCachedGroupSchedule } from "../schedule-cache";
 
 const CALENDAR_APP_URL = `${config.calendarApi.url || "https://calendar.remoodle.app"}/account`;
 
@@ -39,10 +40,10 @@ type MenuUser = {
   } | null;
 };
 
-async function buildMenuMessage(user: MenuUser): Promise<string> {
+async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
   const parts: string[] = ["👋 ReMoodle is ready"];
 
-  const summary = await buildMenuSummary(user);
+  const summary = await buildMenuSummary(ctx, user);
   if (summary) {
     parts.push(summary);
   } else if (user.calendarAccountLinked && !user.group) {
@@ -54,10 +55,10 @@ async function buildMenuMessage(user: MenuUser): Promise<string> {
   return parts.join("\n\n");
 }
 
-async function buildMenuSummary(user: MenuUser): Promise<string | null> {
+async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | null> {
   const [deadlinesCount, classesCount] = await Promise.all([
     getTodayDeadlinesCount(user),
-    getTodayClassesCount(user),
+    getTodayClassesCount(ctx, user),
   ]);
 
   if (deadlinesCount !== null && classesCount !== null) {
@@ -104,6 +105,7 @@ async function getTodayDeadlinesCount(user: Pick<MenuUser, "calendarUrl" | "excl
 }
 
 async function getTodayClassesCount(
+  ctx: Context,
   user: Pick<MenuUser, "group" | "excludedCourses" | "scheduleFilters">,
 ) {
   if (!user.group) {
@@ -111,7 +113,7 @@ async function getTodayClassesCount(
   }
 
   try {
-    const items = await fetchGroupSchedule(user.group);
+    const items = await fetchCachedGroupSchedule(ctx, user.group);
     const filters = normalizeScheduleFilters(user.scheduleFilters);
     const filtered = applyScheduleFilters(items, filters, user.excludedCourses);
     const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
@@ -175,7 +177,7 @@ feature.command("start", async (ctx) => {
 
   if (existing.length > 0) {
     const user = existing[0]!;
-    await ctx.reply(await buildMenuMessage(user), {
+    await ctx.reply(await buildMenuMessage(ctx, user), {
       reply_markup: buildMenuKeyboard(),
     });
     return;
@@ -204,7 +206,7 @@ feature.callbackQuery(menuCallback.filter(), async (ctx) => {
   }
 
   const user = rows[0]!;
-  await ctx.editMessageText(await buildMenuMessage(user), {
+  await ctx.editMessageText(await buildMenuMessage(ctx, user), {
     reply_markup: buildMenuKeyboard(),
   });
   await ctx.answerCallbackQuery();
@@ -297,7 +299,7 @@ feature.on("message:text", async (ctx, next) => {
       thresholds: user!.thresholds,
     });
 
-    await ctx.reply(`✅ Calendar URL saved!\n\n${await buildMenuMessage(user!)}`, {
+    await ctx.reply(`✅ Calendar URL saved!\n\n${await buildMenuMessage(ctx, user!)}`, {
       reply_markup: buildMenuKeyboard(),
     });
     return;
@@ -351,7 +353,7 @@ feature.on("message:text", async (ctx, next) => {
       : "⚠️ No saved primary group found in Calendar. Save it in calendar.remoodle.app/account, then reconnect here to enable /schedule.";
 
     await ctx.reply(
-      `✅ Calendar account connected!\n\n${groupMsg}\n\n${await buildMenuMessage(user!)}`,
+      `✅ Calendar account connected!\n\n${groupMsg}\n\n${await buildMenuMessage(ctx, user!)}`,
       {
         parse_mode: "HTML",
         reply_markup: buildMenuKeyboard(),
