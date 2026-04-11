@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.16.0](https://github.com/remoodle/heresy/compare/remoodle-v0.15.1...remoodle-v0.16.0) (2026-04-11)
+
+
+### Features
+
+* add delete account option ([f6148b8](https://github.com/remoodle/heresy/commit/f6148b839b2c2a96d49d764f00d6472cae447d93))
+* **bot:** add cache for calendar ([403ed4f](https://github.com/remoodle/heresy/commit/403ed4fb8d1ee21ec71918f5b5508d3c23466b95))
+* **bot:** merge pairs by default ([e770454](https://github.com/remoodle/heresy/commit/e770454d5570c2ecb739f5dd196342b87ec5b706))
+* **bot:** update schedule and menu ([61f5c9b](https://github.com/remoodle/heresy/commit/61f5c9bd26eee3f4cb17981871d9db0f55afe333))
+
+
+### Bug Fixes
+
+* **bot:** update keyboard menus ([d0b3b4d](https://github.com/remoodle/heresy/commit/d0b3b4d386a4472b6617cf2c814ded70106581b6))
+
+
+### Miscellaneous Chores
+
+* **calendar:** bump drizzle ([3c17b86](https://github.com/remoodle/heresy/commit/3c17b8660a78458c9115f00d35534817a79aeaa4))
+
 ## [0.15.1](https://github.com/remoodle/heresy/compare/remoodle-v0.15.0...remoodle-v0.15.1) (2026-04-10)
 
 
