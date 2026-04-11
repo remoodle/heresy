@@ -11,6 +11,7 @@
     "type-check": "vp run -r type-check",
     "test": "vp run -r test",
     "build": "vp run -r build",
+    "dev": "vp run -F @heresy/calendar -F @heresy/remoodle dev",
     "dev:calendar": "vp run @heresy/calendar#dev",
     "dev:remoodle": "vp run @heresy/remoodle#dev"
   },
