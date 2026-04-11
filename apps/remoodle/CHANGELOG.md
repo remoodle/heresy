@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.16.2](https://github.com/remoodle/heresy/compare/remoodle-v0.16.1...remoodle-v0.16.2) (2026-04-11)
+
+
+### Bug Fixes
+
+* update builds ([1d9c43d](https://github.com/remoodle/heresy/commit/1d9c43dd5268b56c98562eacbe2ba08e21c0be00))
+
+
+### Code Refactoring
+
+* update configs and promises ([97d8631](https://github.com/remoodle/heresy/commit/97d8631d06613c81c0593d6a06c7b5571e4007e5))
+
 ## [0.16.1](https://github.com/remoodle/heresy/compare/remoodle-v0.16.0...remoodle-v0.16.1) (2026-04-11)
 
 
