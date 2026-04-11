@@ -23,6 +23,7 @@ import {
   accountCallback,
   deleteAccountCallback,
   confirmDeleteAccountCallback,
+  coursesCallback,
 } from "../callback-data";
 
 export const composer = new Composer<Context>();
@@ -36,6 +37,7 @@ function buildSettingsKeyboard() {
     .text("📋 Deadlines", deadlinesSettingsCallback.pack({}))
     .text("📆 Schedule", scheduleSettingsCallback.pack({}))
     .row()
+    .text("📚 Courses", coursesCallback.pack({}))
     .text("👤 Account", accountCallback.pack({}))
     .row()
     .text("Back ←", menuCallback.pack({}));

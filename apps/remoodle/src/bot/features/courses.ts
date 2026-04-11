@@ -4,8 +4,7 @@ import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
-import { coursesCallback, toggleCourseCallback, menuCallback } from "../callback-data";
-import { buildBackToMenuKeyboard } from "../keyboards/menu";
+import { coursesCallback, toggleCourseCallback, settingsCallback } from "../callback-data";
 
 export const composer = new Composer<Context>();
 
@@ -28,7 +27,7 @@ function buildCoursesKeyboard(courses: string[], excluded: string[]) {
       .text(`${isExcluded ? "❌" : "✅"} ${course}`, toggleCourseCallback.pack({ idx: String(i) }));
   }
 
-  keyboard.row().text("Back ←", menuCallback.pack({}));
+  keyboard.row().text("Back ←", settingsCallback.pack({}));
   return keyboard;
 }
 
@@ -62,7 +61,7 @@ feature.command("courses", async (ctx) => {
       "📋 <b>Courses</b>\n\nConnect your Calendar account first.\n\nGo to /settings → Schedule → Connect Calendar account.",
       {
         parse_mode: "HTML",
-        reply_markup: buildBackToMenuKeyboard(),
+        reply_markup: new InlineKeyboard().text("Back ←", settingsCallback.pack({})),
       },
     );
     return;
@@ -99,7 +98,7 @@ feature.callbackQuery(coursesCallback.filter(), async (ctx) => {
       "📋 <b>Courses</b>\n\nConnect your Calendar account first.\n\nGo to Settings → Schedule → Connect Calendar account.",
       {
         parse_mode: "HTML",
-        reply_markup: buildBackToMenuKeyboard(),
+        reply_markup: new InlineKeyboard().text("Back ←", settingsCallback.pack({})),
       },
     );
     return;
