@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/remoodle/heresy/compare/remoodle-v0.16.0...remoodle-v0.16.1) (2026-04-11)
+
+
+### Code Refactoring
+
+* **bot:** remove redis ([0b8bffc](https://github.com/remoodle/heresy/commit/0b8bffcef1be9c17b769e260f34f9dd6e02600e2))
+
 ## [0.16.0](https://github.com/remoodle/heresy/compare/remoodle-v0.15.1...remoodle-v0.16.0) (2026-04-11)
 
 
