@@ -1,9 +1,9 @@
-FROM node:22-alpine AS base
+FROM --platform=$BUILDPLATFORM node:22-alpine AS build-base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
 
-FROM base AS builder
+FROM build-base AS builder
 WORKDIR /workspace
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
 COPY apps/remoodle/package.json ./apps/remoodle/package.json
@@ -12,7 +12,10 @@ COPY . .
 RUN pnpm --filter @heresy/remoodle build
 RUN pnpm deploy --filter @heresy/remoodle --prod /app
 
-FROM base AS runner
+FROM --platform=$TARGETPLATFORM node:22-alpine AS runner
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 WORKDIR /app
 RUN apk add --no-cache tzdata \
     && export TZ="Asia/Almaty" \
