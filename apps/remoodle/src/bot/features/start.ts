@@ -135,6 +135,7 @@ function buildAboutMessage() {
     `Calendar: <a href="${config.calendar.url}/">${config.calendar.host}</a>`,
     `Map: <a href="${config.aitumap.url}/">${config.aitumap.host}</a>`,
     `Docs: <a href="${config.docs.url}/">${config.docs.host}</a>`,
+    'GitHub: <a href="https://github.com/remoodle/heresy">github.com/remoodle/heresy</a>',
   ].join("\n");
 }
 
