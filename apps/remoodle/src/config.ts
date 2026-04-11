@@ -12,7 +12,6 @@ export const env = cleanEnv(process.env, {
   CALENDAR_API_URL: str({ default: "" }),
   CALENDAR_INTERNAL_TOKEN: str({ default: "" }),
   CABGEN_CDN_URL: str({ default: "https://cabgen.remoodle.app" }),
-  REDIS_URL: str({ default: "" }),
   SHORT_CACHE_TTL_SECONDS: num({ default: 30 }),
 });
 
@@ -35,9 +34,7 @@ export const config = {
     defaultThresholds: ["P1D", "PT3H"],
     maxThresholds: 10,
   },
-  redis: {
-    url: env.REDIS_URL,
-    enabled: env.REDIS_URL.length > 0,
+  cache: {
     shortCacheTtlSeconds: env.SHORT_CACHE_TTL_SECONDS,
   },
 };

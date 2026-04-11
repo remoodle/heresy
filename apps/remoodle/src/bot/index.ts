@@ -5,7 +5,7 @@ import { createBot } from "./bot";
 import { BOT_COMMANDS } from "./commands";
 
 async function main() {
-  const shortCache = createShortCache("short-cache", logger.bot);
+  const shortCache = createShortCache();
   const bot = createBot(config.telegram.token, shortCache);
 
   await bot.api.setMyCommands(BOT_COMMANDS);

@@ -15,5 +15,6 @@ In particular:
 
 - `vp install`
 - `vp run ready`
-- `pnpm dev:calendar`
-- `pnpm dev:remoodle`
+- `vp run dev`
+- `vp run dev:calendar`
+- `vp run dev:remoodle`
