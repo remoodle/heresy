@@ -23,6 +23,7 @@
     "@grammyjs/hydrate": "^1.6.0",
     "@hatchet-dev/typescript-sdk": "^1.19.1",
     "@libsql/client": "^0.17.2",
+    "better-all": "catalog:",
     "callback-data": "^1.1.1",
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",

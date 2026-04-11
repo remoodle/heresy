@@ -396,8 +396,7 @@ function buildScheduleSettingsMessage(
   msg += `Merge adjacent pairs: ${filters.combineAdjacentPairs ? "✅ On" : "☐ Off"}\n`;
   msg += "\nConfigure event types, formats, and notifications.";
   if (!group) {
-    msg +=
-      "\n\n<i>Schedule integration requires a saved primary group in Calendar. Save it in calendar.remoodle.app/account, then reconnect your Calendar account here.</i>";
+    msg += `\n\n<i>Schedule integration requires a saved primary group in Calendar. Save it in ${config.calendar.host}/account, then reconnect your Calendar account here.</i>`;
   }
   return msg;
 }

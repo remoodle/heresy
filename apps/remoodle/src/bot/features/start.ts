@@ -1,3 +1,4 @@
+import { all } from "better-all";
 import { eq } from "drizzle-orm";
 import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
@@ -25,8 +26,6 @@ import {
 } from "../callback-data";
 import { buildMenuKeyboard } from "../keyboards/menu";
 import { fetchCachedGroupSchedule } from "../schedule-cache";
-
-const CALENDAR_APP_URL = `${config.calendarApi.url || "https://calendar.remoodle.app"}/account`;
 
 type MenuUser = {
   group: string | null;
@@ -56,10 +55,14 @@ async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
 }
 
 async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | null> {
-  const [deadlinesCount, classesCount] = await Promise.all([
-    getTodayDeadlinesCount(user),
-    getTodayClassesCount(ctx, user),
-  ]);
+  const { deadlinesCount, classesCount } = await all({
+    async deadlinesCount() {
+      return getTodayDeadlinesCount(user);
+    },
+    async classesCount() {
+      return getTodayClassesCount(ctx, user);
+    },
+  });
 
   if (deadlinesCount !== null && classesCount !== null) {
     return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} and ${classesCount} class${classesCount === 1 ? "" : "es"} for today`;
@@ -129,9 +132,9 @@ function buildAboutMessage() {
     "",
     "ReMoodle helps AITU students keep up with deadlines and schedule",
     "",
-    'Calendar: <a href="https://calendar.remoodle.app/">calendar.remoodle.app/account</a>',
-    'Map: <a href="https://aitumap.remoodle.app/">aitumap.remoodle.app</a>',
-    'Docs: <a href="https://docs.remoodle.app/">docs.remoodle.app</a>',
+    `Calendar: <a href="${config.calendar.url}/">${config.calendar.host}</a>`,
+    `Map: <a href="${config.aitumap.url}/">${config.aitumap.host}</a>`,
+    `Docs: <a href="${config.docs.url}/">${config.docs.host}</a>`,
   ].join("\n");
 }
 
@@ -153,7 +156,7 @@ function buildUpdateCalendarKeyboard(from: "setup" | "deadlines_settings") {
   );
 }
 
-const CALENDAR_URL_PROMPT = `Send your Moodle calendar URL:\n\n<a href="https://docs.remoodle.app/guide/moodle-calendar-url">Where to get it?</a>`;
+const CALENDAR_URL_PROMPT = `Send your Moodle calendar URL:\n\n<a href="${config.docs.moodleCalendarGuideUrl}">Where to get it?</a>`;
 
 function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings") {
   return new InlineKeyboard().text(
@@ -163,7 +166,7 @@ function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings") {
 }
 
 function buildConnectCalendarMessage() {
-  return `Go to <a href="${CALENDAR_APP_URL}">calendar.remoodle.app/account</a>\n\n→ Open <b>Account</b>\n→ Click <b>Generate code</b>\n→ Paste the 6-character code here:`;
+  return `Go to <a href="${config.calendar.accountUrl}">${config.calendar.host}/account</a>\n\n→ Open <b>Account</b>\n→ Click <b>Generate code</b>\n→ Paste the 6-character code here:`;
 }
 
 export const composer = new Composer<Context>();
@@ -350,7 +353,7 @@ feature.on("message:text", async (ctx, next) => {
 
     const groupMsg = connectResult.group
       ? `📆 Your group: <b>${connectResult.group}</b>`
-      : "⚠️ No saved primary group found in Calendar. Save it in calendar.remoodle.app/account, then reconnect here to enable /schedule.";
+      : `⚠️ No saved primary group found in Calendar. Save it in ${config.calendar.host}/account, then reconnect here to enable /schedule.`;
 
     await ctx.reply(
       `✅ Calendar account connected!\n\n${groupMsg}\n\n${await buildMenuMessage(ctx, user!)}`,

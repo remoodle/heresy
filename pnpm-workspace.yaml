@@ -15,6 +15,7 @@ catalog:
   "@schedule-x/theme-shadcn": ^4.4.0
   "@schedule-x/vue": ^4.1.0
   "@types/node": ^24
+  better-all: ^0.0.7
   dotenv: ^17
   drizzle-kit: 1.0.0-beta.20
   drizzle-orm: 1.0.0-beta.20

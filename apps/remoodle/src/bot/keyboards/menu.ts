@@ -1,4 +1,5 @@
 import { InlineKeyboard } from "grammy";
+import { config } from "../../config";
 import {
   aboutCallback,
   menuCallback,
@@ -6,9 +7,6 @@ import {
   deadlinesCallback,
   scheduleCallback,
 } from "../callback-data";
-
-const CALENDAR_URL = "https://calendar.remoodle.app/account";
-const MAP_URL = "https://aitumap.remoodle.app/";
 
 export function buildMenuKeyboard() {
   return new InlineKeyboard()
@@ -18,8 +16,8 @@ export function buildMenuKeyboard() {
     .text("Settings", settingsCallback.pack({}))
     .text("About", aboutCallback.pack({}))
     .row()
-    .webApp("Map", MAP_URL)
-    .url("Calendar", CALENDAR_URL);
+    .webApp("Map", config.aitumap.url)
+    .url("Calendar", config.calendar.accountUrl);
 }
 
 export function buildBackToMenuKeyboard() {

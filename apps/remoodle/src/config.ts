@@ -1,6 +1,10 @@
 import { cleanEnv, num, str } from "envalid";
 import "dotenv/config";
 
+const CALENDAR_URL = "https://calendar.remoodle.app";
+const AITUMAP_URL = "https://aitumap.remoodle.app";
+const DOCS_URL = "https://docs.remoodle.app";
+
 export const env = cleanEnv(process.env, {
   NODE_ENV: str({
     choices: ["development", "test", "production", "staging"],
@@ -28,6 +32,20 @@ export const config = {
   calendarApi: {
     url: env.CALENDAR_API_URL,
     internalToken: env.CALENDAR_INTERNAL_TOKEN,
+  },
+  calendar: {
+    url: CALENDAR_URL,
+    host: "calendar.remoodle.app",
+    accountUrl: `${CALENDAR_URL}/account`,
+  },
+  aitumap: {
+    url: AITUMAP_URL,
+    host: "aitumap.remoodle.app",
+  },
+  docs: {
+    url: DOCS_URL,
+    host: "docs.remoodle.app",
+    moodleCalendarGuideUrl: `${DOCS_URL}/guide/moodle-calendar-url`,
   },
   roomsCdnUrl: env.CABGEN_CDN_URL,
   reminders: {
