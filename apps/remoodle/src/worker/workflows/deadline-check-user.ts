@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
-import { calendarEvents, sentReminders, users } from "../../db/schema";
+import { calendarEvents, sentNotifications, users } from "../../db/schema";
 import { type CalendarEvent } from "../../library/calendar";
 import { buildReminderMessage, trackDeadlineReminders } from "../../library/deadline-reminders";
 import { hatchet } from "../hatchet-client";
@@ -55,9 +55,9 @@ export const deadlineCheckUser = hatchet.task<Input>({
     }
 
     const existing = await db
-      .select({ eventId: sentReminders.eventId, triggeredAt: sentReminders.triggeredAt })
-      .from(sentReminders)
-      .where(eq(sentReminders.userId, input.userId));
+      .select({ eventId: sentNotifications.eventId, triggeredAt: sentNotifications.triggeredAt })
+      .from(sentNotifications)
+      .where(eq(sentNotifications.userId, input.userId));
 
     const existingMapped = existing.map((row) => ({
       eventId: row.eventId,

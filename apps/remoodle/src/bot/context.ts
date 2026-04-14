@@ -5,6 +5,7 @@ import type { ShortCache } from "../library/short-cache";
 export type SessionData = {
   awaitingCalendarUrl?: boolean;
   awaitingRemoodleToken?: boolean;
+  awaitingScheduleReminderMinutes?: boolean;
 };
 
 export type Context = HydrateFlavor<

@@ -28,3 +28,4 @@ export const confirmDeleteAccountCallback = createCallbackData("confirm_delete_a
 });
 export const roomPhotoCallback = createCallbackData("room_photo", { room: String });
 export const closeMessageCallback = createCallbackData("close_msg", {});
+export const setScheduleReminderCallback = createCallbackData("set_sched_reminder", {});

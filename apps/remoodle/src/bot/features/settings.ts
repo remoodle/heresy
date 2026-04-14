@@ -3,7 +3,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { config } from "../../config";
 import { db } from "../../db";
-import { calendarEvents, sentReminders, users } from "../../db/schema";
+import { calendarEvents, sentNotifications, users } from "../../db/schema";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { normalizeScheduleFilters, type ScheduleFilters } from "../../library/schedule";
@@ -24,6 +24,7 @@ import {
   deleteAccountCallback,
   confirmDeleteAccountCallback,
   coursesCallback,
+  setScheduleReminderCallback,
 } from "../callback-data";
 
 export const composer = new Composer<Context>();
@@ -195,7 +196,7 @@ feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
 
   const userId = rows[0]!.id;
 
-  await db.delete(sentReminders).where(eq(sentReminders.userId, userId));
+  await db.delete(sentNotifications).where(eq(sentNotifications.userId, userId));
   await db.delete(calendarEvents).where(eq(calendarEvents.userId, userId));
   await db.delete(users).where(eq(users.id, userId));
 
@@ -324,6 +325,7 @@ function buildScheduleSettingsKeyboard(
   scheduleEnabled: boolean,
   hasGroup: boolean,
   filters: ScheduleFilters,
+  reminderOffset: string,
 ) {
   const keyboard = new InlineKeyboard();
 
@@ -372,6 +374,13 @@ function buildScheduleSettingsKeyboard(
       toggleScheduleMergeCallback.pack({}),
     );
 
+  keyboard
+    .row()
+    .text(
+      `🔔 Remind ${humanizeDuration(reminderOffset)} before`,
+      setScheduleReminderCallback.pack({}),
+    );
+
   if (!hasGroup) {
     keyboard
       .row()
@@ -403,6 +412,7 @@ function buildScheduleSettingsMessage(
 
 feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
   ctx.session.awaitingRemoodleToken = false;
+  ctx.session.awaitingScheduleReminderMinutes = false;
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
     await ctx.answerCallbackQuery("Not registered.");
@@ -414,7 +424,12 @@ feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
     buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
     {
       parse_mode: "HTML",
-      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+      reply_markup: buildScheduleSettingsKeyboard(
+        user.scheduleEnabled,
+        !!user.group,
+        filters,
+        user.scheduleReminderOffset,
+      ),
     },
   );
   await ctx.answerCallbackQuery();
@@ -442,7 +457,12 @@ feature.callbackQuery(toggleScheduleCallback.filter(), async (ctx) => {
   const filters = normalizeScheduleFilters(user.scheduleFilters);
   await ctx.editMessageText(buildScheduleSettingsMessage(updated, user.group, filters), {
     parse_mode: "HTML",
-    reply_markup: buildScheduleSettingsKeyboard(updated, !!user.group, filters),
+    reply_markup: buildScheduleSettingsKeyboard(
+      updated,
+      !!user.group,
+      filters,
+      user.scheduleReminderOffset,
+    ),
   });
   await ctx.answerCallbackQuery();
 });
@@ -467,7 +487,12 @@ feature.callbackQuery(toggleScheduleTypeCallback.filter(), async (ctx) => {
     buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
     {
       parse_mode: "HTML",
-      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+      reply_markup: buildScheduleSettingsKeyboard(
+        user.scheduleEnabled,
+        !!user.group,
+        filters,
+        user.scheduleReminderOffset,
+      ),
     },
   );
   await ctx.answerCallbackQuery();
@@ -493,7 +518,12 @@ feature.callbackQuery(toggleScheduleFormatCallback.filter(), async (ctx) => {
     buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
     {
       parse_mode: "HTML",
-      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+      reply_markup: buildScheduleSettingsKeyboard(
+        user.scheduleEnabled,
+        !!user.group,
+        filters,
+        user.scheduleReminderOffset,
+      ),
     },
   );
   await ctx.answerCallbackQuery();
@@ -515,9 +545,92 @@ feature.callbackQuery(toggleScheduleMergeCallback.filter(), async (ctx) => {
     buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters),
     {
       parse_mode: "HTML",
-      reply_markup: buildScheduleSettingsKeyboard(user.scheduleEnabled, !!user.group, filters),
+      reply_markup: buildScheduleSettingsKeyboard(
+        user.scheduleEnabled,
+        !!user.group,
+        filters,
+        user.scheduleReminderOffset,
+      ),
     },
   );
+  await ctx.answerCallbackQuery();
+});
+
+// ─── Schedule reminder offset ─────────────────────────────────────────────────
+
+feature.on("message:text", async (ctx, next) => {
+  if (!ctx.session.awaitingScheduleReminderMinutes) {
+    return next();
+  }
+
+  const raw = ctx.message.text.trim();
+  const mins = parseInt(raw, 10);
+
+  if (!Number.isInteger(mins) || mins < 1 || mins > 240) {
+    await ctx.reply("Please send a number between 1 and 240:");
+    return;
+  }
+
+  const offset = `PT${mins}M`;
+  ctx.session.awaitingScheduleReminderMinutes = false;
+
+  await db
+    .update(users)
+    .set({ scheduleReminderOffset: offset })
+    .where(eq(users.telegramId, ctx.from.id));
+
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) return;
+  const user = rows[0]!;
+  const filters = normalizeScheduleFilters(user.scheduleFilters);
+
+  await ctx.reply(
+    `✅ You'll be reminded <b>${mins} minutes</b> before each class.\n\n${buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters)}`,
+    {
+      parse_mode: "HTML",
+      reply_markup: buildScheduleSettingsKeyboard(
+        user.scheduleEnabled,
+        !!user.group,
+        filters,
+        offset,
+      ),
+    },
+  );
+});
+
+feature.callbackQuery(setScheduleReminderCallback.filter(), async (ctx) => {
+  ctx.session.awaitingScheduleReminderMinutes = true;
+  const rows = await db
+    .select({ scheduleReminderOffset: users.scheduleReminderOffset })
+    .from(users)
+    .where(eq(users.telegramId, ctx.from.id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery("Not registered.");
+    return;
+  }
+
+  const current = rows[0]!.scheduleReminderOffset;
+  const currentMins = Math.round(durationToMs(current) / 60000);
+
+  try {
+    await ctx.editMessageText(
+      `<b>🔔 Schedule reminder</b>\n\nCurrently set to <b>${currentMins} minutes</b> before class.\n\nSend a number (1–240) to set how many minutes before each class you want to be reminded:`,
+      {
+        parse_mode: "HTML",
+        reply_markup: new InlineKeyboard().text("Cancel", scheduleSettingsCallback.pack({})),
+      },
+    );
+  } catch {
+    await ctx.reply(
+      `<b>🔔 Schedule reminder</b>\n\nCurrently set to <b>${currentMins} minutes</b> before class.\n\nSend a number (1–240) to set how many minutes before each class you want to be reminded:`,
+      {
+        parse_mode: "HTML",
+        reply_markup: new InlineKeyboard().text("Cancel", scheduleSettingsCallback.pack({})),
+      },
+    );
+  }
   await ctx.answerCallbackQuery();
 });
 

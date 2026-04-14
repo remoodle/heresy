@@ -1,5 +1,5 @@
 import { db } from "../../db";
-import { sentReminders } from "../../db/schema";
+import { sentNotifications } from "../../db/schema";
 import { hatchet } from "../hatchet-client";
 import { telegramSendMessage } from "./telegram-send-message";
 
@@ -22,7 +22,7 @@ export const deadlineNotifyUser = hatchet.task<Input>({
     await telegramSendMessage.run({ chatId: input.chatId, message: input.message });
 
     await db
-      .insert(sentReminders)
+      .insert(sentNotifications)
       .values(
         input.reminders.map((reminder) => ({
           userId: input.userId,

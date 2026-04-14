@@ -30,6 +30,7 @@ export const users = sqliteTable("users", {
       eventFormats: { online: true, offline: true },
       combineAdjacentPairs: true,
     }),
+  scheduleReminderOffset: text("schedule_reminder_offset").notNull().default("PT30M"),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -54,8 +55,8 @@ export const calendarEvents = sqliteTable(
   (table) => [unique().on(table.userId, table.eventId)],
 );
 
-export const sentReminders = sqliteTable(
-  "sent_reminders",
+export const sentNotifications = sqliteTable(
+  "sent_notifications",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     userId: integer("user_id")
