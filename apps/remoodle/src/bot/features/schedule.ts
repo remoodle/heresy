@@ -10,7 +10,6 @@ import {
   buildNextWeekScheduleMessage,
   applyScheduleFilters,
   DEFAULT_SCHEDULE_FILTERS,
-  getUniqueRooms,
   getScheduleForDay,
   getScheduleForDays,
   getDayName,
@@ -18,8 +17,8 @@ import {
   hasRemainingClassesThisWeek,
   mergeAdjacentScheduleItems,
   normalizeScheduleFilters,
-  sanitizeRoomFilename,
 } from "../../library/schedule";
+import { getUniqueRooms, sanitizeRoomFilename } from "../../library/rooms";
 import {
   scheduleCallback,
   scheduleViewCallback,

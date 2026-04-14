@@ -63,15 +63,7 @@ function extractTime(timeStr: string): string {
   return parts.length === 2 ? parts[1]! : timeStr;
 }
 
-const ROOM_CODE_PATTERN = /C1\.\d+\.\d+[A-Z]*/;
-
-export function extractRoomCode(location: string): string | null {
-  return location.match(ROOM_CODE_PATTERN)?.[0] ?? null;
-}
-
-export function sanitizeRoomFilename(room: string): string {
-  return room.replace(/[/\\?%*:|"<>.\s]/g, "-");
-}
+import { extractRoomCode } from "./rooms";
 
 const SLOT_BREAK_THRESHOLD_MINUTES = 15;
 

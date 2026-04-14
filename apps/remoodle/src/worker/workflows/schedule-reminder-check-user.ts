@@ -10,6 +10,7 @@ import {
   DEFAULT_SCHEDULE_FILTERS,
   type ScheduleFilters,
 } from "../../library/schedule";
+import { extractRoomCode } from "../../library/rooms";
 import { hatchet } from "../hatchet-client";
 import { telegramSendMessage } from "./telegram-send-message";
 
@@ -154,7 +155,31 @@ export const scheduleReminderCheckUser = hatchet.task<Input>({
       })),
     );
 
-    await telegramSendMessage.run({ chatId: input.telegramId, message });
+    // Build keyboard: room photo buttons for each unique offline room, then close
+    const seenRooms = new Set<string>();
+    for (const { item } of toSend) {
+      if (!item.isOnline) {
+        const code = extractRoomCode(item.location);
+        if (code) seenRooms.add(code);
+      }
+    }
+
+    const roomRows: { text: string; callback_data: string }[][] = [];
+    const roomEntries = Array.from(seenRooms);
+    for (let i = 0; i < roomEntries.length; i += 3) {
+      roomRows.push(
+        roomEntries.slice(i, i + 3).map((code) => ({
+          text: `📍 ${code}`,
+          callback_data: `room_photo:${code}`,
+        })),
+      );
+    }
+
+    const replyMarkup = {
+      inline_keyboard: [...roomRows, [{ text: "✕ Close", callback_data: "remove_message" }]],
+    };
+
+    await telegramSendMessage.run({ chatId: input.telegramId, message, replyMarkup });
 
     await db
       .insert(sentNotifications)
