@@ -152,12 +152,12 @@ export function useSchedule(group: () => string, filters: () => Record<string, S
       };
 
       const start = getTargetDateByDay(item.start);
-      const end = start.add({ minutes: 50 });
+      const end = getTargetDateByDay(item.end);
 
       return {
         ...newEvent,
-        start: start,
-        end: end,
+        start,
+        end,
         _customContent: {
           timeGrid: `<strong>
                       ${item.courseName.length > 30 ? item.courseName.slice(0, 26) + "..." : item.courseName}

@@ -15,7 +15,7 @@ export function generateIcal(
   const sourceItems = options?.combineAdjacentPairs ? mergeAdjacentScheduleItems(items) : items;
 
   return generateScheduleIcal(sourceItems, now, {
-    eventTimeFormat: "utc",
+    eventTimeFormat: "local",
     rangeStart: options?.rangeStart,
     rangeEnd: options?.rangeEnd,
   });

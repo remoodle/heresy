@@ -29,6 +29,7 @@ const eventsServicePlugin = createEventsServicePlugin();
 const calendarControlsPlugin = createCalendarControlsPlugin();
 
 const calendarApp = createCalendar({
+  timezone: CALENDAR_TIME_ZONE,
   views: [createViewWeek(), createViewMonthAgenda()],
   plugins: [
     createEventRecurrencePlugin(),
