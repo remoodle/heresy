@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.17.0](https://github.com/remoodle/heresy/compare/remoodle-v0.16.2...remoodle-v0.17.0) (2026-04-14)
+
+
+### Features
+
+* add github url ([30cf1c2](https://github.com/remoodle/heresy/commit/30cf1c225eddbf04cafda4c199024700cc976d22))
+* **remoodle:** update notifications logic ([8c885db](https://github.com/remoodle/heresy/commit/8c885db50e5488c50c59f10acac04fbb60dd3679))
+
 ## [0.16.2](https://github.com/remoodle/heresy/compare/remoodle-v0.16.1...remoodle-v0.16.2) (2026-04-11)
 
 
