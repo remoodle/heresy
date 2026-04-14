@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.18.0](https://github.com/remoodle/heresy/compare/remoodle-v0.17.0...remoodle-v0.18.0) (2026-04-14)
+
+
+### Features
+
+* **remoodle:** update notifications ([2a2adae](https://github.com/remoodle/heresy/commit/2a2adaea1656836703396cb6049ddc748818002d))
+
+
+### Miscellaneous Chores
+
+* **remoodle:** remove next days workflows ([d7e7a9d](https://github.com/remoodle/heresy/commit/d7e7a9d8f4bd0e38ddd65b4af97faa76faa46304))
+
 ## [0.17.0](https://github.com/remoodle/heresy/compare/remoodle-v0.16.2...remoodle-v0.17.0) (2026-04-14)
 
 
