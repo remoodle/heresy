@@ -1,10 +1,11 @@
 import { config } from "../config";
+import { m } from "./i18n/messages.js";
 
 type InlineKeyboardButton = { text: string; callback_data: string };
 type InlineKeyboard = { inline_keyboard: InlineKeyboardButton[][] };
 
 const DEFAULT_KEYBOARD: InlineKeyboard = {
-  inline_keyboard: [[{ text: "Clear", callback_data: "remove_message" }]],
+  inline_keyboard: [[{ text: m.ui_clear(), callback_data: "remove_message" }]],
 };
 
 export async function sendTelegramMessage(

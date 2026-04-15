@@ -3,6 +3,7 @@ import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { db } from "../../db";
 import { users } from "../../db/schema";
+import { m } from "../../library/i18n/messages.js";
 import { coursesCallback, toggleCourseCallback, settingsCallback } from "../callback-data";
 import { fetchCachedGroupSchedule } from "../schedule-cache";
 
@@ -27,20 +28,16 @@ function buildCoursesKeyboard(courses: string[], excluded: string[]) {
       .text(`${isExcluded ? "❌" : "✅"} ${course}`, toggleCourseCallback.pack({ idx: String(i) }));
   }
 
-  keyboard.row().text("Back ←", settingsCallback.pack({}));
+  keyboard.row().text(m.ui_back(), settingsCallback.pack({}));
   return keyboard;
 }
 
 function buildCoursesMessage(courses: string[], excluded: string[]): string {
   if (courses.length === 0) {
-    return "📋 <b>Courses</b>\n\nNo courses found for your group.";
+    return m.courses_no_courses();
   }
   const active = courses.length - excluded.filter((e) => courses.includes(e)).length;
-  return (
-    `📋 <b>Courses</b>\n\n` +
-    `Toggle courses to hide them from deadlines, schedule, and notifications.\n\n` +
-    `${active} of ${courses.length} active`
-  );
+  return m.courses_header({ active, total: courses.length });
 }
 
 feature.command("courses", async (ctx) => {
@@ -50,20 +47,17 @@ feature.command("courses", async (ctx) => {
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.reply("You're not registered. Use /start first.");
+    await ctx.reply(m.not_registered());
     return;
   }
 
   const user = rows[0]!;
 
   if (!user.group) {
-    await ctx.reply(
-      "📋 <b>Courses</b>\n\nConnect your Calendar account first.\n\nGo to /settings → Schedule → Connect Calendar account.",
-      {
-        parse_mode: "HTML",
-        reply_markup: new InlineKeyboard().text("Back ←", settingsCallback.pack({})),
-      },
-    );
+    await ctx.reply(m.courses_no_group(), {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_back(), settingsCallback.pack({})),
+    });
     return;
   }
 
@@ -71,7 +65,7 @@ feature.command("courses", async (ctx) => {
   try {
     courses = await getGroupCourses(ctx, user.group);
   } catch {
-    await ctx.reply("📋 <b>Courses</b>\n\nFailed to fetch schedule. Try again later.", {
+    await ctx.reply(m.courses_fetch_failed(), {
       parse_mode: "HTML",
     });
     return;
@@ -86,7 +80,7 @@ feature.command("courses", async (ctx) => {
 feature.callbackQuery(coursesCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -94,13 +88,10 @@ feature.callbackQuery(coursesCallback.filter(), async (ctx) => {
 
   if (!user.group) {
     await ctx.answerCallbackQuery();
-    await ctx.editMessageText(
-      "📋 <b>Courses</b>\n\nConnect your Calendar account first.\n\nGo to Settings → Schedule → Connect Calendar account.",
-      {
-        parse_mode: "HTML",
-        reply_markup: new InlineKeyboard().text("Back ←", settingsCallback.pack({})),
-      },
-    );
+    await ctx.editMessageText(m.courses_no_group(), {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_back(), settingsCallback.pack({})),
+    });
     return;
   }
 
@@ -108,7 +99,7 @@ feature.callbackQuery(coursesCallback.filter(), async (ctx) => {
   try {
     courses = await getGroupCourses(ctx, user.group);
   } catch {
-    await ctx.answerCallbackQuery("Failed to fetch schedule.");
+    await ctx.answerCallbackQuery(m.schedule_fetch_failed_short());
     return;
   }
 
@@ -124,14 +115,14 @@ feature.callbackQuery(toggleCourseCallback.filter(), async (ctx) => {
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
   const user = rows[0]!;
 
   if (!user.group) {
-    await ctx.answerCallbackQuery("No group linked.");
+    await ctx.answerCallbackQuery(m.error_no_group_linked());
     return;
   }
 
@@ -139,13 +130,13 @@ feature.callbackQuery(toggleCourseCallback.filter(), async (ctx) => {
   try {
     courses = await getGroupCourses(ctx, user.group);
   } catch {
-    await ctx.answerCallbackQuery("Failed to fetch schedule.");
+    await ctx.answerCallbackQuery(m.schedule_fetch_failed_short());
     return;
   }
 
   const course = courses[Number(idx)];
   if (!course) {
-    await ctx.answerCallbackQuery("Course not found.");
+    await ctx.answerCallbackQuery(m.error_course_not_found());
     return;
   }
 

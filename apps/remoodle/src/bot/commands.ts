@@ -1,12 +1,13 @@
 import type { BotCommand } from "grammy/types";
+import { m } from "../library/i18n/messages.js";
 
 export const BOT_COMMANDS: BotCommand[] = [
-  { command: "start", description: "open menu" },
-  { command: "deadlines", description: "show deadlines" },
-  { command: "ds", description: "show deadlines (2 days)" },
-  { command: "d", description: "show deadlines" },
-  { command: "today", description: "show today's schedule" },
-  { command: "schedule", description: "show next week's schedule" },
-  { command: "settings", description: "open settings" },
-  { command: "update", description: "update Moodle calendar URL" },
+  { command: "start", description: m.command_open_menu() },
+  { command: "deadlines", description: m.command_show_deadlines() },
+  { command: "ds", description: m.command_show_deadlines_short() },
+  { command: "d", description: m.command_show_deadlines() },
+  { command: "today", description: m.command_show_today_schedule() },
+  { command: "schedule", description: m.command_show_next_week_schedule() },
+  { command: "settings", description: m.command_open_settings() },
+  { command: "update", description: m.command_update_calendar_url() },
 ];

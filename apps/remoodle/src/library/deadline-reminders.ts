@@ -1,3 +1,5 @@
+import { m } from "./i18n/messages.js";
+import { bold } from "./telegram-html";
 import type { CalendarEvent } from "./calendar";
 import { durationToMs, getTimeLeft, formatDate, humanizeDuration } from "./dates";
 
@@ -60,7 +62,7 @@ export function getDeadlineName(summary: string): string {
 }
 
 function getCourseLabel(event: Pick<CalendarEvent, "courseName">): string {
-  return event.courseName?.trim() || "Unknown course";
+  return event.courseName?.trim() || m.unknown_course();
 }
 
 function getDeadlineIcon(timestampMs: number, fireThresholdHours = 3): string {
@@ -97,23 +99,27 @@ export function buildReminderMessage(
     remindersByCourse.set(courseLabel, items);
   }
 
-  let message = "🔔 Upcoming deadlines 🔔\n\n";
+  const parts: string[] = [m.reminder_header(), ""];
 
   for (const [courseLabel, courseReminders] of Array.from(remindersByCourse.entries())) {
-    message += `🗓 ${courseLabel}\n`;
+    parts.push(m.reminder_course_label({ course: courseLabel }));
 
     for (const event of courseReminders.sort(
       (a: ReminderItem, b: ReminderItem) => a.timestampMs - b.timestampMs,
     )) {
-      message += `  • ${getDeadlineName(event.summary)}: <b>${getTimeLeft(
-        event.timestampMs,
-      )}</b>, ${formatDate(event.timestampMs)}\n`;
+      parts.push(
+        m.reminder_deadline_item({
+          name: getDeadlineName(event.summary),
+          timeLeft: bold(getTimeLeft(event.timestampMs)),
+          date: formatDate(event.timestampMs),
+        }),
+      );
     }
 
-    message += "\n";
+    parts.push("");
   }
 
-  return message.trim();
+  return parts.join("\n").trim();
 }
 
 export function buildDeadlinesMessage(events: CalendarEvent[], daysLimit = 14): string {
@@ -125,20 +131,25 @@ export function buildDeadlinesMessage(events: CalendarEvent[], daysLimit = 14): 
     .sort((a, b) => a.timestampMs - b.timestampMs);
 
   if (upcoming.length === 0) {
-    return `No upcoming deadlines in the next ${daysLimit} days.`;
+    return m.no_upcoming_deadlines({ days: daysLimit });
   }
 
-  let message = "Upcoming deadlines:\n\n";
+  const parts: string[] = [m.deadlines_upcoming_header(), ""];
 
   for (const event of upcoming) {
-    message += `${getDeadlineIcon(event.timestampMs)}  <b>${getDeadlineName(
-      event.summary,
-    )}</b>  |  ${getCourseLabel(event)}  |  Date → ${formatDate(
-      event.timestampMs,
-    )}  |  Time left → <b>${getTimeLeft(event.timestampMs)}</b>\n\n`;
+    parts.push(
+      m.deadline_item({
+        icon: getDeadlineIcon(event.timestampMs),
+        name: bold(getDeadlineName(event.summary)),
+        course: getCourseLabel(event),
+        date: formatDate(event.timestampMs),
+        timeLeft: bold(getTimeLeft(event.timestampMs)),
+      }),
+      "",
+    );
   }
 
-  return message.trim();
+  return parts.join("\n").trim();
 }
 
 export const AVAILABLE_THRESHOLDS = [
@@ -153,20 +164,20 @@ export const AVAILABLE_THRESHOLDS = [
 ] as const;
 
 export function buildThresholdsMessage(thresholds: string[]): string {
-  let msg = "<b>Deadline reminder thresholds</b>\n\n";
+  const parts: string[] = [bold(m.thresholds_header()), ""];
 
   if (thresholds.length === 0) {
-    msg += "No thresholds configured — you won't receive reminders.\n\n";
+    parts.push(m.no_thresholds_configured(), "");
   } else {
-    msg += "Active:\n";
+    parts.push(m.thresholds_active_header());
     [...thresholds]
       .sort((a, b) => durationToMs(a) - durationToMs(b))
       .forEach((t) => {
-        msg += `  • ${humanizeDuration(t)}\n`;
+        parts.push(m.threshold_item({ duration: humanizeDuration(t) }));
       });
-    msg += "\n";
+    parts.push("");
   }
 
-  msg += "Toggle thresholds below:";
-  return msg;
+  parts.push(m.thresholds_toggle_prompt());
+  return parts.join("\n");
 }

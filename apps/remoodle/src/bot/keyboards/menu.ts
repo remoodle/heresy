@@ -1,5 +1,6 @@
 import { InlineKeyboard } from "grammy";
 import { config } from "../../config";
+import { m } from "../../library/i18n/messages.js";
 import {
   aboutCallback,
   menuCallback,
@@ -10,16 +11,16 @@ import {
 
 export function buildMenuKeyboard() {
   return new InlineKeyboard()
-    .text("📋 Deadlines", deadlinesCallback.pack({}))
-    .text("📆 Schedule", scheduleCallback.pack({}))
+    .text(m.menu_button_deadlines(), deadlinesCallback.pack({}))
+    .text(m.menu_button_schedule(), scheduleCallback.pack({}))
     .row()
-    .text("Settings", settingsCallback.pack({}))
-    .text("About", aboutCallback.pack({}))
+    .text(m.ui_settings(), settingsCallback.pack({}))
+    .text(m.ui_about(), aboutCallback.pack({}))
     .row()
-    .webApp("Map", config.aitumap.url)
-    .url("Calendar", config.calendar.accountUrl);
+    .webApp(m.ui_map(), config.aitumap.url)
+    .url(m.ui_calendar(), config.calendar.accountUrl);
 }
 
 export function buildBackToMenuKeyboard() {
-  return new InlineKeyboard().text("Back ←", menuCallback.pack({}));
+  return new InlineKeyboard().text(m.ui_back(), menuCallback.pack({}));
 }

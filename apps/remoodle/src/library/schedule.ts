@@ -1,3 +1,6 @@
+import { m } from "./i18n/messages.js";
+import { bold } from "./telegram-html";
+
 type CalendarScheduleItem = {
   id: string;
   start: string;
@@ -170,13 +173,20 @@ export function normalizeScheduleFilters(
 function formatScheduleItem(item: CalendarScheduleItem): string {
   const start = extractTime(item.start);
   const end = extractTime(item.end);
-  const typeLabel =
-    item.type === "lecture" ? "Lecture" : item.type === "practice" ? "Practice" : "Class";
-  const locationStr = item.isOnline ? "Online" : item.location;
+  const type =
+    item.type === "lecture"
+      ? m.class_type_lecture()
+      : item.type === "practice"
+        ? m.class_type_practice()
+        : m.class_type_class();
+  const location = item.isOnline ? m.location_online() : item.location;
 
-  return [`<b>${start} – ${end}</b>  ${typeLabel}`, item.courseName, `📍 ${locationStr}`].join(
-    "\n",
-  );
+  return m.schedule_item({
+    time: bold(`${start} – ${end}`),
+    type,
+    course: item.courseName,
+    location,
+  });
 }
 
 export function getUniqueRooms(items: CalendarScheduleItem[]): string[] {
@@ -215,13 +225,13 @@ export function classifyScheduleItem(item: {
   return item.isOnline ? "online class" : "class";
 }
 
-const CLASS_KIND_PLURAL: Record<ClassKind, string> = {
-  lecture: "lectures",
-  "online lecture": "online lectures",
-  practice: "practices",
-  "online practice": "online practices",
-  class: "classes",
-  "online class": "online classes",
+const CLASS_KIND_MESSAGE: Record<ClassKind, (count: number) => string> = {
+  lecture: (n) => m.class_kind_lecture({ count: n }),
+  "online lecture": (n) => m.class_kind_online_lecture({ count: n }),
+  practice: (n) => m.class_kind_practice({ count: n }),
+  "online practice": (n) => m.class_kind_online_practice({ count: n }),
+  class: (n) => m.class_kind_class({ count: n }),
+  "online class": (n) => m.class_kind_online_class({ count: n }),
 };
 
 export function buildClassBreakdown(
@@ -234,7 +244,7 @@ export function buildClassBreakdown(
   }
 
   return Array.from(counts.entries())
-    .map(([kind, n]) => `${n} ${n === 1 ? kind : CLASS_KIND_PLURAL[kind]}`)
+    .map(([kind, n]) => CLASS_KIND_MESSAGE[kind](n))
     .join(", ");
 }
 
@@ -294,18 +304,18 @@ export function buildScheduleMessage(
     timeZone: "Asia/Almaty",
   });
 
-  let msg = `📆 <b>Schedule — ${group}</b>\n${dateStr}\n\n`;
+  const parts: string[] = [`${bold(m.schedule_header({ group }))}\n${dateStr}`, ""];
 
   if (dayItems.length === 0) {
-    msg += "No classes.";
-    return msg;
+    parts.push(m.no_classes());
+    return parts.join("\n");
   }
 
   for (const item of dayItems) {
-    msg += `${formatScheduleItem(item)}\n\n`;
+    parts.push(formatScheduleItem(item), "");
   }
 
-  return msg.trim();
+  return parts.join("\n").trim();
 }
 
 export function buildTodayScheduleMessage(
@@ -323,19 +333,23 @@ export function buildTodayScheduleMessage(
     timeZone: "Asia/Almaty",
   });
 
-  let msg = `📆 <b>Schedule — ${group}</b>\n\n`;
-  msg += `<b>Today</b>\n${dateStr}\n\n`;
+  const parts: string[] = [
+    bold(m.schedule_header({ group })),
+    "",
+    m.schedule_today_label({ date: dateStr }),
+    "",
+  ];
 
   if (dayItems.length === 0) {
-    msg += "No classes today.";
-    return msg;
+    parts.push(m.no_classes_today());
+    return parts.join("\n");
   }
 
   for (const item of dayItems) {
-    msg += `${formatScheduleItem(item)}\n\n`;
+    parts.push(formatScheduleItem(item), "");
   }
 
-  return msg.trim();
+  return parts.join("\n").trim();
 }
 
 export function buildWeeklyScheduleMessage(
@@ -345,9 +359,6 @@ export function buildWeeklyScheduleMessage(
 ): string {
   const orderedDays = getRemainingDaysOfWeek(date);
 
-  let msg = `📆 <b>Schedule — ${group}</b>\n\n`;
-  msg += "<b>This week</b>\n";
-
   const sections: string[] = [];
   for (const dayName of orderedDays) {
     const dayItems = getScheduleForDay(items, dayName);
@@ -355,7 +366,7 @@ export function buildWeeklyScheduleMessage(
       continue;
     }
 
-    const lines = [`<b>${dayName}</b>`];
+    const lines = [bold(dayName)];
     for (const item of dayItems) {
       lines.push(formatScheduleItem(item));
     }
@@ -363,13 +374,13 @@ export function buildWeeklyScheduleMessage(
     sections.push(lines.join("\n"));
   }
 
+  const header = `${bold(m.schedule_header({ group }))}\n\n${bold(m.schedule_this_week())}`;
+
   if (sections.length === 0) {
-    msg += "No more classes this week.";
-  } else {
-    msg += sections.join("\n\n");
+    return `${header}\n${m.no_classes_this_week()}`;
   }
 
-  return msg.trim();
+  return `${header}\n${sections.join("\n\n")}`;
 }
 
 export function buildNextWeekScheduleMessage(
@@ -377,9 +388,6 @@ export function buildNextWeekScheduleMessage(
   _date: Date,
   group: string,
 ): string {
-  let msg = `📆 <b>Schedule — ${group}</b>\n\n`;
-  msg += "<b>Next week</b>\n";
-
   const sections: string[] = [];
   for (const dayName of WEEK_DAY_ORDER) {
     const dayItems = getScheduleForDay(items, dayName);
@@ -387,7 +395,7 @@ export function buildNextWeekScheduleMessage(
       continue;
     }
 
-    const lines = [`<b>${dayName}</b>`];
+    const lines = [bold(dayName)];
     for (const item of dayItems) {
       lines.push(formatScheduleItem(item));
     }
@@ -395,11 +403,11 @@ export function buildNextWeekScheduleMessage(
     sections.push(lines.join("\n"));
   }
 
+  const header = `${bold(m.schedule_header({ group }))}\n\n${bold(m.schedule_next_week())}`;
+
   if (sections.length === 0) {
-    msg += "No classes next week.";
-  } else {
-    msg += sections.join("\n\n");
+    return `${header}\n${m.no_classes_next_week()}`;
   }
 
-  return msg.trim();
+  return `${header}\n${sections.join("\n\n")}`;
 }

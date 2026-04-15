@@ -7,6 +7,7 @@ import { db } from "../../db";
 import { users } from "../../db/schema";
 import { fetchCalendarEvents } from "../../library/calendar";
 import { validateRemoodleConnectToken } from "../../library/calendar-api";
+import { bold, link } from "../../library/telegram-html";
 import {
   applyScheduleFilters,
   buildClassBreakdown,
@@ -15,6 +16,7 @@ import {
   mergeAdjacentScheduleItems,
   normalizeScheduleFilters,
 } from "../../library/schedule";
+import { m } from "../../library/i18n/messages.js";
 import { calendarFetchUser } from "../../worker/workflows/calendar-fetch-user";
 import {
   aboutCallback,
@@ -41,15 +43,15 @@ type MenuUser = {
 };
 
 async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
-  const parts: string[] = ["👋 ReMoodle is ready"];
+  const parts: string[] = [m.menu_ready()];
 
   const summary = await buildMenuSummary(ctx, user);
   if (summary) {
     parts.push(summary);
   } else if (user.calendarAccountLinked && !user.group) {
-    parts.push("⚠️ Save a primary group in Calendar, then reconnect.");
+    parts.push(m.warn_no_group_in_calendar());
   } else if (!user.calendarUrl) {
-    parts.push("⚠️ Add your Moodle calendar URL in Settings to enable deadlines.");
+    parts.push(m.warn_add_calendar_url());
   }
 
   return parts.join("\n\n");
@@ -69,30 +71,30 @@ async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | 
   const deadlineOnly = deadlinesCount !== null && todayClasses === null;
   const classesOnly = todayClasses !== null && deadlinesCount === null;
 
-  const chillEmoji = "🌴";
-
   if (hasBoth) {
-    const deadlinePart =
-      deadlinesCount === 0
-        ? "no deadlines"
-        : `${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"}`;
-    const classPart = todayClasses.length === 0 ? "no classes" : buildClassBreakdown(todayClasses);
     const freeDay = deadlinesCount === 0 && todayClasses.length === 0;
-    return `${freeDay ? `${chillEmoji} ` : ""}You have ${deadlinePart} and ${classPart} for today`;
+    if (freeDay) {
+      return m.menu_free_day();
+    }
+    const deadlinePart =
+      deadlinesCount === 0 ? m.no_deadlines_count() : m.deadline_count({ count: deadlinesCount });
+    const classPart =
+      todayClasses.length === 0 ? m.no_classes_count() : buildClassBreakdown(todayClasses);
+    return m.menu_today_summary({ deadlines: deadlinePart, classes: classPart });
   }
 
   if (deadlineOnly) {
     if (deadlinesCount === 0) {
-      return `${chillEmoji} No deadlines for today`;
-    };
-    return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} for today`;
+      return m.menu_no_deadlines_today();
+    }
+    return m.menu_classes_today({ breakdown: m.deadline_count({ count: deadlinesCount }) });
   }
 
   if (classesOnly) {
     if (todayClasses.length === 0) {
-      return `${chillEmoji} No classes for today`;
-    };
-    return `You have ${buildClassBreakdown(todayClasses)} for today`;
+      return m.menu_no_classes_today();
+    }
+    return m.menu_classes_today({ breakdown: buildClassBreakdown(todayClasses) });
   }
 
   return null;
@@ -147,45 +149,40 @@ async function getTodayClasses(
 
 function buildAboutMessage() {
   return [
-    "<b>About ReMoodle</b>",
+    bold(m.about_header()),
     "",
-    "ReMoodle helps AITU students keep up with deadlines and schedule",
+    m.about_description(),
     "",
-    `Calendar: <a href="${config.calendar.url}/">${config.calendar.host}</a>`,
-    'GitHub: <a href="https://github.com/remoodle/heresy">github.com/remoodle/heresy</a>',
-    `Docs: <a href="${config.docs.url}/">${config.docs.host}</a>`,
+    m.about_calendar_link({ url: link(`${config.calendar.url}/`, config.calendar.host) }),
+    m.about_github_link({
+      url: link("https://github.com/remoodle/heresy", "github.com/remoodle/heresy"),
+    }),
+    m.about_docs_link({ url: link(`${config.docs.url}/`, config.docs.host) }),
   ].join("\n");
 }
 
 function buildSetupKeyboard() {
   return new InlineKeyboard()
-    .text("📅 Add Moodle calendar URL", updateCalendarCallback.pack({ from: "setup" }))
+    .text(m.setup_button_add_calendar_url(), updateCalendarCallback.pack({ from: "setup" }))
     .row()
-    .text("🔗 Connect Calendar account", connectCalendarCallback.pack({ from: "setup" }));
-}
-
-function buildSetupMessage() {
-  return `👋 Welcome to ReMoodle!\n\nHow would you like to set up?\n\n📅 <b>Moodle calendar URL</b> — track assignment deadlines\n🔗 <b>Calendar account</b> — view your class schedule`;
+    .text(
+      m.setup_button_connect_calendar_account(),
+      connectCalendarCallback.pack({ from: "setup" }),
+    );
 }
 
 function buildUpdateCalendarKeyboard(from: "setup" | "deadlines_settings") {
   return new InlineKeyboard().text(
-    "Back ←",
+    m.ui_back(),
     from === "deadlines_settings" ? deadlinesSettingsCallback.pack({}) : setupCallback.pack({}),
   );
 }
 
-const CALENDAR_URL_PROMPT = `Send your Moodle calendar URL:\n\n<a href="${config.docs.moodleCalendarGuideUrl}">Where to get it?</a>`;
-
 function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings") {
   return new InlineKeyboard().text(
-    "Back ←",
+    m.ui_back(),
     from === "schedule_settings" ? scheduleSettingsCallback.pack({}) : setupCallback.pack({}),
   );
-}
-
-function buildConnectCalendarMessage() {
-  return `Go to <a href="${config.calendar.accountUrl}">${config.calendar.host}/account</a>\n\n→ Open <b>Account</b>\n→ Click <b>Generate code</b>\n→ Paste the 6-character code here:`;
 }
 
 export const composer = new Composer<Context>();
@@ -205,7 +202,7 @@ feature.command("start", async (ctx) => {
     return;
   }
 
-  await ctx.reply(buildSetupMessage(), {
+  await ctx.reply(m.setup_welcome(), {
     parse_mode: "HTML",
     reply_markup: buildSetupKeyboard(),
   });
@@ -213,7 +210,14 @@ feature.command("start", async (ctx) => {
 
 feature.command("update", async (ctx) => {
   ctx.session.awaitingCalendarUrl = true;
-  await ctx.reply(CALENDAR_URL_PROMPT, { parse_mode: "HTML" });
+  await ctx.reply(
+    m.calendar_url_prompt({
+      guideUrl: link(config.docs.moodleCalendarGuideUrl, "Where to get it?"),
+    }),
+    {
+      parse_mode: "HTML",
+    },
+  );
 });
 
 feature.callbackQuery(menuCallback.filter(), async (ctx) => {
@@ -223,7 +227,7 @@ feature.callbackQuery(menuCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, telegramId)).limit(1);
 
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -237,7 +241,7 @@ feature.callbackQuery(menuCallback.filter(), async (ctx) => {
 feature.callbackQuery(aboutCallback.filter(), async (ctx) => {
   await ctx.editMessageText(buildAboutMessage(), {
     parse_mode: "HTML",
-    reply_markup: new InlineKeyboard().text("Back ←", menuCallback.pack({})),
+    reply_markup: new InlineKeyboard().text(m.ui_back(), menuCallback.pack({})),
   });
   await ctx.answerCallbackQuery();
 });
@@ -245,7 +249,7 @@ feature.callbackQuery(aboutCallback.filter(), async (ctx) => {
 feature.callbackQuery(setupCallback.filter(), async (ctx) => {
   ctx.session.awaitingRemoodleToken = false;
   ctx.session.awaitingCalendarUrl = false;
-  await ctx.editMessageText(buildSetupMessage(), {
+  await ctx.editMessageText(m.setup_welcome(), {
     parse_mode: "HTML",
     reply_markup: buildSetupKeyboard(),
   });
@@ -259,10 +263,13 @@ feature.callbackQuery(updateCalendarCallback.filter(), async (ctx) => {
   ctx.session.awaitingCalendarUrl = true;
   ctx.session.awaitingRemoodleToken = false;
   const keyboard = buildUpdateCalendarKeyboard(from);
+  const prompt = m.calendar_url_prompt({
+    guideUrl: link(config.docs.moodleCalendarGuideUrl, "Where to get it?"),
+  });
   try {
-    await ctx.editMessageText(CALENDAR_URL_PROMPT, { parse_mode: "HTML", reply_markup: keyboard });
+    await ctx.editMessageText(prompt, { parse_mode: "HTML", reply_markup: keyboard });
   } catch {
-    await ctx.reply(CALENDAR_URL_PROMPT, { parse_mode: "HTML", reply_markup: keyboard });
+    await ctx.reply(prompt, { parse_mode: "HTML", reply_markup: keyboard });
   }
   await ctx.answerCallbackQuery();
 });
@@ -273,13 +280,16 @@ feature.callbackQuery(connectCalendarCallback.filter(), async (ctx) => {
   };
   ctx.session.awaitingRemoodleToken = true;
   ctx.session.awaitingCalendarUrl = false;
+  const steps = m.connect_calendar_steps({
+    accountUrl: link(config.calendar.accountUrl, `${config.calendar.host}/account`),
+  });
   try {
-    await ctx.editMessageText(buildConnectCalendarMessage(), {
+    await ctx.editMessageText(steps, {
       parse_mode: "HTML",
       reply_markup: buildConnectCalendarKeyboard(from),
     });
   } catch {
-    await ctx.reply(buildConnectCalendarMessage(), {
+    await ctx.reply(steps, {
       parse_mode: "HTML",
       reply_markup: buildConnectCalendarKeyboard(from),
     });
@@ -292,7 +302,7 @@ feature.on("message:text", async (ctx, next) => {
     const url = ctx.message.text.trim();
 
     if (!url.startsWith("http")) {
-      await ctx.reply("That doesn't look like a URL. Please send a valid Moodle calendar URL:");
+      await ctx.reply(m.invalid_url());
       return;
     }
 
@@ -321,7 +331,7 @@ feature.on("message:text", async (ctx, next) => {
       thresholds: user!.thresholds,
     });
 
-    await ctx.reply(`✅ Calendar URL saved!\n\n${await buildMenuMessage(ctx, user!)}`, {
+    await ctx.reply(`${m.calendar_url_saved()}\n\n${await buildMenuMessage(ctx, user!)}`, {
       reply_markup: buildMenuKeyboard(),
     });
     return;
@@ -335,7 +345,7 @@ feature.on("message:text", async (ctx, next) => {
     const telegramId = ctx.from.id;
 
     if (!config.calendarApi.url) {
-      await ctx.reply("Calendar integration is not configured. Contact the admin.");
+      await ctx.reply(m.calendar_not_configured());
       ctx.session.awaitingRemoodleToken = false;
       return;
     }
@@ -344,8 +354,8 @@ feature.on("message:text", async (ctx, next) => {
     try {
       connectResult = await validateRemoodleConnectToken(code);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Unknown error";
-      await ctx.reply(`❌ ${msg}\n\nTry generating a new code in the Calendar app.`);
+      const msg = err instanceof Error ? err.message : m.unknown_error();
+      await ctx.reply(m.calendar_connect_error({ error: msg }));
       return;
     }
 
@@ -371,11 +381,11 @@ feature.on("message:text", async (ctx, next) => {
     ctx.session.awaitingRemoodleToken = false;
 
     const groupMsg = connectResult.group
-      ? `📆 Your group: <b>${connectResult.group}</b>`
-      : `⚠️ No saved primary group found in Calendar. Save it in ${config.calendar.host}/account, then reconnect here to enable /schedule.`;
+      ? m.group_label({ group: bold(connectResult.group) })
+      : m.no_group_saved_in_calendar({ host: config.calendar.host });
 
     await ctx.reply(
-      `✅ Calendar account connected!\n\n${groupMsg}\n\n${await buildMenuMessage(ctx, user!)}`,
+      `${m.calendar_connected()}\n\n${groupMsg}\n\n${await buildMenuMessage(ctx, user!)}`,
       {
         parse_mode: "HTML",
         reply_markup: buildMenuKeyboard(),

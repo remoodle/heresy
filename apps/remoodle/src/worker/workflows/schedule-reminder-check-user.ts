@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../db";
+import { m } from "../../library/i18n/messages.js";
 import { sentNotifications } from "../../db/schema";
 import { fetchGroupSchedule } from "../../library/calendar-api";
 import { durationToMs } from "../../library/dates";
@@ -11,6 +12,7 @@ import {
   type ScheduleFilters,
 } from "../../library/schedule";
 import { extractRoomCode } from "../../library/rooms";
+import { bold } from "../../library/telegram-html";
 import { hatchet } from "../hatchet-client";
 import { telegramSendMessage } from "./telegram-send-message";
 
@@ -88,12 +90,16 @@ function buildClassReminderMessage(
   const lines = items.map((item) => {
     const startTime = item.start.split(" ")[1] ?? item.start;
     const endTime = item.end.split(" ")[1] ?? item.end;
-    const loc = item.isOnline ? "Online" : item.location;
-    return `<b>${startTime} – ${endTime}</b>  ${item.courseName}\n📍 ${loc}`;
+    const location = item.isOnline ? m.location_online() : item.location;
+    return m.class_reminder_item({
+      time: bold(`${startTime} – ${endTime}`),
+      course: item.courseName,
+      location,
+    });
   });
 
   const minsUntil = items[0]!.minsUntil;
-  return `⏰ <b>Class in ${minsUntil} min</b>\n\n${lines.join("\n\n")}`;
+  return `${bold(m.class_reminder_header({ minutes: minsUntil }))}\n\n${lines.join("\n\n")}`;
 }
 
 export const scheduleReminderCheckUser = hatchet.task<Input>({
@@ -176,7 +182,7 @@ export const scheduleReminderCheckUser = hatchet.task<Input>({
     }
 
     const replyMarkup = {
-      inline_keyboard: [...roomRows, [{ text: "✕ Close", callback_data: "remove_message" }]],
+      inline_keyboard: [...roomRows, [{ text: m.ui_close(), callback_data: "remove_message" }]],
     };
 
     await telegramSendMessage.run({ chatId: input.telegramId, message, replyMarkup });

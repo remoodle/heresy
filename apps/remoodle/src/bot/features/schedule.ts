@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { Composer, InputFile, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { config } from "../../config";
+import { m } from "../../library/i18n/messages.js";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import {
@@ -68,17 +69,20 @@ function buildScheduleKeyboard(view: ScheduleView, rooms: string[], hasThisWeek:
 
   if (view === "today") {
     if (hasThisWeek) {
-      keyboard.text("This week →", scheduleViewCallback.pack({ view: "week" }));
+      keyboard.text(m.schedule_button_this_week(), scheduleViewCallback.pack({ view: "week" }));
     }
-    keyboard.text("Next week →", scheduleViewCallback.pack({ view: "next_week" }));
+    keyboard.text(m.schedule_button_next_week(), scheduleViewCallback.pack({ view: "next_week" }));
   } else if (view === "week") {
     keyboard
-      .text("← Today", scheduleViewCallback.pack({ view: "today" }))
-      .text("Next week →", scheduleViewCallback.pack({ view: "next_week" }));
+      .text(m.schedule_button_today_back(), scheduleViewCallback.pack({ view: "today" }))
+      .text(m.schedule_button_next_week(), scheduleViewCallback.pack({ view: "next_week" }));
   } else {
-    keyboard.text("← Today", scheduleViewCallback.pack({ view: "today" }));
+    keyboard.text(m.schedule_button_today_back(), scheduleViewCallback.pack({ view: "today" }));
     if (hasThisWeek) {
-      keyboard.text("← This week", scheduleViewCallback.pack({ view: "week" }));
+      keyboard.text(
+        m.schedule_button_this_week_back(),
+        scheduleViewCallback.pack({ view: "week" }),
+      );
     }
   }
 
@@ -87,12 +91,12 @@ function buildScheduleKeyboard(view: ScheduleView, rooms: string[], hasThisWeek:
       const rowRooms = rooms.slice(i, i + 3);
       keyboard.row();
       for (const room of rowRooms) {
-        keyboard.text(`📍 ${room}`, roomPhotoCallback.pack({ room }));
+        keyboard.text(m.ui_room_label({ room }), roomPhotoCallback.pack({ room }));
       }
     }
   }
 
-  keyboard.row().text("Back ←", menuCallback.pack({}));
+  keyboard.row().text(m.ui_back(), menuCallback.pack({}));
   return keyboard;
 }
 
@@ -103,16 +107,14 @@ async function replyWithScheduleView(ctx: Context, view: ScheduleView) {
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.reply("You're not registered. Use /start first.");
+    await ctx.reply(m.not_registered());
     return;
   }
 
   const user = rows[0]!;
 
   if (!user.group) {
-    await ctx.reply(
-      "No group linked. Connect your Calendar account via /settings → Schedule → Connect Calendar account.",
-    );
+    await ctx.reply(m.no_group_schedule_command());
     return;
   }
 
@@ -128,7 +130,7 @@ async function replyWithScheduleView(ctx: Context, view: ScheduleView) {
       view,
     );
   } catch {
-    await ctx.reply("Failed to fetch schedule. Try again later.");
+    await ctx.reply(m.schedule_fetch_failed());
     return;
   }
 
@@ -149,7 +151,7 @@ feature.command("schedule", async (ctx) => {
 feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -157,7 +159,7 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
 
   if (!user.group) {
     await ctx.answerCallbackQuery({
-      text: "No group linked. Go to Settings → Schedule to connect.",
+      text: m.no_group_schedule_callback(),
       show_alert: true,
     });
     return;
@@ -175,7 +177,7 @@ feature.callbackQuery(scheduleCallback.filter(), async (ctx) => {
       "today",
     );
   } catch {
-    await ctx.editMessageText("Failed to fetch schedule.", {
+    await ctx.editMessageText(m.schedule_fetch_failed_short(), {
       reply_markup: buildScheduleKeyboard("today", [], false),
     });
     return;
@@ -192,7 +194,7 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -200,7 +202,7 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
 
   if (!user.group) {
     await ctx.answerCallbackQuery({
-      text: "No group linked. Go to Settings → Schedule to connect.",
+      text: m.no_group_schedule_callback(),
       show_alert: true,
     });
     return;
@@ -218,7 +220,7 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
       view,
     );
   } catch {
-    await ctx.editMessageText("Failed to fetch schedule.", {
+    await ctx.editMessageText(m.schedule_fetch_failed_short(), {
       reply_markup: buildScheduleKeyboard(view, [], false),
     });
     return;
@@ -236,7 +238,7 @@ feature.callbackQuery(roomPhotoCallback.filter(), async (ctx) => {
 
   await ctx.answerCallbackQuery();
 
-  const closeKeyboard = new InlineKeyboard().text("✕ Close", closeMessageCallback.pack({}));
+  const closeKeyboard = new InlineKeyboard().text(m.ui_close(), closeMessageCallback.pack({}));
 
   try {
     const res = await fetch(url);
@@ -245,11 +247,11 @@ feature.callbackQuery(roomPhotoCallback.filter(), async (ctx) => {
     }
     const buffer = Buffer.from(await res.arrayBuffer());
     await ctx.replyWithPhoto(new InputFile(buffer, `${sanitizeRoomFilename(room)}.png`), {
-      caption: `📍 ${room}`,
+      caption: m.ui_room_label({ room }),
       reply_markup: closeKeyboard,
     });
   } catch {
-    await ctx.reply(`📍 ${room}\n\nNo photo available.`, {
+    await ctx.reply(m.room_no_photo({ room }), {
       reply_markup: closeKeyboard,
     });
   }

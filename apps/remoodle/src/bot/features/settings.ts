@@ -7,6 +7,8 @@ import { calendarEvents, sentNotifications, users } from "../../db/schema";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
 import { normalizeScheduleFilters, type ScheduleFilters } from "../../library/schedule";
+import { m } from "../../library/i18n/messages.js";
+import { bold, code, italic } from "../../library/telegram-html";
 import {
   settingsCallback,
   deadlinesSettingsCallback,
@@ -31,42 +33,41 @@ export const composer = new Composer<Context>();
 
 const feature = composer.chatType("private");
 
+function checkboxLabel(enabled: boolean, label: string) {
+  return `${enabled ? "✅" : "☐"} ${label}`;
+}
+
+function notificationsLabel(enabled: boolean) {
+  return m.ui_notifications({ status: enabled ? m.ui_status_on() : m.ui_status_muted_off() });
+}
+
 // ─── Settings root ───────────────────────────────────────────────────────────
 
 function buildSettingsKeyboard() {
   return new InlineKeyboard()
-    .text("📋 Deadlines", deadlinesSettingsCallback.pack({}))
-    .text("📆 Schedule", scheduleSettingsCallback.pack({}))
+    .text(m.menu_button_deadlines(), deadlinesSettingsCallback.pack({}))
+    .text(m.menu_button_schedule(), scheduleSettingsCallback.pack({}))
     .row()
-    .text("📚 Courses", coursesCallback.pack({}))
-    .text("👤 Account", accountCallback.pack({}))
+    .text(m.settings_button_courses(), coursesCallback.pack({}))
+    .text(m.account_header(), accountCallback.pack({}))
     .row()
-    .text("Back ←", menuCallback.pack({}));
-}
-
-function buildSettingsMessage() {
-  return "<b>⚙️ Settings</b>\n\nChoose a category to configure:";
+    .text(m.ui_back(), menuCallback.pack({}));
 }
 
 function buildAccountKeyboard() {
   return new InlineKeyboard()
-    .text("🗑 Delete account", deleteAccountCallback.pack({}))
+    .text(m.account_button_delete(), deleteAccountCallback.pack({}))
     .row()
-    .text("Back ←", settingsCallback.pack({}));
+    .text(m.ui_back(), settingsCallback.pack({}));
 }
 
 function buildDeleteAccountKeyboard() {
   return new InlineKeyboard()
-    .text("⚠️ Yes, delete", confirmDeleteAccountCallback.pack({ confirmed: "yes" }))
-    .text("Cancel", confirmDeleteAccountCallback.pack({ confirmed: "no" }));
-}
-
-function buildDeleteAccountMessage() {
-  return (
-    "<b>⚠️ Delete account</b>\n\n" +
-    "This will permanently remove your account, saved calendar events, and reminder history.\n\n" +
-    "Are you sure?"
-  );
+    .text(
+      m.account_button_confirm_delete(),
+      confirmDeleteAccountCallback.pack({ confirmed: "yes" }),
+    )
+    .text(m.ui_cancel(), confirmDeleteAccountCallback.pack({ confirmed: "no" }));
 }
 
 function buildAccountMessage(user: {
@@ -76,13 +77,19 @@ function buildAccountMessage(user: {
   calendarAccountLinked: boolean;
   group: string | null;
 }): string {
-  let msg = "<b>👤 Account</b>\n\n";
-  msg += `User ID: <code>${user.id}</code>\n`;
-  msg += `Telegram ID: <code>${user.telegramId}</code>\n\n`;
-  msg += `Group: ${user.group ? `<b>${user.group}</b>` : "not set"}\n\n`;
-  msg += `Moodle calendar: ${user.calendarUrl ? "✅" : "not set"}\n`;
-  msg += `Calendar account: ${user.calendarAccountLinked ? "✅" : "not set"}\n`;
-  return msg;
+  return [
+    bold(m.account_header()),
+    "",
+    m.account_user_id({ id: code(user.id) }),
+    m.account_telegram_id({ telegramId: code(user.telegramId) }),
+    "",
+    user.group ? m.account_group({ group: bold(user.group) }) : m.account_no_group(),
+    "",
+    user.calendarUrl ? m.account_moodle_calendar_set() : m.account_moodle_calendar_unset(),
+    user.calendarAccountLinked
+      ? m.account_calendar_account_linked()
+      : m.account_calendar_account_unlinked(),
+  ].join("\n");
 }
 
 feature.command("settings", async (ctx) => {
@@ -91,17 +98,17 @@ feature.command("settings", async (ctx) => {
   }
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.reply("You're not registered. Use /start first.");
+    await ctx.reply(m.not_registered());
     return;
   }
-  await ctx.reply(buildSettingsMessage(), {
+  await ctx.reply(m.settings_header(), {
     parse_mode: "HTML",
     reply_markup: buildSettingsKeyboard(),
   });
 });
 
 feature.callbackQuery(settingsCallback.filter(), async (ctx) => {
-  await ctx.editMessageText(buildSettingsMessage(), {
+  await ctx.editMessageText(m.settings_header(), {
     parse_mode: "HTML",
     reply_markup: buildSettingsKeyboard(),
   });
@@ -122,7 +129,7 @@ feature.callbackQuery(accountCallback.filter(), async (ctx) => {
     .limit(1);
 
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -141,14 +148,17 @@ feature.callbackQuery(deleteAccountCallback.filter(), async (ctx) => {
     .limit(1);
 
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
-  await ctx.editMessageText(buildDeleteAccountMessage(), {
-    parse_mode: "HTML",
-    reply_markup: buildDeleteAccountKeyboard(),
-  });
+  await ctx.editMessageText(
+    [bold(m.delete_account_header()), "", m.delete_account_body()].join("\n"),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildDeleteAccountKeyboard(),
+    },
+  );
   await ctx.answerCallbackQuery();
 });
 
@@ -171,7 +181,7 @@ feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
       .limit(1);
 
     if (rows.length === 0) {
-      await ctx.answerCallbackQuery("Not registered.");
+      await ctx.answerCallbackQuery(m.not_registered_short());
       return;
     }
 
@@ -190,7 +200,7 @@ feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
     .limit(1);
 
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -203,8 +213,8 @@ feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
   ctx.session.awaitingCalendarUrl = false;
   ctx.session.awaitingRemoodleToken = false;
 
-  await ctx.editMessageText("✅ Account deleted. Send /start to set up ReMoodle again.");
-  await ctx.answerCallbackQuery({ text: "Account deleted." });
+  await ctx.editMessageText(m.account_deleted());
+  await ctx.answerCallbackQuery({ text: m.account_deleted() });
 });
 
 // ─── Deadlines settings ───────────────────────────────────────────────────────
@@ -212,12 +222,7 @@ feature.callbackQuery(confirmDeleteAccountCallback.filter(), async (ctx) => {
 function buildDeadlinesKeyboard(activeThresholds: string[], deadlinesEnabled: boolean) {
   const keyboard = new InlineKeyboard();
 
-  keyboard
-    .row()
-    .text(
-      `Notifications: ${deadlinesEnabled ? "✅ On" : "🔕 Off"}`,
-      toggleDeadlinesCallback.pack({}),
-    );
+  keyboard.row().text(notificationsLabel(deadlinesEnabled), toggleDeadlinesCallback.pack({}));
 
   for (let i = 0; i < AVAILABLE_THRESHOLDS.length; i += 2) {
     const row = AVAILABLE_THRESHOLDS.slice(i, i + 2);
@@ -233,26 +238,28 @@ function buildDeadlinesKeyboard(activeThresholds: string[], deadlinesEnabled: bo
 
   keyboard
     .row()
-    .text("Update Calendar URL", updateCalendarCallback.pack({ from: "deadlines_settings" }))
+    .text(
+      m.settings_button_update_calendar_url(),
+      updateCalendarCallback.pack({ from: "deadlines_settings" }),
+    )
     .row()
-    .text("Back ←", settingsCallback.pack({}));
+    .text(m.ui_back(), settingsCallback.pack({}));
 
   return keyboard;
 }
 
 function buildDeadlinesMessage(thresholds: string[], deadlinesEnabled: boolean): string {
-  let msg = "<b>📋 Deadlines Settings</b>\n\n";
-  msg += buildThresholdsMessage(thresholds);
+  const parts = [bold(m.deadlines_settings_header()), "", buildThresholdsMessage(thresholds)];
   if (!deadlinesEnabled) {
-    msg += "\n\n⚠️ Notifications are currently disabled.";
+    parts.push("", m.deadlines_disabled_warning());
   }
-  return msg;
+  return parts.join("\n");
 }
 
 feature.callbackQuery(deadlinesSettingsCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -266,7 +273,7 @@ feature.callbackQuery(deadlinesSettingsCallback.filter(), async (ctx) => {
 feature.callbackQuery(toggleDeadlinesCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -289,7 +296,7 @@ feature.callbackQuery(toggleThresholdCallback.filter(), async (ctx) => {
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
@@ -302,7 +309,7 @@ feature.callbackQuery(toggleThresholdCallback.filter(), async (ctx) => {
   } else {
     if (user.thresholds.length >= config.reminders.maxThresholds) {
       await ctx.answerCallbackQuery({
-        text: `Maximum ${config.reminders.maxThresholds} thresholds allowed.`,
+        text: m.max_thresholds({ max: config.reminders.maxThresholds }),
         show_alert: true,
       });
       return;
@@ -329,68 +336,63 @@ function buildScheduleSettingsKeyboard(
 ) {
   const keyboard = new InlineKeyboard();
 
-  keyboard
-    .row()
-    .text(
-      `Notifications: ${scheduleEnabled ? "✅ On" : "🔕 Off"}`,
-      toggleScheduleCallback.pack({}),
-    );
+  keyboard.row().text(notificationsLabel(scheduleEnabled), toggleScheduleCallback.pack({}));
 
   const { eventTypes, eventFormats } = filters;
 
   keyboard
     .row()
     .text(
-      `${eventTypes.lecture ? "✅" : "☐"} Lecture`,
+      checkboxLabel(eventTypes.lecture, m.class_type_lecture()),
       toggleScheduleTypeCallback.pack({ key: "lecture" }),
     )
     .text(
-      `${eventTypes.practice ? "✅" : "☐"} Practice`,
+      checkboxLabel(eventTypes.practice, m.class_type_practice()),
       toggleScheduleTypeCallback.pack({ key: "practice" }),
     );
 
   keyboard
     .row()
     .text(
-      `${eventTypes.learn ? "✅" : "☐"} Learn`,
+      checkboxLabel(eventTypes.learn, m.ui_learn()),
       toggleScheduleTypeCallback.pack({ key: "learn" }),
     );
 
   keyboard
     .row()
     .text(
-      `${eventFormats.online ? "✅" : "☐"} Online`,
+      checkboxLabel(eventFormats.online, m.location_online()),
       toggleScheduleFormatCallback.pack({ key: "online" }),
     )
     .text(
-      `${eventFormats.offline ? "✅" : "☐"} Offline`,
+      checkboxLabel(eventFormats.offline, m.ui_offline()),
       toggleScheduleFormatCallback.pack({ key: "offline" }),
     );
 
   keyboard
     .row()
     .text(
-      `${filters.combineAdjacentPairs ? "✅" : "☐"} Combine adjacent pairs`,
+      checkboxLabel(!!filters.combineAdjacentPairs, m.ui_combine_adjacent_pairs()),
       toggleScheduleMergeCallback.pack({}),
     );
 
-  keyboard
-    .row()
-    .text(
-      `🔔 Remind ${Math.round(durationToMs(reminderOffset) / 60000)} min before`,
-      setScheduleReminderCallback.pack({}),
-    );
+  keyboard.row().text(
+    m.schedule_button_remind_before({
+      minutes: Math.round(durationToMs(reminderOffset) / 60000),
+    }),
+    setScheduleReminderCallback.pack({}),
+  );
 
   if (!hasGroup) {
     keyboard
       .row()
       .text(
-        "🔗 Connect Calendar account",
+        m.setup_button_connect_calendar_account(),
         connectCalendarCallback.pack({ from: "schedule_settings" }),
       );
   }
 
-  keyboard.row().text("Back ←", settingsCallback.pack({}));
+  keyboard.row().text(m.ui_back(), settingsCallback.pack({}));
 
   return keyboard;
 }
@@ -400,14 +402,20 @@ function buildScheduleSettingsMessage(
   group: string | null,
   filters: ScheduleFilters,
 ): string {
-  let msg = "<b>📆 Schedule Settings</b>\n\n";
-  msg += group ? `Group: <b>${group}</b>\n` : "Group: not set\n";
-  msg += `Merge adjacent pairs: ${filters.combineAdjacentPairs ? "✅ On" : "☐ Off"}\n`;
-  msg += "\nConfigure event types, formats, and notifications.";
+  const lines = [
+    bold(m.schedule_settings_header()),
+    "",
+    group ? m.schedule_group({ group: bold(group) }) : m.schedule_no_group(),
+    m.schedule_merge_label({
+      status: filters.combineAdjacentPairs ? m.ui_status_on() : m.ui_status_off(),
+    }),
+    "",
+    m.schedule_configure_hint(),
+  ];
   if (!group) {
-    msg += `\n\n<i>Schedule integration requires a saved primary group in Calendar. Save it in ${config.calendar.host}/account, then reconnect your Calendar account here.</i>`;
+    lines.push("", italic(m.schedule_no_group_hint({ host: config.calendar.host })));
   }
-  return msg;
+  return lines.join("\n");
 }
 
 feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
@@ -415,7 +423,7 @@ feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
   ctx.session.awaitingScheduleReminderMinutes = false;
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -438,14 +446,14 @@ feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
 feature.callbackQuery(toggleScheduleCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
 
   if (!user.group && !user.scheduleEnabled) {
     await ctx.answerCallbackQuery({
-      text: "Connect your Calendar account first to enable schedule notifications.",
+      text: m.no_group_for_schedule(),
       show_alert: true,
     });
     return;
@@ -471,7 +479,7 @@ feature.callbackQuery(toggleScheduleTypeCallback.filter(), async (ctx) => {
   const { key } = toggleScheduleTypeCallback.unpack(ctx.callbackQuery.data) as { key: string };
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -502,7 +510,7 @@ feature.callbackQuery(toggleScheduleFormatCallback.filter(), async (ctx) => {
   const { key } = toggleScheduleFormatCallback.unpack(ctx.callbackQuery.data) as { key: string };
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -532,7 +540,7 @@ feature.callbackQuery(toggleScheduleFormatCallback.filter(), async (ctx) => {
 feature.callbackQuery(toggleScheduleMergeCallback.filter(), async (ctx) => {
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
   const user = rows[0]!;
@@ -567,7 +575,7 @@ feature.on("message:text", async (ctx, next) => {
   const mins = parseInt(raw, 10);
 
   if (!Number.isInteger(mins) || mins < 1 || mins > 240) {
-    await ctx.reply("Please send a number between 1 and 240:");
+    await ctx.reply(m.reminder_minutes_invalid());
     return;
   }
 
@@ -587,7 +595,7 @@ feature.on("message:text", async (ctx, next) => {
   const filters = normalizeScheduleFilters(user.scheduleFilters);
 
   await ctx.reply(
-    `✅ You'll be reminded <b>${mins} minutes</b> before each class.\n\n${buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters)}`,
+    `${m.schedule_reminder_saved({ minutes: bold(`${mins} minutes`) })}\n\n${buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters)}`,
     {
       parse_mode: "HTML",
       reply_markup: buildScheduleSettingsKeyboard(
@@ -609,29 +617,28 @@ feature.callbackQuery(setScheduleReminderCallback.filter(), async (ctx) => {
     .limit(1);
 
   if (rows.length === 0) {
-    await ctx.answerCallbackQuery("Not registered.");
+    await ctx.answerCallbackQuery(m.not_registered_short());
     return;
   }
 
   const current = rows[0]!.scheduleReminderOffset;
   const currentMins = Math.round(durationToMs(current) / 60000);
+  const reminderMsg = [
+    bold(m.schedule_reminder_settings_header()),
+    "",
+    m.schedule_reminder_settings_body({ minutes: bold(`${currentMins} minutes`) }),
+  ].join("\n");
 
   try {
-    await ctx.editMessageText(
-      `<b>🔔 Schedule reminder</b>\n\nCurrently set to <b>${currentMins} minutes</b> before class.\n\nSend a number (1–240) to set how many minutes before each class you want to be reminded:`,
-      {
-        parse_mode: "HTML",
-        reply_markup: new InlineKeyboard().text("Cancel", scheduleSettingsCallback.pack({})),
-      },
-    );
+    await ctx.editMessageText(reminderMsg, {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_cancel(), scheduleSettingsCallback.pack({})),
+    });
   } catch {
-    await ctx.reply(
-      `<b>🔔 Schedule reminder</b>\n\nCurrently set to <b>${currentMins} minutes</b> before class.\n\nSend a number (1–240) to set how many minutes before each class you want to be reminded:`,
-      {
-        parse_mode: "HTML",
-        reply_markup: new InlineKeyboard().text("Cancel", scheduleSettingsCallback.pack({})),
-      },
-    );
+    await ctx.reply(reminderMsg, {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_cancel(), scheduleSettingsCallback.pack({})),
+    });
   }
   await ctx.answerCallbackQuery();
 });

@@ -3,6 +3,8 @@ packages:
   - "docs"
 
 catalog:
+  "@inlang/paraglide-js": ^2.16.0
+  "@inlang/plugin-message-format": ^4.4.0
   "@schedule-x/calendar": ^4.4.0
   "@schedule-x/calendar-controls": ^4.4.0
   "@schedule-x/current-time": ^4.4.0
