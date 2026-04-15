@@ -8,7 +8,7 @@ catalog:
   "@schedule-x/calendar": ^4.4.0
   "@schedule-x/calendar-controls": ^4.4.0
   "@schedule-x/current-time": ^4.4.0
-  "@schedule-x/date-picker": 4.2.0
+  "@schedule-x/date-picker": 4.4.0
   "@schedule-x/event-modal": ^4.4.0
   "@schedule-x/event-recurrence": ^4.4.0
   "@schedule-x/events-service": ^4.4.0
