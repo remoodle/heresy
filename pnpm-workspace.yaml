@@ -27,7 +27,7 @@ catalog:
   oxc-minify: ^0.124.0
   oxfmt: ^0.44.0
   oxlint: ^1.59.0
-  temporal-polyfill: 0.3.0
+  temporal-polyfill: 0.3.2
   tsdown: ^0.20.3
   tsx: ^4.21.0
   typescript: ^5
