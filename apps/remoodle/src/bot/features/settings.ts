@@ -57,7 +57,7 @@ function buildAccountKeyboard() {
 
 function buildDeleteAccountKeyboard() {
   return new InlineKeyboard()
-    .text("✅ Yes, delete", confirmDeleteAccountCallback.pack({ confirmed: "yes" }))
+    .text("⚠️ Yes, delete", confirmDeleteAccountCallback.pack({ confirmed: "yes" }))
     .text("Cancel", confirmDeleteAccountCallback.pack({ confirmed: "no" }));
 }
 
@@ -377,7 +377,7 @@ function buildScheduleSettingsKeyboard(
   keyboard
     .row()
     .text(
-      `🔔 Remind ${humanizeDuration(reminderOffset)} before`,
+      `🔔 Remind ${Math.round(durationToMs(reminderOffset) / 60000)} min before`,
       setScheduleReminderCallback.pack({}),
     );
 
@@ -580,7 +580,9 @@ feature.on("message:text", async (ctx, next) => {
     .where(eq(users.telegramId, ctx.from.id));
 
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
-  if (rows.length === 0) return;
+  if (rows.length === 0) {
+    return;
+  }
   const user = rows[0]!;
   const filters = normalizeScheduleFilters(user.scheduleFilters);
 

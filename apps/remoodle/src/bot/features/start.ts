@@ -9,6 +9,7 @@ import { fetchCalendarEvents } from "../../library/calendar";
 import { validateRemoodleConnectToken } from "../../library/calendar-api";
 import {
   applyScheduleFilters,
+  buildClassBreakdown,
   getDayName,
   getScheduleForDay,
   mergeAdjacentScheduleItems,
@@ -55,25 +56,37 @@ async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
 }
 
 async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | null> {
-  const { deadlinesCount, classesCount } = await all({
+  const { deadlinesCount, todayClasses } = await all({
     async deadlinesCount() {
       return getTodayDeadlinesCount(user);
     },
-    async classesCount() {
-      return getTodayClassesCount(ctx, user);
+    async todayClasses() {
+      return getTodayClasses(ctx, user);
     },
   });
 
-  if (deadlinesCount !== null && classesCount !== null) {
-    return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} and ${classesCount} class${classesCount === 1 ? "" : "es"} for today`;
+  const hasBoth = deadlinesCount !== null && todayClasses !== null;
+  const deadlineOnly = deadlinesCount !== null && todayClasses === null;
+  const classesOnly = todayClasses !== null && deadlinesCount === null;
+
+  if (hasBoth) {
+    const deadlinePart =
+      deadlinesCount === 0
+        ? "no deadlines"
+        : `${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"}`;
+    const classPart = todayClasses.length === 0 ? "no classes" : buildClassBreakdown(todayClasses);
+    const freeDay = deadlinesCount === 0 && todayClasses.length === 0;
+    return `${freeDay ? "🌴 " : ""}You have ${deadlinePart} and ${classPart} for today`;
   }
 
-  if (deadlinesCount !== null) {
+  if (deadlineOnly) {
+    if (deadlinesCount === 0) return "🌴 No deadlines for today";
     return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} for today`;
   }
 
-  if (classesCount !== null) {
-    return `You have ${classesCount} class${classesCount === 1 ? "" : "es"} for today`;
+  if (classesOnly) {
+    if (todayClasses.length === 0) return "🌴 No classes for today";
+    return `You have ${buildClassBreakdown(todayClasses)} for today`;
   }
 
   return null;
@@ -107,7 +120,7 @@ async function getTodayDeadlinesCount(user: Pick<MenuUser, "calendarUrl" | "excl
   }
 }
 
-async function getTodayClassesCount(
+async function getTodayClasses(
   ctx: Context,
   user: Pick<MenuUser, "group" | "excludedCourses" | "scheduleFilters">,
 ) {
@@ -120,7 +133,7 @@ async function getTodayClassesCount(
     const filters = normalizeScheduleFilters(user.scheduleFilters);
     const filtered = applyScheduleFilters(items, filters, user.excludedCourses);
     const merged = filters.combineAdjacentPairs ? mergeAdjacentScheduleItems(filtered) : filtered;
-    return getScheduleForDay(merged, getDayName(new Date())).length;
+    return getScheduleForDay(merged, getDayName(new Date()));
   } catch {
     return null;
   }

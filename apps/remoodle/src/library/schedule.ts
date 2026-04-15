@@ -92,19 +92,33 @@ function canMergeScheduleItems(current: CalendarScheduleItem, next: CalendarSche
   const currentEnd = parseScheduleTime(current.end);
   const nextStart = parseScheduleTime(next.start);
 
-  if (currentStart.weekday !== nextStart.weekday) return false;
-  if (current.courseName !== next.courseName) return false;
-  if (current.teacher !== next.teacher) return false;
-  if (current.type !== next.type) return false;
-  if (current.location !== next.location) return false;
-  if (current.isOnline !== next.isOnline) return false;
+  if (currentStart.weekday !== nextStart.weekday) {
+    return false;
+  }
+  if (current.courseName !== next.courseName) {
+    return false;
+  }
+  if (current.teacher !== next.teacher) {
+    return false;
+  }
+  if (current.type !== next.type) {
+    return false;
+  }
+  if (current.location !== next.location) {
+    return false;
+  }
+  if (current.isOnline !== next.isOnline) {
+    return false;
+  }
 
   const gap = toMinutes(nextStart) - toMinutes(currentEnd);
   return gap >= 0 && gap <= SLOT_BREAK_THRESHOLD_MINUTES;
 }
 
 export function mergeAdjacentScheduleItems(items: CalendarScheduleItem[]): CalendarScheduleItem[] {
-  if (items.length < 2) return items;
+  if (items.length < 2) {
+    return items;
+  }
 
   const sortedItems = [...items].sort((a, b) => {
     const aStart = parseScheduleTime(a.start);
@@ -114,7 +128,9 @@ export function mergeAdjacentScheduleItems(items: CalendarScheduleItem[]): Calen
     const weekdayDiff =
       (aWeekdayIndex === -1 ? 99 : aWeekdayIndex) - (bWeekdayIndex === -1 ? 99 : bWeekdayIndex);
 
-    if (weekdayDiff !== 0) return weekdayDiff;
+    if (weekdayDiff !== 0) {
+      return weekdayDiff;
+    }
     return toMinutes(aStart) - toMinutes(bStart);
   });
 
@@ -176,6 +192,50 @@ export function getUniqueRooms(items: CalendarScheduleItem[]): string[] {
     }
   }
   return rooms;
+}
+
+type ClassKind =
+  | "lecture"
+  | "online lecture"
+  | "practice"
+  | "online practice"
+  | "class"
+  | "online class";
+
+export function classifyScheduleItem(item: {
+  type: "lecture" | "practice" | null;
+  isOnline: boolean;
+}): ClassKind {
+  if (item.type === "lecture") {
+    return item.isOnline ? "online lecture" : "lecture";
+  }
+  if (item.type === "practice") {
+    return item.isOnline ? "online practice" : "practice";
+  }
+  return item.isOnline ? "online class" : "class";
+}
+
+const CLASS_KIND_PLURAL: Record<ClassKind, string> = {
+  lecture: "lectures",
+  "online lecture": "online lectures",
+  practice: "practices",
+  "online practice": "online practices",
+  class: "classes",
+  "online class": "online classes",
+};
+
+export function buildClassBreakdown(
+  items: { type: "lecture" | "practice" | null; isOnline: boolean }[],
+): string {
+  const counts = new Map<ClassKind, number>();
+  for (const item of items) {
+    const kind = classifyScheduleItem(item);
+    counts.set(kind, (counts.get(kind) ?? 0) + 1);
+  }
+
+  return Array.from(counts.entries())
+    .map(([kind, n]) => `${n} ${n === 1 ? kind : CLASS_KIND_PLURAL[kind]}`)
+    .join(", ");
 }
 
 export function applyScheduleFilters(
