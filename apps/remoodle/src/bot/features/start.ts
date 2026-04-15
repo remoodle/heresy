@@ -69,6 +69,8 @@ async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | 
   const deadlineOnly = deadlinesCount !== null && todayClasses === null;
   const classesOnly = todayClasses !== null && deadlinesCount === null;
 
+  const chillEmoji = "🌴";
+
   if (hasBoth) {
     const deadlinePart =
       deadlinesCount === 0
@@ -76,16 +78,20 @@ async function buildMenuSummary(ctx: Context, user: MenuUser): Promise<string | 
         : `${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"}`;
     const classPart = todayClasses.length === 0 ? "no classes" : buildClassBreakdown(todayClasses);
     const freeDay = deadlinesCount === 0 && todayClasses.length === 0;
-    return `${freeDay ? "🌴 " : ""}You have ${deadlinePart} and ${classPart} for today`;
+    return `${freeDay ? `${chillEmoji} ` : ""}You have ${deadlinePart} and ${classPart} for today`;
   }
 
   if (deadlineOnly) {
-    if (deadlinesCount === 0) return "🌴 No deadlines for today";
+    if (deadlinesCount === 0) {
+      return `${chillEmoji} No deadlines for today`;
+    };
     return `You have ${deadlinesCount} deadline${deadlinesCount === 1 ? "" : "s"} for today`;
   }
 
   if (classesOnly) {
-    if (todayClasses.length === 0) return "🌴 No classes for today";
+    if (todayClasses.length === 0) {
+      return `${chillEmoji} No classes for today`;
+    };
     return `You have ${buildClassBreakdown(todayClasses)} for today`;
   }
 
@@ -146,9 +152,8 @@ function buildAboutMessage() {
     "ReMoodle helps AITU students keep up with deadlines and schedule",
     "",
     `Calendar: <a href="${config.calendar.url}/">${config.calendar.host}</a>`,
-    `Map: <a href="${config.aitumap.url}/">${config.aitumap.host}</a>`,
-    `Docs: <a href="${config.docs.url}/">${config.docs.host}</a>`,
     'GitHub: <a href="https://github.com/remoodle/heresy">github.com/remoodle/heresy</a>',
+    `Docs: <a href="${config.docs.url}/">${config.docs.host}</a>`,
   ].join("\n");
 }
 
