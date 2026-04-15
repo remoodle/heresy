@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.19.0](https://github.com/remoodle/heresy/compare/remoodle-v0.18.0...remoodle-v0.19.0) (2026-04-15)
+
+
+### Features
+
+* **remoodle:** update bot messages ([ae31dc4](https://github.com/remoodle/heresy/commit/ae31dc430adccc83b1078adeb2a3d126adfcbb7d))
+
+
+### Miscellaneous Chores
+
+* **remoodle:** place hatchet skills properly ([d1c45c1](https://github.com/remoodle/heresy/commit/d1c45c165afcfc604d08eff965a68106f8435c72))
+
 ## [0.18.0](https://github.com/remoodle/heresy/compare/remoodle-v0.17.0...remoodle-v0.18.0) (2026-04-14)
 
 
