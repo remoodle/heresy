@@ -66,7 +66,7 @@ async function copyCode() {
 
     <!-- Connect to ReMoodle -->
     <div class="flex flex-col gap-2">
-      <p class="text-xs text-muted-foreground">Connect to @remoodle_bot</p>
+      <p class="text-xs text-muted-foreground">Connect to @feathermoodbot</p>
 
       <template v-if="generatedCode">
         <div
@@ -83,7 +83,7 @@ async function copyCode() {
           </button>
         </div>
         <p class="text-[11px] text-muted-foreground">
-          Send this code to @remoodle_bot — valid for 10 min.
+          Send this code to @feathermoodbot — valid for 10 min.
           <button
             class="underline underline-offset-2 hover:text-foreground"
             @click="handleGenerateCode"
