@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.19.1](https://github.com/remoodle/heresy/compare/remoodle-v0.19.0...remoodle-v0.19.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* **remoodle:** change about section ([0df08dc](https://github.com/remoodle/heresy/commit/0df08dc62b956090ccb7812d827a898a8bddc5b6))
+
+
+### Code Refactoring
+
+* **remoodle:** integrate paraglide ([28f06e4](https://github.com/remoodle/heresy/commit/28f06e4004461d1680e75b68ac00566f0cc9e171))
+
 ## [0.19.0](https://github.com/remoodle/heresy/compare/remoodle-v0.18.0...remoodle-v0.19.0) (2026-04-15)
 
 
