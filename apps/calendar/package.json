@@ -45,7 +45,7 @@
     "better-auth": "^1.5.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "dayjs": "^1.11.13",
+    "dayjs": "catalog:",
     "drizzle-orm": "catalog:",
     "hono": "catalog:",
     "lucide-vue-next": "^0.540.0",
