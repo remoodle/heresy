@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.2](https://github.com/remoodle/heresy/compare/remoodle-v0.19.1...remoodle-v0.19.2) (2026-04-16)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependencies ([e3791f2](https://github.com/remoodle/heresy/commit/e3791f2a83290e597440e4b74bfc6488e6f205e4))
+
 ## [0.19.1](https://github.com/remoodle/heresy/compare/remoodle-v0.19.0...remoodle-v0.19.1) (2026-04-15)
 
 
