@@ -1,0 +1,72 @@
+[
+  {
+    "name": "cookies::schedule-sync",
+    "repeat": {
+      "every": 600000
+    }
+  },
+  {
+    "name": "cookies::update",
+    "opts": {
+      "concurrency": 5
+    }
+  },
+  {
+    "name": "courses::schedule-sync",
+    "repeat": {
+      "pattern": "0 */30 * * * *"
+    }
+  },
+  {
+    "name": "grades::schedule-sync",
+    "repeat": {
+      "every": 60000
+    }
+  },
+  {
+    "name": "events::schedule-sync",
+    "repeat": {
+      "pattern": "0 */10 * * * *"
+    }
+  },
+  {
+    "name": "courses::update",
+    "opts": {
+      "concurrency": 5
+    }
+  },
+  {
+    "name": "events::update",
+    "opts": {
+      "concurrency": 5
+    }
+  },
+  {
+    "name": "grades::update-by-course",
+    "opts": {
+      "concurrency": 5
+    }
+  },
+  {
+    "name": "grades::combine-diffs",
+    "opts": {
+      "concurrency": 20
+    }
+  },
+  {
+    "name": "reminders::check",
+    "opts": {
+      "concurrency": 20
+    }
+  },
+  {
+    "name": "telegram::send-message",
+    "opts": {
+      "concurrency": 5,
+      "limiter": {
+        "max": 30,
+        "duration": 1000
+      }
+    }
+  }
+]

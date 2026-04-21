@@ -1,0 +1,17 @@
+.DS_Store
+
+.turbo
+
+node_modules
+
+.dev.vars
+.wrangler/
+
+.env
+*.local
+data/
+*.log
+
+dist
+
+data

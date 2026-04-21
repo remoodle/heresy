@@ -43,7 +43,7 @@
   "devDependencies": {
     "@iconify/vue": "^5.0.0",
     "@julr/vite-plugin-validate-env": "^2.2.0",
-    "@remoodle/backend": "workspace:*",
+    "@remoodle/arem": "workspace:*",
     "@remoodle/eslint-config": "workspace:^",
     "@remoodle/types": "workspace:*",
     "@tailwindcss/typography": "^0.5.19",
