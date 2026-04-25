@@ -37,7 +37,7 @@ export function createBot(token: string, shortCache: ShortCache) {
     try {
       await ctx.deleteMessage();
     } catch {
-      await ctx.editMessageText("✅ Cleared");
+      await ctx.editMessageReplyMarkup().catch(() => {});
     }
     await ctx.answerCallbackQuery();
   });
