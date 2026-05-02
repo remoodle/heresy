@@ -18,8 +18,8 @@
     "cf-typegen": "wrangler types",
     "sync-dev": "jiti scripts/sync-dev.ts",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:migrate:remote": "DRIZZLE_ENV=remote drizzle-kit migrate",
+    "db:migrate": "wrangler d1 migrations apply calendar-auth --local",
+    "db:migrate:remote": "wrangler d1 migrations apply calendar-auth --remote --env-file .dev.vars",
     "db:studio": "drizzle-kit studio",
     "db:studio:remote": "DRIZZLE_ENV=remote drizzle-kit studio"
   },
