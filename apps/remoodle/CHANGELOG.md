@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.19.3](https://github.com/remoodle/heresy/compare/remoodle-v0.19.2...remoodle-v0.19.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* removed cleared version ([f57c60b](https://github.com/remoodle/heresy/commit/f57c60b80ab78b553b98b4fe459f458cd20682d0))
+
+
+### Code Refactoring
+
+* use evlog for logging ([49789c9](https://github.com/remoodle/heresy/commit/49789c97c0da323bbc488805711b1caecc5f6923))
+
 ## [0.19.2](https://github.com/remoodle/heresy/compare/remoodle-v0.19.1...remoodle-v0.19.2) (2026-04-16)
 
 
