@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "run-s paraglide:compile dev:run",
     "dev:run": "run-p dev:bot dev:worker",
-    "dev:bot": "tsx watch src/bot/index.ts | pino-pretty",
+    "dev:bot": "tsx watch src/bot/index.ts",
     "dev:worker": "tsx src/worker/index.ts",
     "start": "run-p start:bot start:worker",
     "paraglide:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/library/i18n --strategy baseLocale --emit-ts-declarations --no-emit-prettier-ignore --no-emit-readme",
@@ -34,11 +34,10 @@
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "envalid": "catalog:",
+    "evlog": "catalog:",
     "grammy": "^1.38.3",
     "hono": "catalog:",
-    "lru-cache": "catalog:",
-    "pino": "catalog:",
-    "pino-pretty": "catalog:"
+    "lru-cache": "catalog:"
   },
   "devDependencies": {
     "@inlang/paraglide-js": "catalog:",

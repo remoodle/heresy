@@ -1,5 +1,6 @@
 import { eq, and } from "drizzle-orm";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
+import { evlog, type EvlogVariables } from "evlog/hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import type { ExtraEnv } from "../env-extra";
@@ -10,11 +11,14 @@ import { icalTokens, user as userTable, remoodleConnectTokens } from "./db/schem
 import { generateIcal } from "./ical";
 
 type Bindings = ExtraEnv & Env;
-
-const app = new Hono<{
+type AppEnv = {
   Bindings: Bindings;
-}>();
+} & EvlogVariables;
+type AppContext = Context<AppEnv>;
 
+const app = new Hono<AppEnv>();
+
+app.use("*", evlog());
 app.use("*", cors());
 
 const FILE_NAME = "main.json";
@@ -22,6 +26,50 @@ const FILE_NAME = "main.json";
 async function getSession(env: Env, headers: Headers) {
   const auth = createAuth(env);
   return auth.api.getSession({ headers });
+}
+
+async function requireSession(c: AppContext) {
+  const session = await getSession(c.env, c.req.raw.headers);
+
+  if (!session) {
+    c.get("log").set({
+      auth: {
+        authenticated: false,
+      },
+    });
+    throw new HTTPException(401, { message: "Unauthorized" });
+  }
+
+  c.get("log").set({
+    auth: {
+      authenticated: true,
+    },
+    user: {
+      id: session.user.id,
+      email: session.user.email,
+    },
+  });
+
+  return session;
+}
+
+function requireInternalToken(c: AppContext) {
+  if (c.req.header("X-Internal-Token") !== c.env.INTERNAL_TOKEN) {
+    c.get("log").set({
+      auth: {
+        authenticated: false,
+        mechanism: "internal-token",
+      },
+    });
+    throw new HTTPException(401, { message: "Unauthorized" });
+  }
+
+  c.get("log").set({
+    auth: {
+      authenticated: true,
+      mechanism: "internal-token",
+    },
+  });
 }
 
 function applyFilters(items: ScheduleData[string], f: ScheduleFilter) {
@@ -42,10 +90,12 @@ function applyFilters(items: ScheduleData[string], f: ScheduleFilter) {
 
 const route = app
   .get("/api/groups", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    await requireSession(c);
+    c.get("log").set({
+      schedule: {
+        scope: "groups",
+      },
+    });
 
     const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
 
@@ -57,10 +107,12 @@ const route = app
     return c.json(Object.keys(scheduleData));
   })
   .get("/api/groups/:group", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    await requireSession(c);
+    c.get("log").set({
+      schedule: {
+        group: c.req.param("group"),
+      },
+    });
 
     const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
 
@@ -75,6 +127,11 @@ const route = app
   })
   .put("/api/schedule", async (c) => {
     const body = await c.req.text();
+    c.get("log").set({
+      schedule: {
+        fileName: FILE_NAME,
+      },
+    });
 
     await c.env.SCHEDULE_BUCKET.put(FILE_NAME, body, {
       httpMetadata: { contentType: "application/json" },
@@ -88,6 +145,11 @@ const route = app
   })
   .get("/api/ical/:token", async (c) => {
     const tokenParam = c.req.param("token");
+    c.get("log").set({
+      ical: {
+        tokenProvided: true,
+      },
+    });
     const db = createDb(c.env.DB);
 
     const [tokenRow] = await db
@@ -104,6 +166,13 @@ const route = app
     if (!schedule) {
       throw new HTTPException(404, { message: "Schedule not found" });
     }
+
+    c.get("log").set({
+      ical: {
+        group: tokenRow.group,
+        hasFilters: Boolean(tokenRow.filters),
+      },
+    });
 
     const scheduleData: ScheduleData = await schedule.json();
     let items = scheduleData[tokenRow.group] ?? [];
@@ -134,10 +203,7 @@ const route = app
     });
   })
   .get("/api/user/profile", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const db = createDb(c.env.DB);
     const [row] = await db
@@ -149,12 +215,14 @@ const route = app
     return c.json({ primaryGroup: row?.primaryGroup ?? null });
   })
   .patch("/api/user/profile", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const { primaryGroup } = await c.req.json<{ primaryGroup: string }>();
+    c.get("log").set({
+      profile: {
+        primaryGroup,
+      },
+    });
 
     const db = createDb(c.env.DB);
     await db
@@ -165,10 +233,7 @@ const route = app
     return c.json({ ok: true });
   })
   .post("/api/user/remoodle-token", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const db = createDb(c.env.DB);
 
@@ -191,18 +256,27 @@ const route = app
       createdAt: new Date(),
     });
 
+    c.get("log").set({
+      remoodleConnect: {
+        expiresAt: expiresAt.toISOString(),
+      },
+    });
+
     return c.json({ token, expiresAt: expiresAt.toISOString() });
   })
   .get("/api/user/ical-token", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const group = c.req.query("group");
     if (!group) {
       throw new HTTPException(400, { message: "group is required" });
     }
+
+    c.get("log").set({
+      ical: {
+        group,
+      },
+    });
 
     const db = createDb(c.env.DB);
     const [tokenRow] = await db
@@ -224,15 +298,19 @@ const route = app
     });
   })
   .post("/api/user/ical-token", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const body = await c.req.json<{ group: string; filters: ScheduleFilter }>();
     if (!body.group) {
       throw new HTTPException(400, { message: "group is required" });
     }
+
+    c.get("log").set({
+      ical: {
+        group: body.group,
+        hasFilters: Boolean(body.filters),
+      },
+    });
 
     const db = createDb(c.env.DB);
 
@@ -264,15 +342,19 @@ const route = app
     return c.json({ token, group: body.group, url });
   })
   .patch("/api/user/ical-token", async (c) => {
-    const session = await getSession(c.env, c.req.raw.headers);
-    if (!session) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    const session = await requireSession(c);
 
     const body = await c.req.json<{ group: string; filters: ScheduleFilter }>();
     if (!body.group) {
       throw new HTTPException(400, { message: "group is required" });
     }
+
+    c.get("log").set({
+      ical: {
+        group: body.group,
+        hasFilters: Boolean(body.filters),
+      },
+    });
 
     const db = createDb(c.env.DB);
 
@@ -294,9 +376,7 @@ const route = app
     return c.json({ ok: true });
   })
   .post("/api/internal/remoodle/connect", async (c) => {
-    if (c.req.header("X-Internal-Token") !== c.env.INTERNAL_TOKEN) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    requireInternalToken(c);
 
     const { token } = await c.req.json<{ token: string }>();
     const db = createDb(c.env.DB);
@@ -330,14 +410,25 @@ const route = app
       throw new HTTPException(404, { message: "User not found" });
     }
 
+    c.get("log").set({
+      remoodleConnect: {
+        userId: u.id,
+        hasPrimaryGroup: Boolean(u.primaryGroup),
+      },
+    });
+
     return c.json({ userId: u.id, email: u.email, group: u.primaryGroup });
   })
   .get("/api/internal/schedule/:group", async (c) => {
-    if (c.req.header("X-Internal-Token") !== c.env.INTERNAL_TOKEN) {
-      throw new HTTPException(401, { message: "Unauthorized" });
-    }
+    requireInternalToken(c);
 
     const group = c.req.param("group");
+    c.get("log").set({
+      schedule: {
+        group,
+        scope: "internal",
+      },
+    });
     const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
 
     if (!schedule) {
@@ -350,7 +441,7 @@ const route = app
 
 app.onError((error, ctx) => {
   const status = error instanceof HTTPException ? error.status : 500;
-  console.error(error);
+  ctx.get("log").error(error, { status });
   return ctx.json({ status, message: error.message, stack: error.stack }, status);
 });
 

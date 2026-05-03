@@ -24,6 +24,7 @@ catalog:
   drizzle-kit: 1.0.0-beta.20
   drizzle-orm: 1.0.0-beta.20
   envalid: ^8.1.1
+  evlog: ^2.14.1
   hono: ^4.12.14
   lru-cache: ^11.3.5
   npm-run-all2: ^8.0.4

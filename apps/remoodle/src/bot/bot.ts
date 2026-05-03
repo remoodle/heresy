@@ -1,7 +1,7 @@
+import { log } from "evlog";
 import { hydrate } from "@grammyjs/hydrate";
 import { Bot, MemorySessionStorage, session } from "grammy";
 import type { Context, SessionData } from "./context";
-import { logger } from "../library/logger";
 import type { ShortCache } from "../library/short-cache";
 import { coursesFeature } from "./features/courses";
 import { deadlinesFeature } from "./features/deadlines";
@@ -43,7 +43,12 @@ export function createBot(token: string, shortCache: ShortCache) {
   });
 
   bot.catch((err) => {
-    logger.bot.error({ error: err.error, update: err.ctx.update }, "Unhandled bot error");
+    log.error({
+      module: "bot",
+      operation: "update",
+      error: err.error instanceof Error ? err.error : new Error(String(err.error)),
+      update: err.ctx.update,
+    });
     err.ctx.answerCallbackQuery().catch(() => {});
   });
 

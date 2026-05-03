@@ -1,5 +1,6 @@
 import { RateLimitDuration } from "@hatchet-dev/typescript-sdk";
-import { logger } from "../library/logger";
+import { createRequestLogger, log } from "evlog";
+import { initRemoodleEvlog } from "../library/evlog";
 import { hatchet } from "./hatchet-client";
 import { calendarFetchUser } from "./workflows/calendar-fetch-user";
 import { deadlineCheck } from "./workflows/deadline-check";
@@ -10,27 +11,75 @@ import { scheduleReminderCheckUser } from "./workflows/schedule-reminder-check-u
 import { TELEGRAM_RATE_LIMIT_KEY, telegramSendMessage } from "./workflows/telegram-send-message";
 
 async function main() {
-  logger.worker.info("Creating Hatchet worker");
+  initRemoodleEvlog("remoodle-worker");
 
-  await hatchet.ratelimits.upsert({
-    key: TELEGRAM_RATE_LIMIT_KEY,
-    limit: 30,
-    duration: RateLimitDuration.SECOND,
+  const requestLog = createRequestLogger({
+    method: "BOOT",
+    path: "/worker/startup",
   });
 
-  const worker = await hatchet.worker("remoodle-worker", {
-    workflows: [
-      deadlineCheck,
-      calendarFetchUser,
-      deadlineCheckUser,
-      deadlineNotifyUser,
-      scheduleReminderCheck,
-      scheduleReminderCheckUser,
-      telegramSendMessage,
-    ],
+  log.info({
+    module: "worker",
+    operation: "startup",
+    message: "Creating Hatchet worker",
   });
 
-  await worker.start();
+  try {
+    requestLog.set({
+      source: "worker",
+      operation: "startup",
+      worker: {
+        name: "remoodle-worker",
+      },
+    });
+
+    await hatchet.ratelimits.upsert({
+      key: TELEGRAM_RATE_LIMIT_KEY,
+      limit: 30,
+      duration: RateLimitDuration.SECOND,
+    });
+
+    requestLog.set({
+      rateLimit: {
+        key: TELEGRAM_RATE_LIMIT_KEY,
+        limit: 30,
+        duration: "second",
+      },
+    });
+
+    const worker = await hatchet.worker("remoodle-worker", {
+      workflows: [
+        deadlineCheck,
+        calendarFetchUser,
+        deadlineCheckUser,
+        deadlineNotifyUser,
+        scheduleReminderCheck,
+        scheduleReminderCheckUser,
+        telegramSendMessage,
+      ],
+    });
+
+    requestLog.set({
+      worker: {
+        started: true,
+      },
+    });
+    requestLog.emit({ status: 200 });
+
+    await worker.start();
+  } catch (error) {
+    requestLog.error(error instanceof Error ? error : new Error(String(error)), {
+      step: "startup",
+    });
+    requestLog.emit({ status: 500 });
+    throw error;
+  }
 }
 
-main().catch((err) => logger.worker.error({ error: err }, "Failed to start worker"));
+main().catch((err) => {
+  log.error({
+    module: "worker",
+    operation: "startup",
+    error: err instanceof Error ? err : new Error(String(err)),
+  });
+});
