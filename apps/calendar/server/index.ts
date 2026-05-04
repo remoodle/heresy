@@ -1,5 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { Hono, type Context } from "hono";
+import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
 import { evlog, type EvlogVariables } from "evlog/hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
@@ -18,7 +19,25 @@ type AppContext = Context<AppEnv>;
 
 const app = new Hono<AppEnv>();
 
+function createEvlogAuth(env: Env): BetterAuthInstance {
+  const auth = createAuth(env);
+
+  return {
+    api: {
+      getSession: ({ headers }) => auth.api.getSession({ headers: headers as Headers }),
+    },
+  };
+}
+
 app.use("*", evlog());
+app.use("*", async (c, next) => {
+  const identify = createAuthMiddleware(createEvlogAuth(c.env), {
+    exclude: ["/api/auth/**"],
+  });
+
+  await identify(c.get("log"), c.req.raw.headers, c.req.path);
+  await next();
+});
 app.use("*", cors());
 
 const FILE_NAME = "main.json";
@@ -43,10 +62,7 @@ async function requireSession(c: AppContext) {
   c.get("log").set({
     auth: {
       authenticated: true,
-    },
-    user: {
-      id: session.user.id,
-      email: session.user.email,
+      mechanism: "session",
     },
   });
 
