@@ -34,7 +34,6 @@
       "binding": "DB",
       "database_name": "calendar-auth",
       "database_id": "010b4586-f9d0-4654-9b0f-8b6007dda541",
-      "migrations_dir": "server/db/migrations",
     },
   ],
   "vars": {
