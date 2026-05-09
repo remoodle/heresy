@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.20.0](https://github.com/remoodle/heresy/compare/remoodle-v0.19.3...remoodle-v0.20.0) (2026-05-09)
+
+
+### Features
+
+* **remoodle:** add daily digest feature ([9787c4a](https://github.com/remoodle/heresy/commit/9787c4a1a5bcb609f28c0c5982f211d119d47573))
+
+
+### Miscellaneous Chores
+
+* adopt evlog better ([39572e8](https://github.com/remoodle/heresy/commit/39572e8c97950955ca15562b41d2e98e401db1ae))
+
 ## [0.19.3](https://github.com/remoodle/heresy/compare/remoodle-v0.19.2...remoodle-v0.19.3) (2026-05-03)
 
 
