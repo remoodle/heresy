@@ -14,6 +14,7 @@ import {
   getDayName,
   getScheduleForDay,
   mergeAdjacentScheduleItems,
+  normalizeDigestWeekdays,
   normalizeScheduleFilters,
 } from "../../library/schedule";
 import { m } from "../../library/i18n/messages.js";
@@ -26,6 +27,7 @@ import {
   setupCallback,
   scheduleSettingsCallback,
   deadlinesSettingsCallback,
+  digestSettingsCallback,
 } from "../callback-data";
 import { buildMenuKeyboard } from "../keyboards/menu";
 import { fetchCachedGroupSchedule } from "../schedule-cache";
@@ -40,6 +42,8 @@ type MenuUser = {
     eventFormats: { online: boolean; offline: boolean };
     combineAdjacentPairs?: boolean;
   } | null;
+  digestEnabled: boolean;
+  digestWeekdays: number[];
 };
 
 async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
@@ -52,6 +56,15 @@ async function buildMenuMessage(ctx: Context, user: MenuUser): Promise<string> {
     parts.push(m.warn_no_group_in_calendar());
   } else if (!user.calendarUrl) {
     parts.push(m.warn_add_calendar_url());
+  }
+
+  if (user.group) {
+    const digestWeekdays = normalizeDigestWeekdays(user.digestWeekdays);
+    if (!user.digestEnabled) {
+      parts.push(m.warn_digest_disabled());
+    } else if (digestWeekdays.length === 0) {
+      parts.push(m.warn_digest_no_days());
+    }
   }
 
   return parts.join("\n\n");
@@ -178,10 +191,14 @@ function buildUpdateCalendarKeyboard(from: "setup" | "deadlines_settings") {
   );
 }
 
-function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings") {
+function buildConnectCalendarKeyboard(from: "setup" | "schedule_settings" | "digest_settings") {
   return new InlineKeyboard().text(
     m.ui_back(),
-    from === "schedule_settings" ? scheduleSettingsCallback.pack({}) : setupCallback.pack({}),
+    from === "schedule_settings"
+      ? scheduleSettingsCallback.pack({})
+      : from === "digest_settings"
+        ? digestSettingsCallback.pack({})
+        : setupCallback.pack({}),
   );
 }
 
@@ -276,7 +293,7 @@ feature.callbackQuery(updateCalendarCallback.filter(), async (ctx) => {
 
 feature.callbackQuery(connectCalendarCallback.filter(), async (ctx) => {
   const { from } = connectCalendarCallback.unpack(ctx.callbackQuery.data) as {
-    from: "setup" | "schedule_settings";
+    from: "setup" | "schedule_settings" | "digest_settings";
   };
   ctx.session.awaitingRemoodleToken = true;
   ctx.session.awaitingCalendarUrl = false;

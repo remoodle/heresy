@@ -6,6 +6,7 @@ import { calendarFetchUser } from "./workflows/calendar-fetch-user";
 import { deadlineCheck } from "./workflows/deadline-check";
 import { deadlineCheckUser } from "./workflows/deadline-check-user";
 import { deadlineNotifyUser } from "./workflows/deadline-notify-user";
+import { digestUser } from "./workflows/digest-user";
 import { scheduleReminderCheck } from "./workflows/schedule-reminder-check";
 import { scheduleReminderCheckUser } from "./workflows/schedule-reminder-check-user";
 import { TELEGRAM_RATE_LIMIT_KEY, telegramSendMessage } from "./workflows/telegram-send-message";
@@ -54,6 +55,7 @@ async function main() {
         deadlineCheckUser,
         deadlineNotifyUser,
         scheduleReminderCheck,
+        digestUser,
         scheduleReminderCheckUser,
         telegramSendMessage,
       ],

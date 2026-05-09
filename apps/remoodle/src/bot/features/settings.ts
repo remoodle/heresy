@@ -6,19 +6,30 @@ import { db } from "../../db";
 import { calendarEvents, sentNotifications, users } from "../../db/schema";
 import { durationToMs, humanizeDuration } from "../../library/dates";
 import { AVAILABLE_THRESHOLDS, buildThresholdsMessage } from "../../library/deadline-reminders";
-import { normalizeScheduleFilters, type ScheduleFilters } from "../../library/schedule";
+import {
+  isValidDigestTime,
+  normalizeDigestWeekdays,
+  normalizeScheduleFilters,
+  DIGEST_WEEKDAYS,
+  type ScheduleFilters,
+} from "../../library/schedule";
 import { m } from "../../library/i18n/messages.js";
 import { bold, code, italic } from "../../library/telegram-html";
 import {
   settingsCallback,
   deadlinesSettingsCallback,
   scheduleSettingsCallback,
+  digestSettingsCallback,
   toggleThresholdCallback,
   toggleDeadlinesCallback,
   toggleScheduleCallback,
   toggleScheduleTypeCallback,
   toggleScheduleFormatCallback,
   toggleScheduleMergeCallback,
+  toggleDigestCallback,
+  setDigestTimeCallback,
+  toggleDigestWeekdayCallback,
+  disableDigestDaysCallback,
   updateCalendarCallback,
   connectCalendarCallback,
   menuCallback,
@@ -50,6 +61,8 @@ function buildSettingsKeyboard() {
     .row()
     .text(m.settings_button_courses(), coursesCallback.pack({}))
     .text(m.account_header(), accountCallback.pack({}))
+    .row()
+    .text(m.settings_button_digest(), digestSettingsCallback.pack({}))
     .row()
     .text(m.ui_back(), menuCallback.pack({}));
 }
@@ -418,9 +431,79 @@ function buildScheduleSettingsMessage(
   return lines.join("\n");
 }
 
+function buildDigestSettingsKeyboard(
+  hasGroup: boolean,
+  digestEnabled: boolean,
+  digestTime: string,
+  digestWeekdays: number[],
+) {
+  const keyboard = new InlineKeyboard();
+
+  keyboard
+    .text(
+      m.digest_status({
+        status: digestEnabled ? m.ui_status_on() : m.ui_status_muted_off(),
+      }),
+      toggleDigestCallback.pack({}),
+    )
+    .row()
+    .text(m.digest_time({ time: digestTime }), setDigestTimeCallback.pack({}));
+
+  const activeWeekdays = new Set(digestWeekdays);
+  for (let i = 0; i < DIGEST_WEEKDAYS.length; i += 2) {
+    const row = keyboard.row();
+    for (const day of DIGEST_WEEKDAYS.slice(i, i + 2)) {
+      row.text(
+        checkboxLabel(activeWeekdays.has(day.value), day.shortLabel),
+        toggleDigestWeekdayCallback.pack({ day: String(day.value) }),
+      );
+    }
+  }
+
+  keyboard.row().text(m.digest_disable_all(), disableDigestDaysCallback.pack({}));
+
+  if (!hasGroup) {
+    keyboard
+      .row()
+      .text(
+        m.setup_button_connect_calendar_account(),
+        connectCalendarCallback.pack({ from: "digest_settings" }),
+      );
+  }
+
+  keyboard.row().text(m.ui_back(), settingsCallback.pack({}));
+
+  return keyboard;
+}
+
+function buildDigestSettingsMessage(
+  group: string | null,
+  digestEnabled: boolean,
+  digestWeekdays: number[],
+): string {
+  const lines = [
+    bold(m.digest_settings_header()),
+    "",
+    group ? m.schedule_group({ group: bold(group) }) : m.schedule_no_group(),
+    m.digest_settings_body(),
+  ];
+
+  if (!group) {
+    lines.push("", italic(m.schedule_no_group_hint({ host: config.calendar.host })));
+  }
+  if (!digestEnabled) {
+    lines.push("", italic(m.digest_warning_disabled()));
+  } else if (digestWeekdays.length === 0) {
+    lines.push("", italic(m.digest_warning_no_days()));
+  }
+
+  return lines.join("\n");
+}
+
 feature.callbackQuery(scheduleSettingsCallback.filter(), async (ctx) => {
   ctx.session.awaitingRemoodleToken = false;
   ctx.session.awaitingScheduleReminderMinutes = false;
+  ctx.session.awaitingDigestTime = false;
   const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
   if (rows.length === 0) {
     await ctx.answerCallbackQuery(m.not_registered_short());
@@ -470,6 +553,116 @@ feature.callbackQuery(toggleScheduleCallback.filter(), async (ctx) => {
       !!user.group,
       filters,
       user.scheduleReminderOffset,
+    ),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(digestSettingsCallback.filter(), async (ctx) => {
+  ctx.session.awaitingRemoodleToken = false;
+  ctx.session.awaitingScheduleReminderMinutes = false;
+  ctx.session.awaitingDigestTime = false;
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery(m.not_registered_short());
+    return;
+  }
+  const user = rows[0]!;
+  const weekdays = normalizeDigestWeekdays(user.digestWeekdays);
+  await ctx.editMessageText(buildDigestSettingsMessage(user.group, user.digestEnabled, weekdays), {
+    parse_mode: "HTML",
+    reply_markup: buildDigestSettingsKeyboard(
+      !!user.group,
+      user.digestEnabled,
+      user.digestTime,
+      weekdays,
+    ),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(toggleDigestCallback.filter(), async (ctx) => {
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery(m.not_registered_short());
+    return;
+  }
+  const user = rows[0]!;
+
+  if (!user.group && !user.digestEnabled) {
+    await ctx.answerCallbackQuery({
+      text: m.no_group_for_schedule(),
+      show_alert: true,
+    });
+    return;
+  }
+
+  const updated = !user.digestEnabled;
+  await db.update(users).set({ digestEnabled: updated }).where(eq(users.telegramId, ctx.from.id));
+
+  const weekdays = normalizeDigestWeekdays(user.digestWeekdays);
+  await ctx.editMessageText(buildDigestSettingsMessage(user.group, updated, weekdays), {
+    parse_mode: "HTML",
+    reply_markup: buildDigestSettingsKeyboard(!!user.group, updated, user.digestTime, weekdays),
+  });
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(toggleDigestWeekdayCallback.filter(), async (ctx) => {
+  const { day } = toggleDigestWeekdayCallback.unpack(ctx.callbackQuery.data) as {
+    day: string;
+  };
+  const dayValue = Number(day);
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery(m.not_registered_short());
+    return;
+  }
+  const user = rows[0]!;
+  const weekdays = normalizeDigestWeekdays(user.digestWeekdays);
+  const updated = weekdays.includes(dayValue)
+    ? weekdays.filter((weekday) => weekday !== dayValue)
+    : [...weekdays, dayValue];
+
+  const normalizedUpdated = normalizeDigestWeekdays(updated);
+  await db
+    .update(users)
+    .set({ digestWeekdays: normalizedUpdated })
+    .where(eq(users.telegramId, ctx.from.id));
+
+  await ctx.editMessageText(
+    buildDigestSettingsMessage(user.group, user.digestEnabled, normalizedUpdated),
+    {
+      parse_mode: "HTML",
+      reply_markup: buildDigestSettingsKeyboard(
+        !!user.group,
+        user.digestEnabled,
+        user.digestTime,
+        normalizedUpdated,
+      ),
+    },
+  );
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(disableDigestDaysCallback.filter(), async (ctx) => {
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery(m.not_registered_short());
+    return;
+  }
+  const user = rows[0]!;
+  const weekdays: number[] = [];
+
+  await db.update(users).set({ digestWeekdays: weekdays }).where(eq(users.telegramId, ctx.from.id));
+
+  await ctx.editMessageText(buildDigestSettingsMessage(user.group, user.digestEnabled, weekdays), {
+    parse_mode: "HTML",
+    reply_markup: buildDigestSettingsKeyboard(
+      !!user.group,
+      user.digestEnabled,
+      user.digestTime,
+      weekdays,
     ),
   });
   await ctx.answerCallbackQuery();
@@ -595,7 +788,11 @@ feature.on("message:text", async (ctx, next) => {
   const filters = normalizeScheduleFilters(user.scheduleFilters);
 
   await ctx.reply(
-    `${m.schedule_reminder_saved({ minutes: bold(`${mins} minutes`) })}\n\n${buildScheduleSettingsMessage(user.scheduleEnabled, user.group, filters)}`,
+    `${m.schedule_reminder_saved({ minutes: bold(`${mins} minutes`) })}\n\n${buildScheduleSettingsMessage(
+      user.scheduleEnabled,
+      user.group,
+      filters,
+    )}`,
     {
       parse_mode: "HTML",
       reply_markup: buildScheduleSettingsKeyboard(
@@ -608,8 +805,45 @@ feature.on("message:text", async (ctx, next) => {
   );
 });
 
+feature.on("message:text", async (ctx, next) => {
+  if (!ctx.session.awaitingDigestTime) {
+    return next();
+  }
+
+  const time = ctx.message.text.trim();
+
+  if (!isValidDigestTime(time)) {
+    await ctx.reply(m.digest_time_invalid());
+    return;
+  }
+
+  ctx.session.awaitingDigestTime = false;
+
+  await db.update(users).set({ digestTime: time }).where(eq(users.telegramId, ctx.from.id));
+
+  const rows = await db.select().from(users).where(eq(users.telegramId, ctx.from.id)).limit(1);
+  if (rows.length === 0) {
+    return;
+  }
+  const user = rows[0]!;
+  const weekdays = normalizeDigestWeekdays(user.digestWeekdays);
+
+  await ctx.reply(
+    `${m.digest_time_saved({ time: bold(time) })}\n\n${buildDigestSettingsMessage(
+      user.group,
+      user.digestEnabled,
+      weekdays,
+    )}`,
+    {
+      parse_mode: "HTML",
+      reply_markup: buildDigestSettingsKeyboard(!!user.group, user.digestEnabled, time, weekdays),
+    },
+  );
+});
+
 feature.callbackQuery(setScheduleReminderCallback.filter(), async (ctx) => {
   ctx.session.awaitingScheduleReminderMinutes = true;
+  ctx.session.awaitingDigestTime = false;
   const rows = await db
     .select({ scheduleReminderOffset: users.scheduleReminderOffset })
     .from(users)
@@ -627,6 +861,41 @@ feature.callbackQuery(setScheduleReminderCallback.filter(), async (ctx) => {
     bold(m.schedule_reminder_settings_header()),
     "",
     m.schedule_reminder_settings_body({ minutes: bold(`${currentMins} minutes`) }),
+  ].join("\n");
+
+  try {
+    await ctx.editMessageText(reminderMsg, {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_cancel(), scheduleSettingsCallback.pack({})),
+    });
+  } catch {
+    await ctx.reply(reminderMsg, {
+      parse_mode: "HTML",
+      reply_markup: new InlineKeyboard().text(m.ui_cancel(), scheduleSettingsCallback.pack({})),
+    });
+  }
+  await ctx.answerCallbackQuery();
+});
+
+feature.callbackQuery(setDigestTimeCallback.filter(), async (ctx) => {
+  ctx.session.awaitingDigestTime = true;
+  ctx.session.awaitingScheduleReminderMinutes = false;
+  const rows = await db
+    .select({ digestTime: users.digestTime })
+    .from(users)
+    .where(eq(users.telegramId, ctx.from.id))
+    .limit(1);
+
+  if (rows.length === 0) {
+    await ctx.answerCallbackQuery(m.not_registered_short());
+    return;
+  }
+
+  const current = rows[0]!.digestTime;
+  const reminderMsg = [
+    bold(m.digest_time_header()),
+    "",
+    m.digest_time_body({ time: bold(current) }),
   ].join("\n");
 
   try {

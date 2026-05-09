@@ -31,6 +31,12 @@ export const users = sqliteTable("users", {
       combineAdjacentPairs: true,
     }),
   scheduleReminderOffset: text("schedule_reminder_offset").notNull().default("PT30M"),
+  digestEnabled: integer("digest_enabled", { mode: "boolean" }).notNull().default(false),
+  digestTime: text("digest_time").notNull().default("08:00"),
+  digestWeekdays: text("digest_weekdays", { mode: "json" })
+    .$type<number[]>()
+    .notNull()
+    .default([1, 2, 3, 4, 5, 6, 0]),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .$defaultFn(() => new Date()),

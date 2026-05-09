@@ -5,6 +5,7 @@ export const setupCallback = createCallbackData("setup", {});
 export const settingsCallback = createCallbackData("settings", {});
 export const deadlinesSettingsCallback = createCallbackData("deadlines_settings", {});
 export const scheduleSettingsCallback = createCallbackData("schedule_settings", {});
+export const digestSettingsCallback = createCallbackData("digest_settings", {});
 export const toggleThresholdCallback = createCallbackData("toggle_threshold", {
   threshold: String,
 });
@@ -21,6 +22,12 @@ export const toggleCourseCallback = createCallbackData("toggle_course", { idx: S
 export const toggleScheduleTypeCallback = createCallbackData("toggle_sched_type", { key: String });
 export const toggleScheduleFormatCallback = createCallbackData("toggle_sched_fmt", { key: String });
 export const toggleScheduleMergeCallback = createCallbackData("toggle_sched_merge", {});
+export const toggleDigestCallback = createCallbackData("toggle_digest", {});
+export const setDigestTimeCallback = createCallbackData("set_digest_time", {});
+export const toggleDigestWeekdayCallback = createCallbackData("toggle_digest_day", {
+  day: String,
+});
+export const disableDigestDaysCallback = createCallbackData("disable_digest_days", {});
 export const accountCallback = createCallbackData("account", {});
 export const deleteAccountCallback = createCallbackData("delete_account", {});
 export const confirmDeleteAccountCallback = createCallbackData("confirm_delete_account", {

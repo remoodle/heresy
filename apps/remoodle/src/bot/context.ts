@@ -6,6 +6,7 @@ export type SessionData = {
   awaitingCalendarUrl?: boolean;
   awaitingRemoodleToken?: boolean;
   awaitingScheduleReminderMinutes?: boolean;
+  awaitingDigestTime?: boolean;
 };
 
 export type Context = HydrateFlavor<
