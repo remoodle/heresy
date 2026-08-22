@@ -20,4 +20,6 @@ data/
 *.db
 *.tsbuildinfo
 
+AGENTS.override.md
+
 .github/scripts/schedule-parser/vendor/*
