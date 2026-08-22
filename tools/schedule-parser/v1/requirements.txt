@@ -1,0 +1,18 @@
+# Core PDF parsing libraries
+openparse>=0.7.0
+PyPDF2>=3.0.1
+
+# Alternative PDF processing (optional, for better text extraction)
+PyMuPDF>=1.26.0
+
+# Data handling and JSON processing
+pandas>=2.0.0
+numpy>=1.24.0
+
+# For better regex support
+regex>=2022.1.18
+
+# Development and testing (optional)
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
