@@ -2,6 +2,15 @@ packages:
   - "apps/*"
   - "docs"
 
+allowBuilds:
+  "@hatchet-dev/typescript-sdk": true
+  better-sqlite3: true
+  esbuild: true
+  protobufjs: true
+  sharp: false
+  vue-demi: false
+  workerd: false
+
 catalog:
   "@hatchet-dev/typescript-sdk": ^1.19.1
   "@inlang/paraglide-js": ^2.16.0
