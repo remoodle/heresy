@@ -46,7 +46,7 @@ jobs:
           rclone_config: ${{ secrets.RCLONE_CONFIG }}
 
       - name: Upload to R2 bucket
-        run: rclone sync ./tools/schedule-parser/output remoodle:calendar-schedule -v
+        run: rclone sync ./tools/schedule-parser/output remoodle:calendar-schedule -v --size-only --fast-list --checkers=24 --transfers=50
 
       - name: Trigger cabgen workflow
         run: gh workflow run cabgen-upload.yml --ref ${{ github.ref_name }}
