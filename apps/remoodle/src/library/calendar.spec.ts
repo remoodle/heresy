@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test } from "vite-plus/test";
 import { parseIcs, shouldIgnoreCalendarEvent } from "./calendar";
 
 const realCalendarFixture = readFileSync(

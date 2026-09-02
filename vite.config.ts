@@ -35,7 +35,4 @@ export default defineConfig({
       typeCheck: true,
     },
   },
-  run: {
-    cache: true,
-  },
 });

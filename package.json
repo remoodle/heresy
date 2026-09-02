@@ -20,6 +20,7 @@
     "migrate:remoodle": "vp run @heresy/remoodle#db:migrate"
   },
   "devDependencies": {
+    "vite": "catalog:",
     "vite-plus": "catalog:"
   },
   "engines": {

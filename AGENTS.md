@@ -4,8 +4,8 @@
 
 Before editing files for a substantial task:
 
-- Run `pnpm dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
-- If a listed skill matches the task, run `pnpm dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
+- Run `vp dlx @tanstack/intent@latest list` from the workspace root to see available local skills.
+- If a listed skill matches the task, run `vp dlx @tanstack/intent@latest load <package>#<skill>` before changing files.
 - Use the loaded `SKILL.md` guidance while making the change.
 - Monorepos: when working across packages, run the skill check from the workspace root and prefer the local skill for the package being changed.
 - Multiple matches: prefer the most specific local skill for the package or concern you are changing; load additional skills only when the task spans multiple packages or concerns.
@@ -30,10 +30,10 @@ Before editing files for a substantial task:
 
 - `any` is the enemy, Infered types are our friend. Our systems should adapt to changes, instead of requiring chnages everywhere.
 - Avoid one-line functions that are just casting wrappers.
-- If not already spcified in project, generally preferred stack is - pnpm, Vite, React, Tailwind CSS.
+- If not already specified in the project, the generally preferred stack is Vite+, React, and Tailwind CSS.
 - When building more complex web apps, pull out TanStack Query, TanStack Start or Router (for SPA), zod.
-- When schema changes are required, create migrations with `pnpm run db:generate`.
-- Apply local schema changes with `pnpm run db:migrate`.
+- When schema changes are required, create migrations with `vp run db:generate`.
+- Apply local schema changes with `vp run db:migrate`.
 - Do not hand-write migration SQL.
 
 ## Coding preferences (Frontend focused)
@@ -126,6 +126,6 @@ These commands map to their corresponding tools. For example, `vp dev --port 300
 ## Review Checklist for Agents
 
 - [ ] Run `vp install` after pulling remote changes and before getting started.
-- [ ] Run `vp check` and `vp test` to validate changes.
+- [ ] Run `vp check` and `vp run -r test` to validate changes across the workspace.
 
 <!--VITE PLUS END-->
