@@ -52,7 +52,7 @@ catalog:
   vite-plus: latest
   vitepress: 2.0.0-alpha.17
   vitest: npm:@voidzero-dev/vite-plus-test@latest
-  wrangler: ^4.83.0
+  wrangler: ^4.127.1
 
 catalogMode: prefer
 
