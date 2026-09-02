@@ -6,7 +6,7 @@
     "dev": "vitepress dev .",
     "build": "vitepress build .",
     "preview": "vitepress preview .",
-    "deploy": "vitepress build . && wrangler deploy",
+    "deploy": "wrangler deploy",
     "format-check": "oxfmt --check .",
     "format": "oxfmt --write ."
   },
