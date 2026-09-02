@@ -14,7 +14,7 @@
     "lint": "run-s lint:*",
     "format-check": "oxfmt --check src/ server/",
     "format": "oxfmt --write src/ server/",
-    "deploy": "pnpm run build && wrangler deploy",
+    "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "sync-dev": "jiti scripts/sync-dev.ts",
     "db:generate": "drizzle-kit generate",
