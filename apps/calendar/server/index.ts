@@ -5,11 +5,12 @@ import { evlog, type EvlogVariables } from "evlog/hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import type { ExtraEnv } from "../env-extra";
-import type { ScheduleData, ScheduleFilter } from "./types.d";
+import type { GroupSchedule, Groups, ScheduleFilter } from "./types.d";
 import { createAuth } from "./auth";
 import { createDb } from "./db";
 import { icalTokens, user as userTable, remoodleConnectTokens } from "./db/schema";
 import { generateIcal } from "./ical";
+import { getGroups, getGroupSchedule, putGroups, putGroupSchedule } from "./schedule";
 
 type Bindings = ExtraEnv & Env;
 type AppEnv = {
@@ -39,8 +40,6 @@ app.use("*", async (c, next) => {
   await next();
 });
 app.use("*", cors());
-
-const FILE_NAME = "main.json";
 
 async function getSession(env: Env, headers: Headers) {
   const auth = createAuth(env);
@@ -88,7 +87,7 @@ function requireInternalToken(c: AppContext) {
   });
 }
 
-function applyFilters(items: ScheduleData[string], f: ScheduleFilter) {
+function applyFilters(items: GroupSchedule, f: ScheduleFilter) {
   return items.filter((item) => {
     if (f.excludedCourses.includes(item.courseName)) return false;
 
@@ -113,14 +112,10 @@ const route = app
       },
     });
 
-    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
+    const groups = await getGroups(c.env.SCHEDULE_BUCKET);
+    if (!groups) throw new HTTPException(404, { message: "Groups not found" });
 
-    if (!schedule) {
-      throw new HTTPException(404, { message: "Schedule not found" });
-    }
-
-    const scheduleData: ScheduleData = await schedule.json();
-    return c.json(Object.keys(scheduleData));
+    return c.json(groups);
   })
   .get("/api/groups/:group", async (c) => {
     await requireSession(c);
@@ -130,28 +125,33 @@ const route = app
       },
     });
 
-    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
-
-    if (!schedule) {
-      throw new HTTPException(404, { message: "Schedule not found" });
-    }
-
-    const scheduleData: ScheduleData = await schedule.json();
     const group = c.req.param("group");
+    const schedule = await getGroupSchedule(c.env.SCHEDULE_BUCKET, group);
 
-    return c.json(scheduleData[group] ?? []);
+    return c.json(schedule ?? []);
   })
-  .put("/api/schedule", async (c) => {
-    const body = await c.req.text();
+  .put("/api/groups", async (c) => {
+    const groups = await c.req.json<Groups>();
     c.get("log").set({
       schedule: {
-        fileName: FILE_NAME,
+        scope: "groups",
       },
     });
 
-    await c.env.SCHEDULE_BUCKET.put(FILE_NAME, body, {
-      httpMetadata: { contentType: "application/json" },
+    await putGroups(c.env.SCHEDULE_BUCKET, groups);
+
+    return c.json({ ok: true });
+  })
+  .put("/api/groups/:group", async (c) => {
+    const group = c.req.param("group");
+    const schedule = await c.req.json<GroupSchedule>();
+    c.get("log").set({
+      schedule: {
+        group,
+      },
     });
+
+    await putGroupSchedule(c.env.SCHEDULE_BUCKET, group, schedule);
 
     return c.json({ ok: true });
   })
@@ -178,7 +178,7 @@ const route = app
       throw new HTTPException(404, { message: "Token not found" });
     }
 
-    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
+    const schedule = await getGroupSchedule(c.env.SCHEDULE_BUCKET, tokenRow.group);
     if (!schedule) {
       throw new HTTPException(404, { message: "Schedule not found" });
     }
@@ -190,8 +190,7 @@ const route = app
       },
     });
 
-    const scheduleData: ScheduleData = await schedule.json();
-    let items = scheduleData[tokenRow.group] ?? [];
+    let items = schedule;
 
     if (tokenRow.filters) {
       items = applyFilters(items, tokenRow.filters as ScheduleFilter);
@@ -445,14 +444,12 @@ const route = app
         scope: "internal",
       },
     });
-    const schedule = await c.env.SCHEDULE_BUCKET.get(FILE_NAME);
-
+    const schedule = await getGroupSchedule(c.env.SCHEDULE_BUCKET, group);
     if (!schedule) {
       throw new HTTPException(404, { message: "Schedule not found" });
     }
 
-    const scheduleData: ScheduleData = await schedule.json();
-    return c.json(scheduleData[group] ?? []);
+    return c.json(schedule);
   });
 
 app.onError((error, ctx) => {

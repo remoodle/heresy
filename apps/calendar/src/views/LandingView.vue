@@ -12,9 +12,7 @@ const route = useRoute();
 const router = useRouter();
 const { data: session, isLoading } = useSessionQuery();
 
-const next = Array.isArray(route.query.next)
-  ? route.query.next[0]
-  : route.query.next;
+const next = Array.isArray(route.query.next) ? route.query.next[0] : route.query.next;
 const callbackURL = next || "/schedule";
 
 watch(session, (currentSession) => {
@@ -51,8 +49,8 @@ watch(session, (currentSession) => {
       <section class="landing-copy" aria-labelledby="landing-title">
         <h1 id="landing-title">Classes and deadlines in one calendar.</h1>
         <p>
-          Your AITU timetable and Moodle deadlines, together. Export everything
-          to the calendar you already use.
+          Your AITU timetable and Moodle deadlines, together. Export everything to the calendar you
+          already use.
         </p>
 
         <div class="landing-action">
@@ -62,9 +60,7 @@ watch(session, (currentSession) => {
               <Icon icon="mdi:arrow-right" aria-hidden="true" />
             </Button>
           </AuthDialog>
-          <span v-else class="landing-loading" aria-live="polite"
-            >Checking your session…</span
-          >
+          <span v-else class="landing-loading" aria-live="polite">Checking your session…</span>
           <span class="landing-hint">Use your AITU Microsoft account</span>
         </div>
       </section>

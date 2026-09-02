@@ -1,10 +1,8 @@
-import type { ScheduleData } from "./types.d";
+import type { GroupScheduleItem } from "./types.d";
 import { generateScheduleIcal, mergeAdjacentScheduleItems } from "../shared/ical";
 
-type ScheduleItem = ScheduleData[string][number];
-
 export function generateIcal(
-  items: ScheduleItem[],
+  items: GroupScheduleItem[],
   now: Date = new Date(),
   options?: {
     combineAdjacentPairs?: boolean;

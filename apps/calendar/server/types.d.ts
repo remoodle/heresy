@@ -1,4 +1,4 @@
-type GroupScheduleItem = {
+export type GroupScheduleItem = {
   id: string;
   start: string;
   end: string;
@@ -27,8 +27,6 @@ export type ScheduleFilter = {
   };
 };
 
-type GroupSchedule = GroupScheduleItem[];
+export type GroupSchedule = GroupScheduleItem[];
 
-export type ScheduleData = {
-  [group: string]: GroupSchedule;
-};
+export type Groups = string[];

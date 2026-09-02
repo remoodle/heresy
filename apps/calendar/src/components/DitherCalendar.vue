@@ -32,8 +32,7 @@ function calendarTone(x: number, y: number) {
   // Header, binding rings, and the line below the month.
   if (x >= 5 && x <= 22 && y >= 5 && y <= 7) tone = Math.max(tone, 0.42);
   if (y === 8 && x >= 4 && x <= 23) tone = 0.9;
-  if ((x === 8 || x === 9 || x === 18 || x === 19) && y >= 2 && y <= 5)
-    tone = 1;
+  if ((x === 8 || x === 9 || x === 18 || x === 19) && y >= 2 && y <= 5) tone = 1;
 
   // Quiet calendar grid.
   if ((x === 10 || x === 16) && y >= 10 && y <= 17) tone = Math.max(tone, 0.24);
@@ -57,13 +56,7 @@ for (let y = 0; y < height; y += 1) {
     const threshold = (bayer[y % 4]![x % 4]! + 0.5) / 16;
     const alternateThreshold = (bayer[(y + 1) % 4]![(x + 1) % 4]! + 0.5) / 16;
     const opacity =
-      tone >= 0.85
-        ? 1
-        : tone >= threshold
-          ? 0.82
-          : tone + 0.16 >= threshold
-            ? 0.2
-            : 0;
+      tone >= 0.85 ? 1 : tone >= threshold ? 0.82 : tone + 0.16 >= threshold ? 0.2 : 0;
     const alternateOpacity =
       tone >= 0.85
         ? 1
