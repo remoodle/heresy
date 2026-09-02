@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.20.0](https://github.com/remoodle/heresy/compare/remoodle-v0.19.3...remoodle-v0.20.0) (2026-09-02)
+
+
+### Features
+
+* setup vite-plus properly ([49640b2](https://github.com/remoodle/heresy/commit/49640b209902ebe5d59cc715c7864604af244352))
+
+
+### Bug Fixes
+
+* **remoodle:** remove stale .npmrc from Docker build ([0f03860](https://github.com/remoodle/heresy/commit/0f03860a831f96877263e163f37ec0a3bae04d90))
+
+
+### Miscellaneous Chores
+
+* clean up agent skills ([2389d09](https://github.com/remoodle/heresy/commit/2389d0940972420b2eac683d403a7b1dae469f74))
+* sync repository contents from remoodle/temp ([82fbe19](https://github.com/remoodle/heresy/commit/82fbe19924ab57c0307a9bd4cd65ae02fa7f0db1))
+
 ## [0.19.3](https://github.com/remoodle/heresy/compare/remoodle-v0.19.2...remoodle-v0.19.3) (2026-05-03)
 
 
