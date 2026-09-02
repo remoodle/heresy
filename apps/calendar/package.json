@@ -60,7 +60,6 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.26.1",
-    "@nerdfolio/drizzle-d1-helpers": "^0.1.5",
     "@tailwindcss/typography": "^0.5.16",
     "@tsconfig/node24": "^24.0.4",
     "@types/better-sqlite3": "^7.6.13",
