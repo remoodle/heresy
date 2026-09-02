@@ -1,4 +1,6 @@
+import * as v from "valibot";
 import { formatLesson, type GroupScheduleItem } from "./model.js";
+import { DuScheduleResponseSchema } from "./schemas.js";
 
 const BASE_URL = "https://du.astanait.edu.kz:8765";
 
@@ -11,13 +13,9 @@ export class DuScheduleClient {
   async scheduleForGroup(group: string): Promise<GroupScheduleItem[]> {
     const path = `/astanait-schedule-module/api/v1/schedule/groupName/${encodeURIComponent(group)}`;
     const response = await this.fetchWithRetry(new URL(path, BASE_URL));
-    const value: unknown = await response.json();
+    const { body } = v.parse(DuScheduleResponseSchema, await response.json());
 
-    if (!isRecord(value) || !Array.isArray(value.body)) {
-      throw new Error(`DU returned an invalid schedule for ${group}`);
-    }
-
-    return value.body.flatMap((lesson) => {
+    return body.flatMap((lesson) => {
       const formatted = formatLesson(lesson);
       return formatted ? [formatted] : [];
     });
@@ -48,8 +46,4 @@ export class DuScheduleClient {
       ? lastError
       : new Error("DU request failed");
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
 }

@@ -1,17 +1,16 @@
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import * as v from "valibot";
+import { GroupsFileSchema } from "./schemas.js";
 
 export async function readGroups(path: string): Promise<string[]> {
-  const value: unknown = JSON.parse(await readFile(path, "utf8"));
-
-  if (
-    !Array.isArray(value) ||
-    !value.every((group) => typeof group === "string")
-  ) {
-    throw new Error(`${path} must contain a JSON array of group names`);
+  try {
+    return v.parse(GroupsFileSchema, await readFile(path, "utf8"));
+  } catch (error) {
+    throw new Error(`${path} must contain a JSON array of group names`, {
+      cause: error,
+    });
   }
-
-  return value;
 }
 
 export async function writeJson(path: string, value: unknown): Promise<void> {

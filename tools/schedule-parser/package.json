@@ -11,7 +11,8 @@
     "test": "pnpm build && node --test dist/test/**/*.node-test.js"
   },
   "dependencies": {
-    "pdf-parse": "^2.4.5"
+    "pdf-parse": "^2.4.5",
+    "valibot": "^1.4.2"
   },
   "devDependencies": {
     "@types/node": "^24.12.2",
