@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up pnpm and Node.js
-        uses: pnpm/setup@v2
+        uses: pnpm/setup@v2.1.0
         with:
           runtime: node@22
           working-directory: tools/schedule-parser
