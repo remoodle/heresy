@@ -24,4 +24,4 @@ for (const file of readdirSync(join(dataDirectory, "schedules"))) {
   if (!response.ok) throw new Error(`Failed to upload ${group}: ${response.status}`);
 }
 
-console.log(`Uploaded ${groups.length} groups and their schedules`);
+console.log(`Seeded ${groups.length} groups and their schedules`);
