@@ -3,7 +3,7 @@ import { Icon } from "@iconify/vue";
 import { watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AuthDialog from "@/components/AuthDialog.vue";
-import DitherCalendar from "@/components/DitherCalendar.vue";
+import LandingCalendar from "@/components/LandingCalendar.vue";
 import { Button } from "@/components/ui/button";
 import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 import { useSessionQuery } from "@/lib/api/session";
@@ -22,254 +22,184 @@ watch(session, (currentSession) => {
 
 <template>
   <div class="landing-page">
-    <header class="landing-header">
-      <a href="/" class="landing-brand">
-        <span class="landing-brand__mark" aria-hidden="true">
-          <span />
-          <span />
-        </span>
-        ReMoodle Calendar
-      </a>
-
-      <nav class="landing-nav" aria-label="Site links">
-        <a
-          href="https://github.com/remoodle/heresy"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="landing-link"
-        >
-          GitHub
-          <Icon icon="mdi:arrow-top-right" aria-hidden="true" />
-        </a>
-        <ThemeSwitcher />
-      </nav>
+    <header class="landing-header landing-rule">
+      <a href="/" class="landing-brand">ReMoodle Calendar</a>
+      <ThemeSwitcher />
     </header>
-
-    <main class="landing-main">
-      <section class="landing-copy" aria-labelledby="landing-title">
-        <h1 id="landing-title">Classes and deadlines in one calendar.</h1>
-        <p>
-          Your AITU timetable and Moodle deadlines, together. Export everything to the calendar you
-          already use.
-        </p>
-
-        <div class="landing-action">
-          <AuthDialog v-if="!isLoading" :callback-u-r-l="callbackURL">
-            <Button>
-              Sign in
-              <Icon icon="mdi:arrow-right" aria-hidden="true" />
-            </Button>
-          </AuthDialog>
-          <span v-else class="landing-loading" aria-live="polite">Checking your session…</span>
-          <span class="landing-hint">Use your AITU Microsoft account</span>
-        </div>
+    <main>
+      <LandingCalendar />
+      <section class="landing-action landing-rule" aria-label="Get started">
+        <AuthDialog v-if="!isLoading" :callback-u-r-l="callbackURL">
+          <Button class="landing-sign-in">
+            Access your schedule
+            <Icon icon="lucide:arrow-right" aria-hidden="true" />
+          </Button>
+        </AuthDialog>
+        <Button v-else disabled class="landing-sign-in" aria-live="polite"
+          >Checking your session…</Button
+        >
       </section>
-
-      <div class="landing-illustration">
-        <DitherCalendar />
-      </div>
+      <section class="landing-copy landing-rule" aria-labelledby="landing-title">
+        <h1 id="landing-title">Know what's next.</h1>
+        <p class="landing-description">
+          Your AITU classes and Moodle deadlines, together in one calendar.
+        </p>
+        <ul class="landing-features">
+          <li>
+            <Icon icon="lucide:calendar-days" aria-hidden="true" /><span
+              >Plan your week around your classes</span
+            >
+          </li>
+          <li>
+            <Icon icon="lucide:circle-check" aria-hidden="true" /><span
+              >See which assignments are due next</span
+            >
+          </li>
+          <li>
+            <Icon icon="lucide:calendar-arrow-down" aria-hidden="true" /><span
+              >Add your schedule to your calendar app</span
+            >
+          </li>
+        </ul>
+      </section>
     </main>
-
-    <footer class="landing-footer">
+    <footer class="landing-footer landing-rule">
       <span>Made for AITU students</span>
-      <span>Schedule · Moodle deadlines · iCal export</span>
+      <a href="https://github.com/remoodle/heresy" target="_blank" rel="noopener noreferrer">
+        GitHub <Icon icon="lucide:arrow-up-right" aria-hidden="true" />
+      </a>
     </footer>
   </div>
 </template>
 
 <style scoped>
 .landing-page {
-  width: min(100% - 40px, 840px);
+  width: min(100% - 40px, 672px);
+  min-height: 100svh;
   margin-inline: auto;
+  border-inline: 1px solid var(--border);
   color: var(--foreground);
 }
-
+/* Extend the section rules beyond the column without creating horizontal overflow. */
+.landing-rule {
+  position: relative;
+}
+.landing-rule::before {
+  position: absolute;
+  inset: 0 calc((100% - 100vw) / 2) auto;
+  height: 1px;
+  background: var(--border);
+  content: "";
+  pointer-events: none;
+}
 .landing-header {
   display: flex;
-  min-height: 64px;
+  min-height: 56px;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--border);
+  padding: 8px 24px;
 }
-
-.landing-brand,
-.landing-link {
-  color: inherit;
+.landing-header::before {
+  top: auto;
+  bottom: 0;
+}
+.landing-brand {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
   text-decoration: none;
 }
-
-.landing-brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.landing-action {
+  padding: 10px 24px;
 }
-
-.landing-brand__mark {
-  position: relative;
+.landing-sign-in {
+  width: 100%;
+  height: 42px;
+  justify-content: space-between;
+  padding-inline: 16px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.landing-sign-in:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 4px;
+}
+.landing-copy {
+  padding: 22px 32px 24px;
+}
+h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2rem);
+  line-height: 1.12;
+  font-weight: 550;
+  letter-spacing: -0.045em;
+}
+.landing-description {
+  max-width: 510px;
+  margin: 12px 0 0;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.landing-features {
   display: grid;
-  width: 15px;
-  height: 15px;
-  grid-template-columns: repeat(2, 3px);
-  grid-template-rows: repeat(2, 3px);
-  place-content: center;
-  gap: 2px;
-  border: 1px solid currentColor;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
 }
-
-.landing-brand__mark::before,
-.landing-brand__mark::after {
-  position: absolute;
-  top: -3px;
-  width: 1px;
-  height: 4px;
-  background: currentColor;
-  content: "";
-}
-
-.landing-brand__mark::before {
-  left: 3px;
-}
-
-.landing-brand__mark::after {
-  right: 3px;
-}
-
-.landing-brand__mark span {
-  width: 3px;
-  height: 3px;
-  background: currentColor;
-  opacity: 0.45;
-}
-
-.landing-nav {
+.landing-features li {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 13px;
+  font-size: 14px;
 }
-
-.landing-link {
+.landing-features svg {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  color: var(--primary);
+}
+.landing-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.landing-footer a {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  color: var(--muted-foreground);
-  font-size: 0.8125rem;
-  text-underline-offset: 3px;
+  gap: 4px;
+  text-underline-offset: 4px;
 }
-
-.landing-link:hover {
+.landing-footer a:hover {
   color: var(--foreground);
   text-decoration: underline;
 }
-
-.landing-link svg {
+.landing-footer svg {
   width: 14px;
   height: 14px;
 }
-
-.landing-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 260px;
-  align-items: center;
-  gap: 64px;
-  padding-block: 88px 82px;
-}
-
-.landing-copy h1 {
-  max-width: 520px;
-  margin: 0;
-  font-size: clamp(2rem, 5vw, 2.75rem);
-  font-weight: 600;
-  line-height: 1.08;
-  letter-spacing: -0.045em;
-  text-wrap: balance;
-}
-
-.landing-copy > p {
-  max-width: 450px;
-  margin: 22px 0 0;
-  color: var(--muted-foreground);
-  font-size: 0.9375rem;
-  line-height: 1.65;
-}
-
-.landing-action {
-  display: flex;
-  min-height: 36px;
-  align-items: center;
-  gap: 14px;
-  margin-top: 30px;
-}
-
-.landing-hint,
-.landing-loading {
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
-}
-
-.landing-illustration {
-  display: flex;
-  justify-content: center;
-}
-
-.landing-footer {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--muted-foreground);
-  font-size: 0.75rem;
-}
-
-@media (max-width: 700px) {
-  .landing-main {
-    grid-template-columns: 1fr;
-    gap: 52px;
-    padding-block: 64px 58px;
-  }
-
-  .landing-illustration {
-    justify-content: flex-start;
-  }
-}
-
 @media (max-width: 480px) {
   .landing-page {
-    width: min(100% - 32px, 840px);
+    width: calc(100% - 24px);
   }
-
-  .landing-header {
-    min-height: 58px;
-  }
-
-  .landing-link {
-    font-size: 0;
-  }
-
-  .landing-link svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  .landing-main {
-    gap: 42px;
-    padding-block: 52px 48px;
-  }
-
-  .landing-action {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 9px;
-  }
-
+  .landing-header,
+  .landing-action,
   .landing-footer {
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
-    gap: 4px;
-    padding-block: 14px;
+    padding-inline: 16px;
+  }
+  .landing-copy {
+    padding: 20px;
+  }
+  .landing-brand {
+    font-size: 12px;
+  }
+  .landing-features li {
+    font-size: 13px;
   }
 }
 </style>
