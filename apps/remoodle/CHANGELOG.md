@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.21.0](https://github.com/remoodle/heresy/compare/remoodle-v0.20.0...remoodle-v0.21.0) (2026-09-17)
+
+
+### Features
+
+* update bot calendar integration ([09e42df](https://github.com/remoodle/heresy/commit/09e42df004b88312cb29c597eaf967088c78b892))
+* update bot filters ([0141676](https://github.com/remoodle/heresy/commit/0141676408f0264eae7a585df61c84be52bdfab3))
+* update connection flow ([8122a5d](https://github.com/remoodle/heresy/commit/8122a5da9ea374d85f0b1962d58bac513002daee))
+* update logger ([8899de0](https://github.com/remoodle/heresy/commit/8899de06ed323d35a937e95b038315f5f72997e0))
+
+
+### Miscellaneous Chores
+
+* install and use anti-slop ([fd423e5](https://github.com/remoodle/heresy/commit/fd423e53106e6d96e606a6abeefbe7dcde1d5b0c))
+
 ## [0.20.0](https://github.com/remoodle/heresy/compare/remoodle-v0.19.3...remoodle-v0.20.0) (2026-09-10)
 
 
