@@ -1,8 +1,8 @@
-import { log } from "evlog";
 import { hydrate } from "@grammyjs/hydrate";
 import { Bot, MemorySessionStorage, session } from "grammy";
 import type { Context, SessionData } from "./context";
 import type { ShortCache } from "../library/short-cache";
+import { logger } from "../library/logger";
 import { coursesFeature } from "./features/courses";
 import { deadlinesFeature } from "./features/deadlines";
 import { scheduleFeature } from "./features/schedule";
@@ -44,12 +44,15 @@ export function createBot(token: string, shortCache: ShortCache) {
   });
 
   bot.catch((err) => {
-    log.error({
-      module: "bot",
-      operation: "update",
-      error: err.error instanceof Error ? err.error : new Error(String(err.error)),
-      update: err.ctx.update,
-    });
+    logger.error(
+      {
+        module: "bot",
+        operation: "update",
+        err: err.error instanceof Error ? err.error : new Error(String(err.error)),
+        update: err.ctx.update,
+      },
+      "bot update failed",
+    );
     err.ctx.answerCallbackQuery().catch(() => {});
   });
 

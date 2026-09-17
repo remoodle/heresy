@@ -1,121 +1,41 @@
-import {
-  type LogExtra,
-  Logger,
-  LogLevelEnum,
-  type LogLevel,
-} from "@hatchet-dev/typescript-sdk/util/logger";
-import { log } from "evlog";
+import { type LogExtra, Logger, type LogLevel } from "@hatchet-dev/typescript-sdk/util/logger";
+import { logger } from "../library/logger";
 
-type HatchetLogEvent = {
-  source: "hatchet";
-  module: "worker";
-  operation: "hatchet";
-  message: string;
-  error?: Error;
-  hatchet: {
-    context: string;
-    configuredLevel: LogLevel;
-    level: Exclude<LogLevel, "OFF">;
-    extra?: LogExtra;
-    utilKey?: string;
-  };
-};
+export class PinoHatchetLogger extends Logger {
+  private readonly log;
 
-function isLevelEnabled(level: Exclude<LogLevel, "OFF">, configuredLevel: LogLevel) {
-  return LogLevelEnum[level] >= LogLevelEnum[configuredLevel];
-}
-
-function emitHatchetLog(event: HatchetLogEvent) {
-  switch (event.hatchet.level) {
-    case "DEBUG":
-      log.debug(event);
-
-      return;
-    case "WARN":
-      log.warn(event);
-
-      return;
-    case "ERROR":
-      log.error(event);
-
-      return;
-    default:
-      log.info(event);
-  }
-}
-
-export class EvlogHatchetLogger extends Logger {
-  constructor(
-    private readonly context: string,
-    private readonly logLevel: LogLevel = "INFO",
-  ) {
+  constructor(context: string, logLevel: LogLevel = "INFO") {
     super();
-  }
-
-  private write(
-    level: Exclude<LogLevel, "OFF">,
-    message: string,
-    extra?: LogExtra,
-    error?: Error,
-    utilKey?: string,
-  ) {
-    if (!isLevelEnabled(level, this.logLevel)) {
-      return;
-    }
-
-    const hatchet: HatchetLogEvent["hatchet"] = {
-      context: this.context,
-      configuredLevel: this.logLevel,
-      level,
-    };
-
-    if (extra && Object.keys(extra).length > 0) {
-      hatchet.extra = extra;
-    }
-
-    if (utilKey) {
-      hatchet.utilKey = utilKey;
-    }
-
-    const event: HatchetLogEvent = {
-      source: "hatchet",
-      module: "worker",
-      operation: "hatchet",
-      message,
-      hatchet,
-    };
-
-    if (error) {
-      event.error = error;
-    }
-
-    emitHatchetLog(event);
+    this.log = logger.child(
+      { module: "worker", operation: "hatchet", context },
+      { level: logLevel === "OFF" ? "silent" : logLevel.toLowerCase() },
+    );
   }
 
   override debug(message: string, extra?: LogExtra) {
-    this.write("DEBUG", message, extra);
+    this.log.debug(extra, message);
   }
 
   override info(message: string, extra?: LogExtra) {
-    this.write("INFO", message, extra);
+    this.log.info(extra, message);
   }
 
   override green(message: string, extra?: LogExtra) {
-    this.write("INFO", message, extra);
+    this.log.info(extra, message);
   }
 
   override warn(message: string, error?: Error, extra?: LogExtra) {
-    this.write("WARN", message, extra, error);
+    this.log.warn({ ...extra, err: error }, message);
   }
 
   override error(message: string, error?: Error, extra?: LogExtra) {
-    this.write("ERROR", message, extra, error);
+    this.log.error({ ...extra, err: error }, message);
   }
 
   override util(key: string, message: string, extra?: LogExtra) {
-    this.write("DEBUG", message, extra, undefined, key);
+    this.log.debug({ ...extra, utilKey: key }, message);
   }
 }
 
 export const createHatchetLogger = (context: string, logLevel?: LogLevel) =>
-  new EvlogHatchetLogger(context, logLevel);
+  new PinoHatchetLogger(context, logLevel);
