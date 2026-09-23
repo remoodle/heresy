@@ -7,6 +7,8 @@ import {
   buildTodayScheduleMessage,
   DEFAULT_SCHEDULE_FILTERS,
   getAlmatyDateParts,
+  getDayName,
+  getScheduleForDay,
   mergeAdjacentScheduleItems,
   normalizeDigestWeekdays,
   normalizeScheduleFilters,
@@ -96,7 +98,24 @@ export const digestUser = hatchet.task<Input>({
       ? mergeAdjacentScheduleItems(filteredItems)
       : filteredItems;
 
-    const message = buildTodayScheduleMessage(toWeeklySchedule(items, now), now, "My DU");
+    const weeklySchedule = toWeeklySchedule(items, now);
+    const todaySchedule = getScheduleForDay(weeklySchedule, getDayName(now));
+
+    if (todaySchedule.length === 0) {
+      await db
+        .insert(sentNotifications)
+        .values({ userId: input.userId, eventId, triggeredAt: now })
+        .onConflictDoNothing();
+
+      await ctx.logger.info("skipped empty digest", {
+        telegramId: input.telegramId,
+        dateKey: dateParts.dateKey,
+      });
+
+      return;
+    }
+
+    const message = buildTodayScheduleMessage(weeklySchedule, now, "My DU");
 
     const replyMarkup = {
       inline_keyboard: [[{ text: m.ui_close(), callback_data: "remove_message" }]],
