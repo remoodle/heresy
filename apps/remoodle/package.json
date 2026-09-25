@@ -28,6 +28,7 @@
     "@grammyjs/hydrate": "^1.6.0",
     "@hatchet-dev/typescript-sdk": "catalog:",
     "@libsql/client": "^0.17.2",
+    "@loglayer/transport-pino": "catalog:",
     "better-all": "catalog:",
     "callback-data": "^1.1.1",
     "dayjs": "catalog:",
@@ -36,6 +37,7 @@
     "envalid": "catalog:",
     "grammy": "^1.38.3",
     "hono": "catalog:",
+    "loglayer": "catalog:",
     "lru-cache": "catalog:",
     "pino": "catalog:"
   },

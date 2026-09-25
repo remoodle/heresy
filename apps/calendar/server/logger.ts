@@ -1,15 +1,12 @@
-import pino from "pino";
+import { pino } from "pino";
 import { LogLayer } from "loglayer";
 import { PinoTransport } from "@loglayer/transport-pino";
-import { env } from "../config";
 
 export const logger = new LogLayer({
   transport: new PinoTransport({
     logger: pino({
-      base: {
-        service: "remoodle",
-        environment: env.NODE_ENV,
-      },
+      base: { service: "calendar-api" },
+      level: "trace",
     }),
   }),
 });

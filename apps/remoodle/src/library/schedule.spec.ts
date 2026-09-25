@@ -94,6 +94,14 @@ describe("schedule merging", () => {
     ]);
   });
 
+  test("merges adjacent pairs when only their undisplayed teachers differ", () => {
+    const second = { ...sampleItems[1]!, teacher: "Replacement teacher" };
+
+    expect(mergeAdjacentScheduleItems([sampleItems[0]!, second])).toStrictEqual([
+      { ...sampleItems[0], end: second.end },
+    ]);
+  });
+
   test("normalizes filters with merge enabled by default", () => {
     expect(DEFAULT_SCHEDULE_FILTERS.combineAdjacentPairs).toBe(true);
     expect(normalizeScheduleFilters(null).combineAdjacentPairs).toBe(true);

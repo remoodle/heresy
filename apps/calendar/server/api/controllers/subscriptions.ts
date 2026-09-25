@@ -48,7 +48,7 @@ async function parseFilters(c: Parameters<typeof requireSession>[0]) {
 
 export const subscriptionsController = new Hono<AppEnv>()
   .get("/api/ical/:token", async (c) => {
-    c.get("log").set({ ical: { tokenProvided: true } });
+    c.var.logger.withContext({ ical: { tokenProvided: true } });
     const db = createDb(c.env.DB);
 
     const [tokenRow] = await db
@@ -111,7 +111,7 @@ export const subscriptionsController = new Hono<AppEnv>()
         target: icalTokens.userId,
         set: { token, filters, createdAt: new Date() },
       });
-    c.get("log").set({ ical: { hasFilters: true } });
+    c.var.logger.withContext({ ical: { hasFilters: true } });
     const subscription = { token, url: `${c.env.BETTER_AUTH_URL}/api/ical/${token}` };
 
     return c.json(subscription);
@@ -127,7 +127,7 @@ export const subscriptionsController = new Hono<AppEnv>()
       .returning({ id: icalTokens.id });
 
     if (!changed.length) throw new HTTPException(404, { message: "Token not found" });
-    c.get("log").set({ ical: { hasFilters: true } });
+    c.var.logger.withContext({ ical: { hasFilters: true } });
 
     return c.json({ ok: true });
   });

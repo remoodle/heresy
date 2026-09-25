@@ -10,7 +10,7 @@ import { scheduleReminderCheck } from "./workflows/schedule-reminder-check";
 import { scheduleReminderCheckUser } from "./workflows/schedule-reminder-check-user";
 import { TELEGRAM_RATE_LIMIT_KEY, telegramSendMessage } from "./workflows/telegram-send-message";
 
-const log = logger.child({ module: "worker", operation: "startup" });
+const log = logger.child().withContext({ module: "worker", operation: "startup" });
 
 async function main() {
   log.info("creating Hatchet worker");
@@ -34,13 +34,12 @@ async function main() {
     ],
   });
 
-  log.info({ worker: "remoodle-worker" }, "Hatchet worker started");
+  log.withMetadata({ worker: "remoodle-worker" }).info("Hatchet worker started");
   await worker.start();
 }
 
 main().catch((error) => {
-  log.error(
-    { err: error instanceof Error ? error : new Error(String(error)) },
-    "worker startup failed",
-  );
+  log
+    .withError(error instanceof Error ? error : new Error(String(error)))
+    .error("worker startup failed");
 });

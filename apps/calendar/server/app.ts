@@ -1,24 +1,14 @@
-import { createAuthMiddleware } from "evlog/better-auth";
-import { evlog } from "evlog/hono";
+import { honoLogLayer } from "@loglayer/hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import type { AppEnv } from "./context";
-import { createEvlogAuth } from "./api/middleware/auth";
 import { apiRouter } from "./api/router";
+import { logger } from "./logger";
 
 const app = new Hono<AppEnv>();
 
-app.use("*", evlog());
-
-app.use("*", async (c, next) => {
-  const identify = createAuthMiddleware(createEvlogAuth(c.env), {
-    exclude: ["/api/auth/**"],
-  });
-
-  await identify(c.get("log"), c.req.raw.headers, c.req.path);
-  await next();
-});
+app.use("*", honoLogLayer({ instance: logger }));
 
 app.use("*", cors());
 
@@ -40,7 +30,7 @@ export const route = app.route("/", apiRouter);
 
 app.onError((error, c) => {
   const status = error instanceof HTTPException ? error.status : 500;
-  c.get("log").error(error, { status });
+  c.var.logger.withError(error).withMetadata({ status }).error("request failed");
 
   return c.json(
     { status, message: status === 500 ? "Something went wrong. Please try again." : error.message },

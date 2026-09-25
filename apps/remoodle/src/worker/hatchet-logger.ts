@@ -1,4 +1,5 @@
 import { type LogExtra, Logger, type LogLevel } from "@hatchet-dev/typescript-sdk/util/logger";
+import type { LogLevelType } from "loglayer";
 import { logger } from "../library/logger";
 
 export class PinoHatchetLogger extends Logger {
@@ -6,34 +7,60 @@ export class PinoHatchetLogger extends Logger {
 
   constructor(context: string, logLevel: LogLevel = "INFO") {
     super();
-    this.log = logger.child(
-      { module: "worker", operation: "hatchet", context },
-      { level: logLevel === "OFF" ? "silent" : logLevel.toLowerCase() },
-    );
+    this.log = logger.child().withContext({ module: "worker", operation: "hatchet", context });
+
+    if (logLevel === "OFF") {
+      this.log.disableLogging();
+    } else {
+      let level: LogLevelType;
+
+      switch (logLevel) {
+        case "DEBUG":
+          level = "debug";
+          break;
+        case "INFO":
+          level = "info";
+          break;
+        case "WARN":
+          level = "warn";
+          break;
+        case "ERROR":
+          level = "error";
+          break;
+      }
+
+      this.log.setLevel(level);
+    }
   }
 
   override debug(message: string, extra?: LogExtra) {
-    this.log.debug(extra, message);
+    this.log.withMetadata(extra ?? {}).debug(message);
   }
 
   override info(message: string, extra?: LogExtra) {
-    this.log.info(extra, message);
+    this.log.withMetadata(extra ?? {}).info(message);
   }
 
   override green(message: string, extra?: LogExtra) {
-    this.log.info(extra, message);
+    this.log.withMetadata(extra ?? {}).info(message);
   }
 
   override warn(message: string, error?: Error, extra?: LogExtra) {
-    this.log.warn({ ...extra, err: error }, message);
+    this.log
+      .withMetadata(extra ?? {})
+      .withError(error)
+      .warn(message);
   }
 
   override error(message: string, error?: Error, extra?: LogExtra) {
-    this.log.error({ ...extra, err: error }, message);
+    this.log
+      .withMetadata(extra ?? {})
+      .withError(error)
+      .error(message);
   }
 
   override util(key: string, message: string, extra?: LogExtra) {
-    this.log.debug({ ...extra, utilKey: key }, message);
+    this.log.withMetadata({ ...extra, utilKey: key }).debug(message);
   }
 }
 

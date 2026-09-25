@@ -184,10 +184,6 @@ function canMergeScheduleItems(current: CalendarScheduleItem, next: CalendarSche
     return false;
   }
 
-  if (current.teacher !== next.teacher) {
-    return false;
-  }
-
   if (current.type !== next.type) {
     return false;
   }

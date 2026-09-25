@@ -44,15 +44,14 @@ export function createBot(token: string, shortCache: ShortCache) {
   });
 
   bot.catch((err) => {
-    logger.error(
-      {
+    logger
+      .withMetadata({
         module: "bot",
         operation: "update",
-        err: err.error instanceof Error ? err.error : new Error(String(err.error)),
         update: err.ctx.update,
-      },
-      "bot update failed",
-    );
+      })
+      .withError(err.error instanceof Error ? err.error : new Error(String(err.error)))
+      .error("bot update failed");
     err.ctx.answerCallbackQuery().catch(() => {});
   });
 

@@ -34,7 +34,7 @@ export const remoodleController = new Hono<AppEnv>()
         createdAt: now,
       }),
     ]);
-    c.get("log").set({ remoodleConnect: { expiresAt: expiresAt.toISOString() } });
+    c.var.logger.withContext({ remoodleConnect: { expiresAt: expiresAt.toISOString() } });
     const result = { token, expiresAt: expiresAt.toISOString() };
 
     return c.json(result);
@@ -62,7 +62,7 @@ export const remoodleController = new Hono<AppEnv>()
       .limit(1);
 
     if (!account) throw new HTTPException(404, { message: "User not found" });
-    c.get("log").set({ remoodleConnect: { userId: account.id } });
+    c.var.logger.withContext({ remoodleConnect: { userId: account.id } });
     const result = { userId: account.id, email: account.email };
 
     return c.json(result);

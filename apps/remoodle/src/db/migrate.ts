@@ -6,7 +6,7 @@ import { db } from "./index";
 
 const migrationsFolder = join(dirname(fileURLToPath(import.meta.url)), "migrations");
 
-const log = logger.child({ module: "db", operation: "migrate" });
+const log = logger.child().withContext({ module: "db", operation: "migrate" });
 
 log.info("running migrations");
 
@@ -17,9 +17,8 @@ const run = async () => {
 };
 
 run().catch((error) => {
-  log.error(
-    { err: error instanceof Error ? error : new Error(String(error)) },
-    "migrations failed",
-  );
+  log
+    .withError(error instanceof Error ? error : new Error(String(error)))
+    .error("migrations failed");
   process.exit(1);
 });

@@ -4,25 +4,24 @@ import { createShortCache } from "../library/short-cache";
 import { createBot } from "./bot";
 import { BOT_COMMANDS } from "./commands";
 
-const log = logger.child({ module: "bot", operation: "startup" });
+const log = logger.child().withContext({ module: "bot", operation: "startup" });
 
 async function main() {
   const shortCache = createShortCache();
   const bot = createBot(config.telegram.token, shortCache);
 
   await bot.api.setMyCommands(BOT_COMMANDS);
-  log.info({ commandCount: BOT_COMMANDS.length }, "bot commands configured");
+  log.withMetadata({ commandCount: BOT_COMMANDS.length }).info("bot commands configured");
 
   await bot.start({
     onStart: (info) => {
-      log.info({ username: info.username }, "bot started");
+      log.withMetadata({ username: info.username }).info("bot started");
     },
   });
 }
 
 main().catch((error) => {
-  log.error(
-    { err: error instanceof Error ? error : new Error(String(error)) },
-    "bot startup failed",
-  );
+  log
+    .withError(error instanceof Error ? error : new Error(String(error)))
+    .error("bot startup failed");
 });
