@@ -1,8 +1,8 @@
-import app, { route } from "./app";
+import app from "./app";
 import type { Bindings } from "./context";
 import { syncDueSchedules } from "./jobs/sync-schedules";
 
-export type AppType = typeof route;
+export type { AppType } from "./app";
 
 export default {
   fetch: app.fetch,

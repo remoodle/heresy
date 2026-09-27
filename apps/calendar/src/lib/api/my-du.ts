@@ -1,3 +1,4 @@
+import type { InferRequestType } from "hono/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/vue-query";
 import { client, parseResponse } from "./client";
 import { useSessionQuery } from "./session";
@@ -41,9 +42,6 @@ export function useMyDuActions() {
   return { start, connect, sync, disconnect };
 }
 
-export type MyDuConnectionInput = {
-  callbackUrl: string;
-  studyYear: number;
-  term: number;
-  firstWeekStart: string;
-};
+export type MyDuConnectionInput = InferRequestType<
+  (typeof client.api.user)["my-du"]["connect"]["$post"]
+>["json"];

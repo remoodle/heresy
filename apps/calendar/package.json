@@ -22,6 +22,7 @@
     "deploy": "vp run db:migrate-remote && wrangler deploy"
   },
   "dependencies": {
+    "@hono/zod-validator": "catalog:",
     "@iconify/vue": "^5.0.0",
     "@internationalized/date": "^3.8.2",
     "@loglayer/hono": "catalog:",

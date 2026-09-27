@@ -15,6 +15,7 @@ allowBuilds:
 
 catalog:
   "@hatchet-dev/typescript-sdk": ^1.19.1
+  "@hono/zod-validator": ^0.9.1
   "@inlang/paraglide-js": ^2.16.0
   "@inlang/plugin-message-format": ^4.4.0
   "@loglayer/hono": ^2.4.0

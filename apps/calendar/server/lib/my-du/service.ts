@@ -18,7 +18,7 @@ import {
   type MyDuConnection,
 } from "./repository";
 import { normalizeWeek } from "./schedule";
-import { connectMyDuSchema, parseMyDuResponse, termLengthSchema } from "./schemas";
+import { parseMyDuResponse, termLengthSchema, type MyDuConnectInput } from "./schemas";
 
 const LOGIN_TTL = 10 * 60_000;
 
@@ -87,18 +87,8 @@ export async function startLogin(env: Env, userId: string) {
 export async function completeLogin(
   env: Env,
   userId: string,
-  input: Parameters<typeof connectMyDuSchema.safeParse>[0],
+  { callbackUrl, ...settings }: MyDuConnectInput,
 ) {
-  const result = connectMyDuSchema.safeParse(input);
-
-  if (!result.success) {
-    throw new HTTPException(400, {
-      message: "Check the connection link, academic year, period, and Monday of teaching week 1.",
-      cause: result.error,
-    });
-  }
-
-  const { callbackUrl, ...settings } = result.data;
   const db = createDb(env.DB);
   const pending = await findLoginRequest(db, userId);
 

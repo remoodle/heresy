@@ -6,36 +6,23 @@ import type { AppEnv } from "./context";
 import { apiRouter } from "./api/router";
 import { logger } from "./logger";
 
-const app = new Hono<AppEnv>();
+const app = new Hono<AppEnv>()
+  .use(honoLogLayer({ instance: logger }))
+  .use(cors())
+  .route("/api", apiRouter)
+  .onError((error, c) => {
+    const status = error instanceof HTTPException ? error.status : 500;
+    c.var.logger.withError(error).withMetadata({ status }).error("request failed");
 
-app.use("*", honoLogLayer({ instance: logger }));
+    return c.json(
+      {
+        status,
+        message: status === 500 ? "Something went wrong. Please try again." : error.message,
+      },
+      status,
+    );
+  });
 
-app.use("*", cors());
-
-app.use("/api/user/*", async (c, next) => {
-  c.header("Cache-Control", "no-store");
-
-  if (!["GET", "HEAD", "OPTIONS"].includes(c.req.method)) {
-    const origin = c.req.header("Origin");
-
-    if (origin !== new URL(c.env.BETTER_AUTH_URL).origin) {
-      throw new HTTPException(403, { message: "Invalid request origin" });
-    }
-  }
-
-  await next();
-});
-
-export const route = app.route("/", apiRouter);
-
-app.onError((error, c) => {
-  const status = error instanceof HTTPException ? error.status : 500;
-  c.var.logger.withError(error).withMetadata({ status }).error("request failed");
-
-  return c.json(
-    { status, message: status === 500 ? "Something went wrong. Please try again." : error.message },
-    status,
-  );
-});
+export type AppType = typeof app;
 
 export default app;

@@ -10,6 +10,9 @@ catalogs:
     '@hatchet-dev/typescript-sdk':
       specifier: ^1.19.1
       version: 1.21.0
+    '@hono/zod-validator':
+      specifier: ^0.9.1
+      version: 0.9.1
     '@inlang/paraglide-js':
       specifier: ^2.16.0
       version: 2.16.0
@@ -153,6 +156,9 @@ importers:
 
   apps/calendar:
     dependencies:
+      '@hono/zod-validator':
+        specifier: 'catalog:'
+        version: 0.9.1(hono@4.12.14)(zod@4.5.4)
       '@iconify/vue':
         specifier: ^5.0.0
         version: 5.0.0(vue@3.5.32(typescript@5.9.3))
@@ -1550,6 +1556,12 @@ packages:
 
   '@hatchet-dev/typescript-sdk@1.21.0':
     resolution: {integrity: sha512-qKBhwWVYWDoAfja6i2JBtIQtkZbLyFXTqmUSJ0tu3uD+56Mu5+atu+VcM6mzHt4s72HKURadBf/sOne1UgyJhg==}
+
+  '@hono/zod-validator@0.9.1':
+    resolution: {integrity: sha512-iiv6w0qrIc0arfvCtUqBWsvl4fXjzaTcQcCJTTtCnkawF9HHGE+KjEl0ox3gQJ6rKZEgE3mLExlQCF72M+mNuw==}
+    peerDependencies:
+      hono: '>=4.11.2'
+      zod: ^3.25.0 || ^4.0.0
 
   '@humanfs/core@0.19.1':
     resolution: {integrity: sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA==}
@@ -7013,6 +7025,11 @@ snapshots:
     transitivePeerDependencies:
       - debug
       - supports-color
+
+  '@hono/zod-validator@0.9.1(hono@4.12.14)(zod@4.5.4)':
+    dependencies:
+      hono: 4.12.14
+      zod: 4.5.4
 
   '@humanfs/core@0.19.1': {}
 

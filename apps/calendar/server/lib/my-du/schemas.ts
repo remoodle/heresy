@@ -19,10 +19,8 @@ export type MyDuCredentials = z.infer<typeof credentialsSchema>;
 export const connectMyDuSchema = z
   .object({
     callbackUrl: z.string().trim().min(1).max(20_000),
-    studyYear: z.coerce.number().int().min(2020).max(2100),
-    term: z.coerce
-      .number()
-      .pipe(z.union([z.literal(-1), z.literal(1), z.literal(2), z.literal(3)])),
+    studyYear: z.number().int().min(2020).max(2100),
+    term: z.number().pipe(z.union([z.literal(-1), z.literal(1), z.literal(2), z.literal(3)])),
     firstWeekStart: z.string(),
   })
   .superRefine((settings, context) => {
@@ -42,7 +40,9 @@ export const connectMyDuSchema = z
     }
   });
 
-export type MyDuSettings = Omit<z.infer<typeof connectMyDuSchema>, "callbackUrl">;
+export type MyDuConnectInput = z.infer<typeof connectMyDuSchema>;
+
+export type MyDuSettings = Omit<MyDuConnectInput, "callbackUrl">;
 
 const classTimeSchema = z.object({
   id: z.number().int().safe(),
