@@ -102,6 +102,27 @@ describe("schedule merging", () => {
     ]);
   });
 
+  test("merges adjacent pairs of dated items that repeat across weeks", () => {
+    const dated = (date: string, hour: number) => ({
+      ...sampleItems[0]!,
+      id: `${date}-${hour}`,
+      start: `${date} ${hour}:00`,
+      end: `${date} ${hour}:50`,
+    });
+
+    const merged = mergeAdjacentScheduleItems([
+      dated("2026-09-24", 19),
+      dated("2026-09-24", 20),
+      dated("2026-10-01", 19),
+      dated("2026-10-01", 20),
+    ]);
+
+    expect(merged.map((item) => [item.start, item.end])).toStrictEqual([
+      ["2026-09-24 19:00", "2026-09-24 20:50"],
+      ["2026-10-01 19:00", "2026-10-01 20:50"],
+    ]);
+  });
+
   test("normalizes filters with merge enabled by default", () => {
     expect(DEFAULT_SCHEDULE_FILTERS.combineAdjacentPairs).toBe(true);
     expect(normalizeScheduleFilters(null).combineAdjacentPairs).toBe(true);

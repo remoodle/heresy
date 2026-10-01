@@ -219,6 +219,15 @@ export function mergeAdjacentScheduleItems(items: CalendarScheduleItem[]): Calen
       return weekdayDiff;
     }
 
+    // Workers merge dated items ("2026-10-01 19:00") before bucketing them into a week, so the
+    // day key is an ISO date rather than a weekday name. Keep each date contiguous, otherwise
+    // the same slot from other weeks sorts in between and splits the pair.
+    const dayDiff = aStart.weekday.localeCompare(bStart.weekday);
+
+    if (dayDiff !== 0) {
+      return dayDiff;
+    }
+
     return toMinutes(aStart) - toMinutes(bStart);
   });
 
