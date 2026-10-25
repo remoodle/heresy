@@ -10,6 +10,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "main": "@tanstack/react-start/server-entry",
   "preview_urls": true,
+  // Required by `wrangler preview`, which Workers Builds runs for non-production branches.
+  "previews": {},
   "vars": {
     // Server-to-server origin of the remoodle API. `.dev.vars` points it at the local API.
     "API_URL": "https://api.remoodle.app",

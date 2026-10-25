@@ -2,6 +2,8 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "docs",
   "compatibility_date": "2025-09-06",
+  // Required by `wrangler preview`, which Workers Builds runs for non-production branches.
+  "previews": {},
   "assets": {
     "directory": ".vitepress/dist",
   },
