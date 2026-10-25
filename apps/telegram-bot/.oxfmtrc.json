@@ -10,5 +10,6 @@
       ["value-parent", "value-sibling", "value-index"],
       "unknown"
     ]
-  }
+  },
+  "ignorePatterns": ["src/i18n"]
 }

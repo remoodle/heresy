@@ -1,6 +1,6 @@
 import { InlineKeyboard } from "grammy";
 import { config } from "../config";
-import { m } from "@heresy/shared/i18n/messages";
+import { m } from "../i18n/messages.js";
 import {
   aboutCallback,
   menuCallback,

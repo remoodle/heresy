@@ -317,6 +317,9 @@ importers:
       '@grammyjs/hydrate':
         specifier: ^1.6.0
         version: 1.6.0(grammy@1.42.0(supports-color@10.2.2))
+      '@hatchet-dev/typescript-sdk':
+        specifier: 'catalog:'
+        version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       '@loglayer/transport-pino':
         specifier: 'catalog:'
         version: 3.3.0(pino@10.3.1)
@@ -357,9 +360,18 @@ importers:
       '@heresy/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@inlang/paraglide-js':
+        specifier: 'catalog:'
+        version: 2.16.0
+      '@inlang/plugin-message-format':
+        specifier: 'catalog:'
+        version: 4.4.0
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.2
+      npm-run-all2:
+        specifier: 'catalog:'
+        version: 8.0.4
       pino-pretty:
         specifier: 'catalog:'
         version: 13.1.3
@@ -409,18 +421,12 @@ importers:
         specifier: 'catalog:'
         version: 4.5.4
     devDependencies:
-      '@inlang/paraglide-js':
+      '@hatchet-dev/typescript-sdk':
         specifier: 'catalog:'
-        version: 2.16.0
-      '@inlang/plugin-message-format':
-        specifier: 'catalog:'
-        version: 4.4.0
+        version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.2
-      npm-run-all2:
-        specifier: 'catalog:'
-        version: 8.0.4
       typescript:
         specifier: 'catalog:'
         version: 5.9.3

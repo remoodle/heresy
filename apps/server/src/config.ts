@@ -6,8 +6,7 @@ export const env = cleanEnv(process.env, {
     choices: ["development", "test", "production", "staging"],
     default: "development",
   }),
-  // The worker sends notifications through the bot without running it.
-  TELEGRAM_BOT_TOKEN: str(),
+  // Links into the bot, such as web sign-in and connection screens.
   TELEGRAM_BOT_USERNAME: str({ default: "feathermoodbot" }),
   // Shared with the Telegram bot, which calls the API on behalf of any Telegram user.
   BOT_API_SECRET: str(),
@@ -22,7 +21,6 @@ export const env = cleanEnv(process.env, {
 
 export const config = {
   telegram: {
-    token: env.TELEGRAM_BOT_TOKEN,
     url: `https://t.me/${env.TELEGRAM_BOT_USERNAME}`,
   },
   hatchet: {

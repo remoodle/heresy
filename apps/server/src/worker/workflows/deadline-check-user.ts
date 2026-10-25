@@ -1,5 +1,5 @@
 import { database } from "../../db";
-import { buildReminderMessage, trackDeadlineReminders } from "@heresy/shared/deadline-reminders";
+import { trackDeadlineReminders } from "../../library/deadline-reminders";
 import { hatchet } from "../hatchet-client";
 import { deadlineNotifyUser } from "./deadline-notify-user";
 
@@ -45,7 +45,7 @@ export const deadlineCheckUser = hatchet.task<Input>({
       return;
     }
 
-    const message = buildReminderMessage(events, pending);
+    const remindedIds = new Set(pending.map((reminder) => reminder.eventId));
 
     await ctx.logger.info("queueing reminder delivery", {
       userId: input.userId,
@@ -56,7 +56,7 @@ export const deadlineCheckUser = hatchet.task<Input>({
     await deadlineNotifyUser.runNoWait({
       chatId: input.telegramId,
       userId: input.userId,
-      message,
+      events: events.filter((event) => remindedIds.has(event.uid)),
       reminders: pending.map((reminder) => ({
         eventId: reminder.eventId,
         triggeredAt: reminder.triggeredAt.getTime(),

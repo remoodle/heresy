@@ -1,6 +1,5 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": ["src/i18n"],
   "sortImports": {
     "newlinesBetween": false,
     "groups": [

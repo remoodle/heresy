@@ -6,17 +6,14 @@ import {
   normalizeScheduleFilters,
   type ScheduleFilters,
 } from "@heresy/shared/schedule/filters";
-import { buildTodayScheduleMessage } from "@heresy/shared/schedule/messages";
 import {
   getDayName,
   getScheduleForDay,
   mergeAdjacentScheduleItems,
   toWeeklySchedule,
 } from "@heresy/shared/schedule/week";
-import { m } from "@heresy/shared/i18n/messages";
-import { CLEAR_MESSAGE_CALLBACK } from "@heresy/shared/telegram-bot";
 import { hatchet } from "../hatchet-client";
-import { telegramSendMessage } from "./telegram-send-message";
+import { notify } from "../notify";
 
 const CRON_WINDOW_MINUTES = 10;
 
@@ -102,13 +99,10 @@ export const digestUser = hatchet.task<Input>({
       return;
     }
 
-    const message = buildTodayScheduleMessage(weeklySchedule, now);
-
-    const replyMarkup = {
-      inline_keyboard: [[{ text: m.ui_close(), callback_data: CLEAR_MESSAGE_CALLBACK }]],
-    };
-
-    await telegramSendMessage.run({ chatId: input.telegramId, message, replyMarkup });
+    await notify({
+      chatId: input.telegramId,
+      notification: { kind: "digest", items: todaySchedule },
+    });
 
     await database.sentNotifications.record(input.userId, [{ eventId, triggeredAt: now }]);
 

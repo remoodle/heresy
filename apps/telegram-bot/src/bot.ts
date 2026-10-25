@@ -1,7 +1,7 @@
 import { hydrate } from "@grammyjs/hydrate";
 import { Bot, MemorySessionStorage, session } from "grammy";
 import type { Context, SessionData } from "./context";
-import { CLEAR_MESSAGE_CALLBACK } from "@heresy/shared/telegram-bot";
+import { clearMessageCallback } from "./callback-data";
 import { logger } from "./logger";
 import { coursesFeature } from "./features/courses";
 import { deadlinesFeature } from "./features/deadlines";
@@ -31,7 +31,7 @@ export function createBot(token: string) {
   bot.use(coursesFeature);
   bot.use(scheduleFeature);
 
-  bot.callbackQuery(CLEAR_MESSAGE_CALLBACK, async (ctx) => {
+  bot.callbackQuery(clearMessageCallback, async (ctx) => {
     try {
       await ctx.deleteMessage();
     } catch {

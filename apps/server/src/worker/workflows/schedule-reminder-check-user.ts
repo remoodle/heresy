@@ -1,5 +1,4 @@
 import { database } from "../../db";
-import { m } from "@heresy/shared/i18n/messages";
 import { durationToMs } from "@heresy/shared/dates";
 import {
   applyScheduleFilters,
@@ -8,11 +7,8 @@ import {
   type ScheduleFilters,
 } from "@heresy/shared/schedule/filters";
 import { mergeAdjacentScheduleItems } from "@heresy/shared/schedule/week";
-import { extractRoomCode } from "@heresy/shared/rooms";
-import { bold } from "@heresy/shared/telegram-html";
-import { CLEAR_MESSAGE_CALLBACK, roomPhotoCallbackData } from "@heresy/shared/telegram-bot";
 import { hatchet } from "../hatchet-client";
-import { telegramSendMessage } from "./telegram-send-message";
+import { notify } from "../notify";
 
 type Input = {
   userId: number;
@@ -37,33 +33,6 @@ function almatyDateStr(utcMs: number): string {
   const day = String(d.getUTCDate()).padStart(2, "0");
 
   return `${y}-${m}-${day}`;
-}
-
-function buildClassReminderMessage(
-  items: {
-    courseName: string;
-    start: string;
-    end: string;
-    isOnline: boolean;
-    location: string;
-    minsUntil: number;
-  }[],
-): string {
-  const lines = items.map((item) => {
-    const startTime = item.start.split(" ")[1] ?? item.start;
-    const endTime = item.end.split(" ")[1] ?? item.end;
-    const location = item.isOnline ? m.location_online() : item.location;
-
-    return m.class_reminder_item({
-      time: bold(`${startTime} – ${endTime}`),
-      course: item.courseName,
-      location,
-    });
-  });
-
-  const minsUntil = items[0]!.minsUntil;
-
-  return `${bold(m.class_reminder_header({ minutes: minsUntil }))}\n\n${lines.join("\n\n")}`;
 }
 
 export const scheduleReminderCheckUser = hatchet.task<Input>({
@@ -113,48 +82,14 @@ export const scheduleReminderCheckUser = hatchet.task<Input>({
       return;
     }
 
-    const message = buildClassReminderMessage(
-      toSend.map((u) => ({
-        courseName: u.item.courseName,
-        start: u.item.start,
-        end: u.item.end,
-        isOnline: u.item.isOnline,
-        location: u.item.location,
-        minsUntil: u.minsUntil,
-      })),
-    );
-
-    // Build keyboard: room photo buttons for each unique offline room, then close
-    const seenRooms = new Set<string>();
-
-    for (const { item } of toSend) {
-      if (!item.isOnline) {
-        const code = extractRoomCode(item.location);
-
-        if (code) seenRooms.add(code);
-      }
-    }
-
-    const roomRows: { text: string; callback_data: string }[][] = [];
-    const roomEntries = Array.from(seenRooms);
-
-    for (let i = 0; i < roomEntries.length; i += 2) {
-      roomRows.push(
-        roomEntries.slice(i, i + 2).map((code) => ({
-          text: m.ui_room_map({ room: code }),
-          callback_data: roomPhotoCallbackData(code),
-        })),
-      );
-    }
-
-    const replyMarkup = {
-      inline_keyboard: [
-        ...roomRows,
-        [{ text: m.ui_close(), callback_data: CLEAR_MESSAGE_CALLBACK }],
-      ],
-    };
-
-    await telegramSendMessage.run({ chatId: input.telegramId, message, replyMarkup });
+    await notify({
+      chatId: input.telegramId,
+      notification: {
+        kind: "classes",
+        minutesUntil: toSend[0]!.minsUntil,
+        items: toSend.map((u) => u.item),
+      },
+    });
 
     await database.sentNotifications.record(
       input.userId,

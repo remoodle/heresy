@@ -1,8 +1,8 @@
 import { Composer } from "grammy";
 import type { Context } from "../context";
 import { fetchDeadlines, findAccount } from "../server";
-import { buildDeadlinesMessage } from "@heresy/shared/deadline-reminders";
-import { m } from "@heresy/shared/i18n/messages";
+import { buildDeadlinesMessage } from "../format/deadlines";
+import { m } from "../i18n/messages.js";
 import { deadlinesCallback } from "../callback-data";
 import { buildBackToMenuKeyboard } from "../keyboards/menu";
 

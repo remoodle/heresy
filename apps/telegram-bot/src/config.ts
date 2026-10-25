@@ -14,6 +14,8 @@ export const env = cleanEnv(process.env, {
   // The server owns every account and connection; the bot only talks to its API.
   API_URL: str({ default: "http://localhost:3000" }),
   BOT_API_SECRET: str(),
+  // Runs the notify task the server's worker sends reminders through.
+  HATCHET_CLIENT_TOKEN: str(),
   // Public origin of the web calendar, linked from the menu.
   CALENDAR_URL: str({ default: "http://localhost:5173" }),
   CABGEN_CDN_URL: str({ default: "https://cabgen.remoodle.app" }),
@@ -22,6 +24,9 @@ export const env = cleanEnv(process.env, {
 export const config = {
   telegram: {
     token: env.TELEGRAM_BOT_TOKEN,
+  },
+  hatchet: {
+    token: env.HATCHET_CLIENT_TOKEN,
   },
   api: {
     url: env.API_URL,

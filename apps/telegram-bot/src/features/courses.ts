@@ -1,8 +1,8 @@
 import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { fetchSchedule, findAccount, updateAccount } from "../server";
-import { m } from "@heresy/shared/i18n/messages";
-import { bold } from "@heresy/shared/telegram-html";
+import { m } from "../i18n/messages.js";
+import { bold } from "../format/telegram-html";
 import { settingLabel, shownHidden } from "../keyboards/labels";
 import {
   courseScheduleCallback,

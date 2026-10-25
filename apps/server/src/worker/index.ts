@@ -1,4 +1,3 @@
-import { RateLimitDuration } from "@hatchet-dev/typescript-sdk";
 import { logger } from "../library/logger";
 import { hatchet } from "./hatchet-client";
 import { calendarFetchUser } from "./workflows/calendar-fetch-user";
@@ -9,18 +8,11 @@ import { digestUser } from "./workflows/digest-user";
 import { myDuSync, myDuSyncUser } from "./workflows/my-du-sync";
 import { scheduleReminderCheck } from "./workflows/schedule-reminder-check";
 import { scheduleReminderCheckUser } from "./workflows/schedule-reminder-check-user";
-import { TELEGRAM_RATE_LIMIT_KEY, telegramSendMessage } from "./workflows/telegram-send-message";
 
 const log = logger.child().withContext({ module: "worker", operation: "startup" });
 
 async function main() {
   log.info("creating Hatchet worker");
-
-  await hatchet.ratelimits.upsert({
-    key: TELEGRAM_RATE_LIMIT_KEY,
-    limit: 30,
-    duration: RateLimitDuration.SECOND,
-  });
 
   const worker = await hatchet.worker("remoodle-worker", {
     workflows: [
@@ -33,7 +25,6 @@ async function main() {
       myDuSync,
       myDuSyncUser,
       scheduleReminderCheckUser,
-      telegramSendMessage,
     ],
   });
 

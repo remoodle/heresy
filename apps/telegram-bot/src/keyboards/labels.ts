@@ -1,4 +1,4 @@
-import { m } from "@heresy/shared/i18n/messages";
+import { m } from "../i18n/messages.js";
 
 // Button conventions: a setting shows its current value after a colon, and the
 // chosen option in a list is marked with a bullet. Buttons carry no emoji.
