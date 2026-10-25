@@ -82,4 +82,10 @@ export const confirmDeleteAccountCallback = createCallbackData("confirm_delete_a
   confirmed: String,
 });
 
+// Also on class reminders, which carry a button per room.
+export const roomPhotoCallback = createCallbackData("room_photo", { room: String });
+
+// Deletes the message. Notifications use it as their "Close" button.
+export const clearMessageCallback = "remove_message";
+
 export const closeMessageCallback = createCallbackData("close_msg", {});

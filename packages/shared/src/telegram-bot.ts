@@ -1,14 +1,23 @@
-// Contracts between the server, which links to and messages through the bot, and the bot itself.
+import type { DeadlineEvent } from "./moodle/deadlines";
+import type { ScheduleItem } from "./schedule/items";
+
+// Contracts between the server and the Telegram bot.
 
 // `/start` payloads. The web calendar sends users to the bot for everything it cannot do itself.
 export const START_PAYLOADS = { myDu: "my_du", moodle: "moodle", loginPrefix: "login_" } as const;
 
-// Attached to notifications the worker sends; the bot deletes the message when it is pressed.
-export const CLEAR_MESSAGE_CALLBACK = "remove_message";
+// The worker decides who is notified and when; the bot owns the texts, so it renders and sends
+// them from this Hatchet task. The worker records a notification once the task completes.
+export const TELEGRAM_NOTIFY_TASK = "telegram-notify";
 
-// The worker builds these buttons without grammY, so both sides share the plain format.
-export function roomPhotoCallbackData(room: string) {
-  return `room_photo:${room}`;
-}
+// Telegram allows about 30 messages per second across all chats.
+export const TELEGRAM_RATE_LIMIT_KEY = "telegram-global";
 
-export const ROOM_PHOTO_CALLBACK_PATTERN = /^room_photo:(.+)$/;
+export type TelegramNotification = {
+  chatId: number;
+  notification:
+    | { kind: "deadlines"; events: DeadlineEvent[] }
+    | { kind: "classes"; minutesUntil: number; items: ScheduleItem[] }
+    // Today's classes, from `toWeeklySchedule`.
+    | { kind: "digest"; items: ScheduleItem[] };
+};

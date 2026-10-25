@@ -13,16 +13,16 @@ import {
   server,
   type Account,
 } from "../server";
-import { bold } from "@heresy/shared/telegram-html";
+import { bold } from "../format/telegram-html";
 import { applyScheduleFilters } from "@heresy/shared/schedule/filters";
-import { buildClassBreakdown } from "@heresy/shared/schedule/messages";
+import { buildClassBreakdown } from "../format/schedule";
 import {
   getDayName,
   getScheduleForDay,
   mergeAdjacentScheduleItems,
   toWeeklySchedule,
 } from "@heresy/shared/schedule/week";
-import { m } from "@heresy/shared/i18n/messages";
+import { m } from "../i18n/messages.js";
 import {
   aboutCallback,
   menuCallback,

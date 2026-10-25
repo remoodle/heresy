@@ -4,13 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts | pino-pretty",
+    "dev": "run-s paraglide:compile dev:run",
+    "dev:run": "tsx watch src/index.ts | pino-pretty",
     "start": "node dist/index.mjs",
-    "build": "vp pack",
-    "type-check": "tsc --noEmit"
+    "paraglide:compile": "paraglide-js compile --project ./project.inlang --outdir ./src/i18n --strategy baseLocale --emit-ts-declarations --no-emit-prettier-ignore --no-emit-readme",
+    "build": "run-s paraglide:compile build:ts",
+    "build:ts": "vp pack",
+    "test": "run-s paraglide:compile test:vitest",
+    "test:vitest": "vp test",
+    "type-check": "run-s paraglide:compile type-check:ts",
+    "type-check:ts": "tsc --noEmit"
   },
   "dependencies": {
     "@grammyjs/hydrate": "^1.6.0",
+    "@hatchet-dev/typescript-sdk": "catalog:",
     "@loglayer/transport-pino": "catalog:",
     "better-all": "catalog:",
     "callback-data": "^1.1.1",
@@ -26,7 +33,10 @@
   },
   "devDependencies": {
     "@heresy/shared": "workspace:*",
+    "@inlang/paraglide-js": "catalog:",
+    "@inlang/plugin-message-format": "catalog:",
     "@types/node": "catalog:",
+    "npm-run-all2": "catalog:",
     "pino-pretty": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:",

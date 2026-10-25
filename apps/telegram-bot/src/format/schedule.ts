@@ -1,13 +1,13 @@
 import { m } from "../i18n/messages.js";
-import { bold } from "../telegram-html";
-import type { ScheduleItem } from "./items";
+import { bold } from "./telegram-html";
+import type { ScheduleItem } from "@heresy/shared/schedule/items";
 import {
   WEEK_DAY_ORDER,
   extractTime,
   getDayName,
   getRemainingDaysOfWeek,
   getScheduleForDay,
-} from "./week";
+} from "@heresy/shared/schedule/week";
 
 // Bot messages expect items from `toWeeklySchedule`, keyed by weekday name.
 
@@ -139,4 +139,20 @@ export function buildNextWeekScheduleMessage(items: ScheduleItem[]): string {
   }
 
   return `${header}\n${sections.join("\n\n")}`;
+}
+
+export function buildClassReminderMessage(items: ScheduleItem[], minutesUntil: number): string {
+  const lines = items.map((item) => {
+    const startTime = item.start.split(" ")[1] ?? item.start;
+    const endTime = item.end.split(" ")[1] ?? item.end;
+    const location = item.isOnline ? m.location_online() : item.location;
+
+    return m.class_reminder_item({
+      time: bold(`${startTime} – ${endTime}`),
+      course: item.courseName,
+      location,
+    });
+  });
+
+  return `${bold(m.class_reminder_header({ minutes: minutesUntil }))}\n\n${lines.join("\n\n")}`;
 }

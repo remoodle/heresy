@@ -1,15 +1,14 @@
 import { Composer, InputFile, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
 import { config } from "../config";
-import { m } from "@heresy/shared/i18n/messages";
-import { ROOM_PHOTO_CALLBACK_PATTERN, roomPhotoCallbackData } from "@heresy/shared/telegram-bot";
+import { m } from "../i18n/messages.js";
 import { fetchSchedule, findAccount, type Account } from "../server";
 import { applyScheduleFilters } from "@heresy/shared/schedule/filters";
 import {
   buildTodayScheduleMessage,
   buildWeeklyScheduleMessage,
   buildNextWeekScheduleMessage,
-} from "@heresy/shared/schedule/messages";
+} from "../format/schedule";
 import {
   getScheduleForDay,
   getScheduleForDays,
@@ -19,12 +18,13 @@ import {
   mergeAdjacentScheduleItems,
   toWeeklySchedule,
 } from "@heresy/shared/schedule/week";
-import { getUniqueRooms, sanitizeRoomFilename } from "@heresy/shared/rooms";
+import { getUniqueRooms, sanitizeRoomFilename } from "../rooms";
 import {
   scheduleCallback,
   scheduleViewCallback,
   menuCallback,
   closeMessageCallback,
+  roomPhotoCallback,
 } from "../callback-data";
 
 export const composer = new Composer<Context>();
@@ -96,7 +96,7 @@ function buildScheduleKeyboard(view: ScheduleView, rooms: string[], hasThisWeek:
       keyboard.row();
 
       for (const room of rooms.slice(i, i + 2)) {
-        keyboard.text(m.ui_room_map({ room }), roomPhotoCallbackData(room));
+        keyboard.text(m.ui_room_map({ room }), roomPhotoCallback.pack({ room }));
       }
     }
   }
@@ -235,9 +235,8 @@ feature.callbackQuery(scheduleViewCallback.filter(), async (ctx) => {
   });
 });
 
-// Reminders from the worker carry these buttons too.
-feature.callbackQuery(ROOM_PHOTO_CALLBACK_PATTERN, async (ctx) => {
-  const room = ctx.match[1];
+feature.callbackQuery(roomPhotoCallback.filter(), async (ctx) => {
+  const { room } = roomPhotoCallback.unpack(ctx.callbackQuery.data);
   const url = `${config.roomsCdnUrl}/${sanitizeRoomFilename(room)}.png`;
 
   await ctx.answerCallbackQuery();

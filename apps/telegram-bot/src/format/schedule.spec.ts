@@ -4,8 +4,8 @@ import {
   buildNextWeekScheduleMessage,
   buildWeeklyScheduleMessage,
   classifyScheduleItem,
-} from "./messages";
-import { weeklyItems } from "../fixtures/schedule";
+} from "./schedule";
+import { weeklyItems } from "@heresy/shared/fixtures/schedule";
 
 describe("weekly schedule views", () => {
   test("this week message does not include earlier days", () => {

@@ -1,6 +1,6 @@
 import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
-import { m } from "@heresy/shared/i18n/messages";
+import { m } from "../i18n/messages.js";
 import {
   MY_DU_TERMS,
   parseFirstWeekStart,
@@ -9,7 +9,7 @@ import {
 } from "@heresy/shared/my-du/period";
 import { START_PAYLOADS } from "@heresy/shared/telegram-bot";
 import { isUserFacing, read, registerAccount, server } from "../server";
-import { bold, italic } from "@heresy/shared/telegram-html";
+import { bold, italic } from "../format/telegram-html";
 import {
   myDuCallback,
   myDuDisconnectCallback,

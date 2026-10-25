@@ -1,12 +1,15 @@
 import { Composer, InlineKeyboard } from "grammy";
 import type { Context } from "../context";
-import { MAX_CLASS_REMINDER_MINUTES, MAX_THRESHOLDS } from "@heresy/shared/settings";
+import {
+  AVAILABLE_THRESHOLDS,
+  MAX_CLASS_REMINDER_MINUTES,
+  MAX_THRESHOLDS,
+} from "@heresy/shared/settings";
 import { findAccount, read, server, updateAccount, type Account } from "../server";
 import { durationToMs, formatDuration } from "@heresy/shared/dates";
-import { AVAILABLE_THRESHOLDS } from "@heresy/shared/deadline-reminders";
 import { isValidDigestTime, DIGEST_WEEKDAYS } from "@heresy/shared/schedule/digest";
-import { m } from "@heresy/shared/i18n/messages";
-import { bold, code } from "@heresy/shared/telegram-html";
+import { m } from "../i18n/messages.js";
+import { bold, code } from "../format/telegram-html";
 import {
   settingsCallback,
   deadlinesSettingsCallback,

@@ -1,5 +1,5 @@
 import type { BotCommand } from "grammy/types";
-import { m } from "@heresy/shared/i18n/messages";
+import { m } from "./i18n/messages.js";
 
 export const BOT_COMMANDS: BotCommand[] = [
   { command: "start", description: m.command_open_menu() },
