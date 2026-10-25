@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.2](https://github.com/remoodle/heresy/compare/remoodle-v2.0.1...remoodle-v2.0.2) (2026-10-25)
+
+
+### Bug Fixes
+
+* **calendar,docs:** add wrangler previews block for preview deploys ([edfe960](https://github.com/remoodle/heresy/commit/edfe9604fcef80a38c8ba126459fa0e28aa35daa))
+
+
+### Code Refactoring
+
+* **server:** keep the Hatchet logger in the worker and trigger telegram-notify via a stub ([35ba39e](https://github.com/remoodle/heresy/commit/35ba39eba8aac5814f47e20b8dbd1f582b277546))
+
 ## [2.0.1](https://github.com/remoodle/heresy/compare/remoodle-v2.0.0...remoodle-v2.0.1) (2026-10-25)
 
 
