@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { defaultMoodleFilters } from "@remoodle/library/moodle/events";
-import { defaultFilters, scheduleFilterSchema } from "@remoodle/library/schedule/items";
+import { defaultMoodleFilters } from "@heresy/shared/moodle/events";
+import { defaultFilters, scheduleFilterSchema } from "@heresy/shared/schedule/items";
 
 export const FILTERS_STORAGE_KEY = "remoodle-filters";
 

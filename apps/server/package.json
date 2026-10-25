@@ -1,0 +1,49 @@
+{
+  "name": "@heresy/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "run-p dev:api dev:worker",
+    "dev:api": "tsx watch src/bin.ts api | pino-pretty",
+    "dev:worker": "tsx src/bin.ts worker | pino-pretty",
+    "start:api": "node dist/bin.mjs api",
+    "start:worker": "node dist/bin.mjs worker",
+    "build": "vp pack",
+    "test": "vp test",
+    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@hatchet-dev/typescript-sdk": "catalog:",
+    "@hono/node-server": "catalog:",
+    "@hono/zod-validator": "catalog:",
+    "@libsql/client": "^0.17.2",
+    "@loglayer/hono": "catalog:",
+    "@loglayer/transport-pino": "catalog:",
+    "better-all": "catalog:",
+    "dayjs": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "envalid": "catalog:",
+    "hono": "catalog:",
+    "ical.js": "catalog:",
+    "loglayer": "catalog:",
+    "pino": "catalog:",
+    "temporal-polyfill": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@heresy/shared": "workspace:*",
+    "@types/node": "catalog:",
+    "drizzle-kit": "catalog:",
+    "npm-run-all2": "catalog:",
+    "pino-pretty": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

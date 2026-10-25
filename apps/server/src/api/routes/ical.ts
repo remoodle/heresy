@@ -1,0 +1,72 @@
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
+import { config } from "../../config";
+import { database } from "../../db";
+import { randomToken } from "../../library/crypto";
+import {
+  generateCalendarEventsIcal,
+  mergeAdjacentCalendarEvents,
+  scheduleToCalendarEvents,
+} from "@heresy/shared/ical";
+import { filterSchedule, scheduleFilterSchema } from "@heresy/shared/schedule/items";
+import type { AppEnv, UserEnv } from "../context";
+import { privateResponse, requireUser } from "../middleware/auth";
+import { jsonBody } from "../validator";
+
+const filtersBody = jsonBody(
+  z.object({ filters: scheduleFilterSchema }),
+  "Invalid calendar filters",
+);
+
+function subscriptionUrl(token: string) {
+  return `${config.api.url}/api/ical/${token}`;
+}
+
+// Public feed for calendar apps; the unguessable token is the only credential.
+export const icalFeed = new Hono<AppEnv>().get("/:token", async (c) => {
+  const row = await database.icalTokens.findByToken(c.req.param("token"));
+
+  if (!row) throw new HTTPException(404, { message: "Token not found" });
+
+  const { filters } = row;
+
+  const events = scheduleToCalendarEvents(
+    filterSchedule(await database.myDu.findSchedule(row.userId), filters),
+  );
+
+  const ical = generateCalendarEventsIcal(
+    filters.ical?.combineAdjacentPairs ? mergeAdjacentCalendarEvents(events) : events,
+    filters.ical?.startDate,
+    filters.ical?.endDate,
+  );
+
+  return c.body(ical, 200, {
+    "Content-Type": "text/calendar; charset=utf-8",
+    "Content-Disposition": 'inline; filename="calendar.ics"',
+  });
+});
+
+export const icalToken = new Hono<UserEnv>()
+  .use(privateResponse, requireUser)
+  .get("/", async (c) => {
+    const row = await database.icalTokens.findByUserId(c.var.user.id);
+
+    return c.json(row ? { url: subscriptionUrl(row.token), filters: row.filters } : null, 200);
+  })
+  .post("/", filtersBody, async (c) => {
+    const { filters } = c.req.valid("json");
+    const token = randomToken();
+    await database.icalTokens.upsert(c.var.user.id, token, filters);
+
+    return c.json({ url: subscriptionUrl(token), filters }, 200);
+  })
+  .patch("/", filtersBody, async (c) => {
+    const { filters } = c.req.valid("json");
+
+    if (!(await database.icalTokens.updateFilters(c.var.user.id, filters))) {
+      throw new HTTPException(404, { message: "Generate a subscription link first." });
+    }
+
+    return c.json({ ok: true }, 200);
+  });

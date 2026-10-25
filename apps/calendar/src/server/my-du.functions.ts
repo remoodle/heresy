@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { myDuConnectSchema, myDuPeriodSchema } from "@remoodle/library/my-du/schemas";
+import { myDuConnectSchema, myDuPeriodSchema } from "@heresy/shared/my-du/period";
 import { readApi } from "./remoodle-api.server";
 import { sessionMiddleware } from "./session-middleware";
 
