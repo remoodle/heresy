@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.0.1](https://github.com/remoodle/heresy/compare/remoodle-v2.0.0...remoodle-v2.0.1) (2026-10-25)
+
+
+### Code Refactoring
+
+* **telegram-bot:** own every user-facing text, including notifications ([#589](https://github.com/remoodle/heresy/issues/589)) ([3678f00](https://github.com/remoodle/heresy/commit/3678f00c9c50df544265943df67d89b448b44deb))
+
 ## [2.0.0](https://github.com/remoodle/heresy/compare/remoodle-v1.0.0...remoodle-v2.0.0) (2026-10-25)
 
 
