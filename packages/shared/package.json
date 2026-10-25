@@ -1,0 +1,34 @@
+{
+  "name": "@heresy/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./i18n/*": "./src/i18n/*.js",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "build": "paraglide-js compile --project ./project.inlang --outdir ./src/i18n --strategy baseLocale --emit-ts-declarations --no-emit-prettier-ignore --no-emit-readme",
+    "test": "run-s build test:vitest",
+    "test:vitest": "vp test",
+    "type-check": "run-s build type-check:ts",
+    "type-check:ts": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@loglayer/transport-pino": "catalog:",
+    "dayjs": "catalog:",
+    "loglayer": "catalog:",
+    "pino": "catalog:",
+    "temporal-polyfill": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@inlang/paraglide-js": "catalog:",
+    "@inlang/plugin-message-format": "catalog:",
+    "@types/node": "catalog:",
+    "npm-run-all2": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

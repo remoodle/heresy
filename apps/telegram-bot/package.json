@@ -1,0 +1,36 @@
+{
+  "name": "@heresy/telegram-bot",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts | pino-pretty",
+    "start": "node dist/index.mjs",
+    "build": "vp pack",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@grammyjs/hydrate": "^1.6.0",
+    "@loglayer/transport-pino": "catalog:",
+    "better-all": "catalog:",
+    "callback-data": "^1.1.1",
+    "dayjs": "catalog:",
+    "dotenv": "catalog:",
+    "envalid": "catalog:",
+    "grammy": "^1.38.3",
+    "hono": "catalog:",
+    "loglayer": "catalog:",
+    "pino": "catalog:",
+    "temporal-polyfill": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@heresy/shared": "workspace:*",
+    "@types/node": "catalog:",
+    "pino-pretty": "catalog:",
+    "tsx": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  }
+}

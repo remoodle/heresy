@@ -4,7 +4,7 @@
     "target": "ES2023",
     "jsx": "react-jsx",
     "module": "ESNext",
-    // ES2023 types are needed by the remoodle API modules reached through `AppType`.
+    // ES2023 types are needed by the server API modules reached through `AppType`.
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "node"],
     "moduleResolution": "bundler",
@@ -18,7 +18,8 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@remoodle/*": ["../remoodle/src/*"]
+      // Type-only: the calendar reads the API's routes from the server source.
+      "@heresy/server/api": ["../server/src/api/app.ts"]
     }
   }
 }

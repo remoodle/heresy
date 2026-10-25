@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "strict": true,
+    "types": ["node"],
+    "verbatimModuleSyntax": true,
+    "noUncheckedIndexedAccess": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "noImplicitThis": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["./src/**/*.ts", "./src/**/*.d.ts", "drizzle.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

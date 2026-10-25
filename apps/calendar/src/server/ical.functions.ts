@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { scheduleFilterSchema } from "@remoodle/library/schedule/items";
+import { scheduleFilterSchema } from "@heresy/shared/schedule/items";
 import { readApi } from "./remoodle-api.server";
 import { sessionMiddleware } from "./session-middleware";
 

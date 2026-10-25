@@ -18,8 +18,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      // Pure modules and API types shared with the remoodle backend.
-      "@remoodle": fileURLToPath(new URL("../remoodle/src", import.meta.url)),
     },
   },
   test: {

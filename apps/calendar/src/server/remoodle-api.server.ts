@@ -1,6 +1,6 @@
 import { DetailedError, hc, parseResponse, type ClientResponse } from "hono/client";
 import { z } from "zod";
-import type { AppType } from "@remoodle/api/app";
+import type { AppType } from "@heresy/server/api";
 
 const errorBody = z.object({ message: z.string() });
 

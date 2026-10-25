@@ -15,8 +15,8 @@ import {
   generateCalendarEventsIcal,
   mergeAdjacentCalendarEvents,
   scheduleToCalendarEvents,
-} from "@remoodle/library/ical";
-import { filterSchedule, type ScheduleFilter } from "@remoodle/library/schedule/items";
+} from "@heresy/shared/ical";
+import { filterSchedule, type ScheduleFilter } from "@heresy/shared/schedule/items";
 import {
   AlertDialog,
   AlertDialogAction,

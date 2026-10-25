@@ -1,0 +1,13 @@
+import type { HydrateFlavor } from "@grammyjs/hydrate";
+import type { Context as GrammyContext, SessionFlavor } from "grammy";
+import type { MyDuPeriod, MyDuTerm } from "@heresy/shared/my-du/period";
+
+export type SessionData = {
+  awaitingMoodleCalendarUrl?: boolean;
+  awaitingClassReminderMinutes?: boolean;
+  awaitingDigestTime?: boolean;
+  // My DU setup asks for the period first: the sign-in code in the pasted link expires within minutes.
+  myDuSetup?: { step: "week_start"; term: MyDuTerm } | { step: "link"; period: MyDuPeriod };
+};
+
+export type Context = HydrateFlavor<GrammyContext & SessionFlavor<SessionData>>;

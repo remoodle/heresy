@@ -1,5 +1,5 @@
 import { Temporal } from "temporal-polyfill";
-import { CALENDAR_TIME_ZONE } from "@remoodle/library/ical";
+import { CALENDAR_TIME_ZONE } from "@heresy/shared/ical";
 import type { CalendarEvent } from "./calendar-events";
 
 export const LOCALE = "en-GB";

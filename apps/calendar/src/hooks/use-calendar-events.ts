@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { filterMoodle } from "@remoodle/library/moodle/events";
-import { filterSchedule } from "@remoodle/library/schedule/items";
+import { filterMoodle } from "@heresy/shared/moodle/events";
+import { filterSchedule } from "@heresy/shared/schedule/items";
 import { moodleEvents, scheduleEvents } from "@/lib/calendar-events";
 import { moodleQuery, myDuQuery } from "@/lib/queries";
 import { useFilters } from "./use-filters";
