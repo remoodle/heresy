@@ -421,9 +421,6 @@ importers:
         specifier: 'catalog:'
         version: 4.5.4
     devDependencies:
-      '@hatchet-dev/typescript-sdk':
-        specifier: 'catalog:'
-        version: 1.21.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       '@types/node':
         specifier: 'catalog:'
         version: 24.12.2

@@ -13,7 +13,7 @@ import {
   toWeeklySchedule,
 } from "@heresy/shared/schedule/week";
 import { hatchet } from "../hatchet-client";
-import { notify } from "../notify";
+import { telegramNotify } from "../telegram-notify";
 
 const CRON_WINDOW_MINUTES = 10;
 
@@ -99,7 +99,7 @@ export const digestUser = hatchet.task<Input>({
       return;
     }
 
-    await notify({
+    await telegramNotify.run({
       chatId: input.telegramId,
       notification: { kind: "digest", items: todaySchedule },
     });

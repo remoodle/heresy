@@ -1,12 +1,13 @@
 import { type LogExtra, Logger, type LogLevel } from "@hatchet-dev/typescript-sdk/util/logger";
-import type { ILogLayer, LogLevelType } from "loglayer";
+import type { LogLevelType } from "loglayer";
+import { logger } from "../library/logger";
 
-class LogLayerHatchetLogger extends Logger {
+export class PinoHatchetLogger extends Logger {
   private readonly log;
 
-  constructor(base: ILogLayer, context: string, logLevel: LogLevel = "INFO") {
+  constructor(context: string, logLevel: LogLevel = "INFO") {
     super();
-    this.log = base.child().withContext({ module: "worker", operation: "hatchet", context });
+    this.log = logger.child().withContext({ module: "worker", operation: "hatchet", context });
 
     if (logLevel === "OFF") {
       this.log.disableLogging();
@@ -63,8 +64,5 @@ class LogLayerHatchetLogger extends Logger {
   }
 }
 
-// Routes Hatchet's own logs through the app logger.
-export function hatchetLogger(base: ILogLayer) {
-  return (context: string, logLevel?: LogLevel) =>
-    new LogLayerHatchetLogger(base, context, logLevel);
-}
+export const createHatchetLogger = (context: string, logLevel?: LogLevel) =>
+  new PinoHatchetLogger(context, logLevel);

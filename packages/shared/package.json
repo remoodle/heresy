@@ -19,18 +19,9 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@hatchet-dev/typescript-sdk": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-plus": "catalog:"
-  },
-  "peerDependencies": {
-    "@hatchet-dev/typescript-sdk": "catalog:"
-  },
-  "peerDependenciesMeta": {
-    "@hatchet-dev/typescript-sdk": {
-      "optional": true
-    }
   }
 }

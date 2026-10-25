@@ -1,7 +1,7 @@
 import type { DeadlineEvent } from "@heresy/shared/moodle/deadlines";
 import { database } from "../../db";
 import { hatchet } from "../hatchet-client";
-import { notify } from "../notify";
+import { telegramNotify } from "../telegram-notify";
 
 type Reminder = {
   eventId: string;
@@ -19,7 +19,7 @@ export const deadlineNotifyUser = hatchet.task<Input>({
   name: "deadline-notify-user",
   executionTimeout: "2m",
   fn: async (input, ctx) => {
-    await notify({
+    await telegramNotify.run({
       chatId: input.chatId,
       notification: { kind: "deadlines", events: input.events },
     });

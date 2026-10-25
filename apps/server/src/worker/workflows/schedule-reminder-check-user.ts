@@ -8,7 +8,7 @@ import {
 } from "@heresy/shared/schedule/filters";
 import { mergeAdjacentScheduleItems } from "@heresy/shared/schedule/week";
 import { hatchet } from "../hatchet-client";
-import { notify } from "../notify";
+import { telegramNotify } from "../telegram-notify";
 
 type Input = {
   userId: number;
@@ -82,7 +82,7 @@ export const scheduleReminderCheckUser = hatchet.task<Input>({
       return;
     }
 
-    await notify({
+    await telegramNotify.run({
       chatId: input.telegramId,
       notification: {
         kind: "classes",

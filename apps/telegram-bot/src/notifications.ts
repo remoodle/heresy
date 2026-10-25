@@ -10,7 +10,7 @@ import { hatchet } from "./hatchet-client";
 
 const api = new Api(config.telegram.token);
 
-// The server's worker runs this by name for every reminder and digest it decides to send.
+// The server's worker runs this through a stub for every reminder and digest it decides to send.
 export const telegramNotify = hatchet.task<TelegramNotification>({
   name: TELEGRAM_NOTIFY_TASK,
   rateLimits: [{ staticKey: TELEGRAM_RATE_LIMIT_KEY, units: 1 }],
